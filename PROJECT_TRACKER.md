@@ -72,7 +72,8 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
-| 2026-06-25 | Agent | PROJECT_TRACKER.md for teammate coordination | this commit |
+| 2026-06-25 | Agent | PROJECT_TRACKER.md for teammate coordination | commit `9a9be60` |
+| 2026-06-25 | Agent | Pre-build: architecture, work plan, roleplay, fixtures | commit `8814c1f` |
 | 2026-06-25 | Agent | R3 corpus (55 items) + DPO persona v0.1 | commit `781aac6` |
 | 2026-06-25 | Agent | Project scaffold, R1/R2 research, audit schema | commit `33d2aeb` |
 | 2026-06-25 | Shirley | Approved evidence batch 001 blocker tags | [`batch_001_practitioner.md`](docs/research/evidence/samples/batch_001_practitioner.md) |
