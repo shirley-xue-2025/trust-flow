@@ -27,8 +27,10 @@
 - **Betriebsrat before DPA?** Both matter; BR gate appears **earlier** in DE rollout narratives than EU AI Act article citations.
 - **Token cost:** Not in this batch — need Reddit/G2 corpus.
 
+**Status:** Tags confirmed by Shirley (2026-06-25). Approved to proceed with community sample batch.
+
 ## Next
 
-- [ ] Shirley: confirm tags / add missing blocker types
+- [x] Shirley: confirm tags / add missing blocker types
 - [ ] Add 5 Reddit/HN items with `source_type: community`
-- [ ] Scale only after confirmation
+- [ ] Scale only after community sample review

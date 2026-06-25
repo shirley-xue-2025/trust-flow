@@ -34,7 +34,7 @@ On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trus
 
 ## Do not commit
 
-- API keys, `.env`, credentials
+- API keys, `.env`, credentials (use `.env.example` as the committed template)
 - Personal career / about-me material
 - Per-developer git or SSH configuration
 - Raw scraped data with PII (use `evidence/samples/` for redacted excerpts only)
