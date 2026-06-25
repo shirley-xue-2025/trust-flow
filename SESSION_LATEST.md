@@ -4,26 +4,24 @@
 
 ---
 
-## Current state — 2026-06-25 (rev 2)
+## Current state — 2026-06-25 (rev 3)
 
-**Phase:** Research & validation — project scaffold complete, **no application code**.
+**Phase:** Research & validation — R3 corpus + DPO persona v0.1. **No application code.**
 
 **Shipped:**
 
-- Day-1 scaffolds: `PROJECT_STRUCTURE.md`, `DEFINITIONS.md`, `RESEARCH_LEDGER.md`
-- Regulatory research: R1 (EU AI Act), R2 (Betriebsrat), R3 plan
-- Gateway audit JSON schema: `docs/schemas/gateway-audit-event.schema.json`
-- Strategy explorer: `prototypes/trustflow_strategy_explorer.html`
-- Repo on GitHub: https://github.com/shirley-xue-2025/trust-flow (`main`)
+- R3 evidence: 55-item corpus, synthesis, `scripts/collect_evidence.py` (~$0.56 Apify)
+- Persona draft: `docs/research/personas/dpo_fintech_de.md`
+- Prior: R1/R2 research, gateway audit schema, strategy explorer, GitHub repo live
 
 **👉 QUEUED NEXT:**
 
-1. **R3 sample evidence** — review batch 001 tags; add 5 community (Reddit/HN) items before batch scrape
-2. **Synthetic DPO persona** — after evidence samples approved
-3. **Invite teammate** as collaborator
-4. Fake-door LP — deferred until R1–R3 stable enough for copy
+1. **Persona review** — Shirley gut-check on DPO red lines
+2. **Boardroom roleplay script** — multi-turn negotiation spec
+3. Invite teammate as collaborator
+4. Fake-door LP — after persona sign-off
 
-**Build lane:** No boardroom / gateway code until R1 verified + R3 samples reviewed.
+**Build lane:** No gateway/boardroom code until persona review + R1 sign-off.
 
 ---
 
@@ -32,8 +30,8 @@
 | Doc | Role |
 |-----|------|
 | `docs/research/RESEARCH_LEDGER.md` | Open validation items |
+| `docs/research/evidence/synthesis.md` | R3 theme counts |
 | `docs/DEFINITIONS.md` | Canonical terms |
-| `docs/PROJECT_STRUCTURE.md` | Placement contract |
 
 ---
 

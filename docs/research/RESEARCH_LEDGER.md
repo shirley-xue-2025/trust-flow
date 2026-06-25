@@ -12,7 +12,7 @@ Last updated: 2026-06-25
 |----|----------|--------|-------|-------------|
 | R1 | What audit fields are **legally required** for productivity AI vs high-risk? | in_progress | — | Gateway schema, Compliance agent memory |
 | R2 | Where is the Betriebsrat **hard stop** for DE enterprises? | in_progress | — | Agent negotiation scripts, deny_reason codes |
-| R3 | What pain points appear in real EU enterprise discourse? | in_progress | — | Synthetic DPO persona, PMF narrative |
+| R3 | What pain points appear in real EU enterprise discourse? | verified (v1) | — | Synthetic DPO persona, PMF narrative |
 | R4 | Will buyers click "Book demo" on a compliance-first landing page? | open | — | Fake-door test (post-research) |
 | R5 | Hidden actors in approval chain beyond DPO/Legal/IT? | open | — | Agent society completeness |
 
@@ -77,9 +77,9 @@ Last updated: 2026-06-25
 
 **Method:** Scrape Reddit (r/sysadmin, r/legaltech, r/gdpr), G2 reviews, LinkedIn posts — DE/EU enterprise AI adoption, GDPR blockers, token cost. Feed 20–50 excerpts into persona construction.
 
-**Status:** Batch 001 (practitioner) tags **approved** 2026-06-25. Next: 5 Reddit/HN community samples.
+**Status:** Batch 001 (practitioner) approved. Batch 002 (community) scraped — 55 items, $0.56 Apify total. Persona v0.1 drafted.
 
-**Detail:** [`03_market_evidence_plan.md`](03_market_evidence_plan.md)
+**Detail:** [`03_market_evidence_plan.md`](03_market_evidence_plan.md) · [`evidence/synthesis.md`](evidence/synthesis.md) · [`personas/dpo_fintech_de.md`](personas/dpo_fintech_de.md)
 
 ---
 

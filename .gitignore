@@ -18,5 +18,8 @@ memory/
 scratch/
 tmp/
 
+# Python venv
+.venv/
+
 # Evidence raw dumps with PII risk (review before any commit)
 **/evidence/raw/

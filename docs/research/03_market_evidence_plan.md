@@ -60,15 +60,22 @@ docs/research/evidence/
 
 ---
 
-## Apify status
+## Apify execution log
 
-MCP Apify server in this workspace exposes run polling tools, not store search. Options:
+| Run | Actor | Items raw | Corpus items | Cost USD |
+|-----|-------|-----------|--------------|----------|
+| Pilot | `trudax/reddit-scraper-lite` | 20 | — | 0.12 |
+| Batch 2 | same | 100 cap → filtered | 55 | 0.44 |
+| HN | Algolia API (free) | — | 4 | 0.00 |
+| **Total** | | | **55** | **~0.56** |
 
-1. Use Apify console to run `apify/reddit-scraper` manually; drop JSON into `evidence/`
-2. Extend MCP with `search-actors` + `call-actor` in a future session
-3. HN Algolia API via small script (when `src/` exists)
+**Actor choice:** `trudax/reddit-scraper-lite` — 3.5M+ runs, 4.6★, ~$0.004/result. G2 scrapers on Apify rated poorly; deferred.
 
-**Decision (2026-06-25):** Manual HN/Reddit sample of 5 threads via web search for this session; formal Apify batch deferred to next session after sample review.
+**Gap:** `r/gdpr` under-sampled (Reddit 429 rate limits during crawl). Optional follow-up run if DE GDPR voice needed in corpus.
+
+**Script:** `scripts/collect_evidence.py` (re-runnable with `max_total_charge_usd` cap).
+
+**Decision (2026-06-25):** Batch 002 sufficient for persona v0.1; no further scrape until persona review or fake-door copy needs G2 voice.
 
 ---
 
