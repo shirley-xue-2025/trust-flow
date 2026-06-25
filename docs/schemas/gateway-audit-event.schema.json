@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustflow.dev/schemas/gateway-audit-event.schema.json",
+  "title": "TrustFlow Gateway Audit Event",
+  "description": "Canonical log record for Layer A (edge gateway). Superset for limited-risk productivity AI; high-risk Annex III deployments may require additional fields per Art. 12 / provider instructions.",
+  "type": "object",
+  "required": [
+    "event_id",
+    "timestamp",
+    "event_type",
+    "system_id",
+    "policy_id",
+    "policy_version_hash",
+    "actor_id",
+    "tool_id",
+    "model_provider",
+    "model_id",
+    "routing_decision",
+    "outcome"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique id for this event (correlation root)"
+    },
+    "parent_event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "For multi-step/agentic chains"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "inference_request",
+        "inference_response",
+        "policy_applied",
+        "pii_redaction",
+        "request_denied",
+        "budget_cap_hit",
+        "human_override",
+        "policy_compiled"
+      ]
+    },
+    "system_id": {
+      "type": "string",
+      "description": "TrustFlow deployment identifier"
+    },
+    "policy_id": {
+      "type": "string",
+      "description": "Compiled policy identifier from boardroom"
+    },
+    "policy_version_hash": {
+      "type": "string",
+      "description": "SHA-256 of canonical policy JSON at enforcement time"
+    },
+    "actor_id": {
+      "type": "string",
+      "description": "Pseudonymous user or service principal (GDPR-minimized)"
+    },
+    "department_id": {
+      "type": "string"
+    },
+    "tool_id": {
+      "type": "string",
+      "description": "Registered AI tool slug (e.g. copilot, chatgpt-enterprise)"
+    },
+    "risk_tier": {
+      "type": "string",
+      "enum": ["prohibited", "high_risk", "limited_risk", "minimal"]
+    },
+    "model_provider": {
+      "type": "string",
+      "examples": ["anthropic", "openai", "alibaba", "local"]
+    },
+    "model_id": {
+      "type": "string",
+      "description": "Exact model version string from provider"
+    },
+    "prompt_template_id": {
+      "type": "string",
+      "description": "Hash or id of system prompt template — not raw prompt text"
+    },
+    "input_fingerprint": {
+      "type": "string",
+      "description": "SHA-256 of normalized input (or redacted excerpt hash)"
+    },
+    "output_fingerprint": {
+      "type": "string"
+    },
+    "pii_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entity_type", "action"],
+        "properties": {
+          "entity_type": { "type": "string", "examples": ["iban", "email", "person_name"] },
+          "action": { "type": "string", "enum": ["blocked", "masked", "pseudonymized", "allowed"] },
+          "count": { "type": "integer" }
+        }
+      }
+    },
+    "routing_decision": {
+      "type": "string",
+      "description": "e.g. LOCAL_QWEN_72B, BLOCKED, CLOUD_QWEN_MAX"
+    },
+    "token_usage": {
+      "type": "object",
+      "properties": {
+        "prompt_tokens": { "type": "integer" },
+        "completion_tokens": { "type": "integer" },
+        "estimated_cost_eur": { "type": "number" }
+      }
+    },
+    "budget_pool_id": {
+      "type": "string"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["allowed", "denied", "redirected", "error"]
+    },
+    "deny_reason_code": {
+      "type": "string",
+      "examples": ["BETRIEBSVEREINBARUNG_PENDING", "PII_BLOCK", "TOOL_NOT_APPROVED", "BUDGET_EXCEEDED"]
+    },
+    "human_reviewer_id": {
+      "type": "string",
+      "description": "Art. 14 / Art. 12 — verifier identity when applicable"
+    },
+    "human_override": {
+      "type": "object",
+      "properties": {
+        "reviewer_id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "action": { "type": "string", "enum": ["approved", "rejected", "modified"] }
+      }
+    },
+    "disclosure_shown": {
+      "type": "boolean",
+      "description": "Art. 50(a) — user informed they interact with AI"
+    },
+    "retention_class": {
+      "type": "string",
+      "enum": ["standard_6mo", "financial_sector", "high_risk_extended"],
+      "description": "Art. 26(6) minimum 6 months unless sector law says otherwise"
+    },
+    "legal_basis": {
+      "type": "string",
+      "description": "GDPR legal basis reference for processing log data"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+# Local-only — never commit
+
+# Parent workspace private memory
+memory/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Env / secrets
+.env
+.env.*
+
+# Scratch
+scratch/
+tmp/
+
+# Evidence raw dumps with PII risk (review before any commit)
+**/evidence/raw/
