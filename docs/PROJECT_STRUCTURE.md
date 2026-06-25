@@ -10,9 +10,15 @@ trust-flow/                    ← this git repo (shared)
 ├── SESSION_LATEST.md
 ├── README.md
 ├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── WORK_PLAN.md
+│   ├── BLOCKED_ON_SHIRLEY.md
+│   ├── DECISION_LOG.md
 │   ├── PROJECT_STRUCTURE.md
 │   ├── DEFINITIONS.md
 │   ├── schemas/
+│   ├── fixtures/
+│   ├── plans/
 │   └── research/
 ├── prototypes/
 ├── session_logs/
@@ -27,6 +33,8 @@ On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trus
 |-------------------|------------|------------------|
 | Regulatory / market research (shareable) | `docs/research/` | `src/`, `prototypes/` |
 | Canonical term or schema | `docs/DEFINITIONS.md` or `docs/schemas/` | Inline in code only |
+| Architecture / work plan | `docs/ARCHITECTURE.md`, `docs/WORK_PLAN.md` | `src/` |
+| Demo fixtures & eval seeds | `docs/fixtures/` | `src/` without migration plan |
 | Pitch / explorer HTML | `prototypes/` | `docs/` |
 | Gateway or agent code | `src/` | `prototypes/` |
 | Session handover (dated) | `session_logs/SESSION_*.md` | Root (except `SESSION_LATEST.md`) |

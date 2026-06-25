@@ -1,0 +1,272 @@
+# TrustFlow — product architecture
+
+**Status:** Pre-build specification (2026-06-25).  
+**Audience:** Shirley, teammate, implementers.  
+**Principle:** Deterministic enforcement at the edge; generative negotiation only for policy *authoring*.
+
+---
+
+## 1. Problem statement (validated)
+
+Enterprises want employees on AI tools; IT/Legal/DPO/Betriebsrat block or slow rollouts because:
+
+1. **Approval friction** dominates public discourse (R3: 21/55 `approval_process` tags).
+2. **Shadow AI** fills the gap when official channels fail (R0006, R0014).
+3. **DE-specific gates** (Betriebsvereinbarung, §87 BetrVG) are invisible in English forums but decisive in target market (R2, practitioner batch).
+4. **Enforcement gap:** policies exist without DLP/gateway monitoring (R0008).
+
+TrustFlow compresses weeks of stakeholder negotiation into a **parameterized policy** compiled to deterministic gateway rules — with an audit trail that satisfies limited-risk deployer duties today and scales to high-risk fields when needed (R1).
+
+---
+
+## 2. System context
+
+```mermaid
+flowchart TB
+    subgraph users [Users]
+        EMP[Employee]
+        ADM[Admin / DPO / IT]
+    end
+
+    subgraph trustflow [TrustFlow]
+        UI[Request & Admin UI]
+        BR[Layer B — Agent Boardroom]
+        PS[(Policy Store)]
+        TR[(Tool Registry)]
+        GW[Layer A — Edge Gateway]
+        AL[(Audit Log)]
+    end
+
+    subgraph external [External]
+        LLM1[Qwen Cloud / other APIs]
+        LLM2[Local Qwen node]
+        IDP[Corporate IdP / SSO]
+    end
+
+    EMP --> UI
+    ADM --> UI
+    UI --> BR
+    BR --> PS
+    BR --> TR
+    EMP --> GW
+    GW --> PS
+    GW --> AL
+    GW --> LLM1
+    GW --> LLM2
+    UI --> IDP
+    GW --> IDP
+```
+
+**Hackathon MVP** can demo Boardroom + mock Gateway (policy compile + sample deny/allow) without production-grade proxy throughput.
+
+---
+
+## 3. Layer A — Edge Gateway (deterministic)
+
+### 3.1 Responsibilities
+
+| Function | Mechanism | Must not |
+|----------|-----------|----------|
+| Authenticate caller | SSO/JWT from IdP | Guess identity via LLM |
+| Load active policy | `policy_id` + version hash | Re-interpret legal text at runtime |
+| Classify request risk tier | Rule table from policy | LLM-only classification |
+| PII detect + mask/block | Regex + NER library (configurable) | Send raw IBAN/names to cloud |
+| Route model | Policy `routing` rules | Hallucinate routing |
+| Enforce budget | Token counter per dept pool | Soft limits only |
+| Emit audit events | Schema in `gateway-audit-event.schema.json` | Manual logging |
+| Deny with reason code | Enum (see DEFINITIONS) | Opaque 403 |
+
+### 3.2 Request lifecycle
+
+```
+1. Employee → POST /v1/inference { tool_id, messages, context }
+2. Gateway resolves: user, dept, tool registration status
+3. Gateway loads policy_version_hash (cache)
+4. Pre-flight checks (ordered):
+   a. tool approved?
+   b. betriebsvereinbarung_status == signed (if DE entity)?
+   c. budget remaining?
+   d. risk tier permits use case?
+   e. PII scan → mask | block
+5. Route to model per policy.routing
+6. Post-flight: fingerprint output, emit audit event
+7. Return response + disclosure flag if Art. 50
+```
+
+### 3.3 Deny reason codes (canonical)
+
+| Code | Layer | Typical resolver |
+|------|-------|------------------|
+| `TOOL_NOT_APPROVED` | Registry | Boardroom + procurement |
+| `BETRIEBSVEREINBARUNG_PENDING` | Governance | Works council process |
+| `VENDOR_DPA_PENDING` | Procurement | Legal |
+| `PII_BLOCK` | Gateway | Runner changes use case or local route |
+| `BUDGET_EXCEEDED` | Finance | Manager + IT |
+| `HIGH_RISK_USE_DENIED` | Compliance | Human oversight workflow |
+| `PROHIBITED_PRACTICE` | Compliance | Hard stop |
+
+### 3.4 Deployment options (decision pending — see BLOCKED_ON_SHIRLEY)
+
+| Model | Pros | Cons |
+|-------|------|------|
+| **Customer-hosted gateway** | Data stays in customer VPC; easier DPO story | Heavier install |
+| **TrustFlow SaaS processor** | Faster demo | DPA + subprocessor narrative harder |
+| **Hybrid** | Gateway on-prem, boardroom SaaS | Two components |
+
+**Hackathon default (proposed):** single-tenant docker compose — gateway + boardroom + UI — runnable locally for judges.
+
+---
+
+## 4. Layer B — Agent Boardroom (generative)
+
+### 4.1 Agent roster (expanded from hackathon sketch)
+
+| Agent | Persistence | Model role | Owns |
+|-------|-------------|------------|------|
+| **Workflow Runner** | Per request | Advocate | Use case, urgency, productivity gain |
+| **Corporate Compliance** | Permanent | Guardian | GDPR, EU AI Act, logging scope, DPIA triggers |
+| **IT & Infra** | Permanent | Optimizer | Routing, cost, sovereignty, SSO |
+| **Procurement & Vendor Risk** | Permanent | Gatekeeper | DPA, subprocessor list, VRM checklist |
+| **Works Council Liaison** | Permanent (DE) | Co-design | Betriebsvereinbarung status, logging visibility to mgmt |
+
+Compliance and Procurement can be **one LLM with two system prompt facets** in MVP to limit API calls; separate agents for demo clarity.
+
+### 4.2 Negotiation input packet
+
+```json
+{
+  "request_id": "uuid",
+  "requester": { "user_id", "department", "role" },
+  "tool": { "tool_id", "vendor", "data_residency", "audit_log_capability" },
+  "use_case": { "category", "data_classes", "annex_iii_risk" },
+  "org_context": {
+    "entity_country": "DE",
+    "betriebsvereinbarung_status": "pending|signed|n/a",
+    "existing_policies": ["policy_id"]
+  }
+}
+```
+
+### 4.3 Negotiation output → policy compiler
+
+Boardroom does **not** push rules directly. It emits a **Policy Proposal** (see `schemas/policy-artifact.schema.json`). A **deterministic compiler** validates and materializes `rules.json`:
+
+- Reject proposal if schema invalid
+- Reject if weaker than org `policy_floor` (non-negotiable red lines)
+- Hash canonical JSON → `policy_version_hash`
+- Write to Policy Store; gateway hot-reloads
+
+```mermaid
+sequenceDiagram
+    participant R as Runner
+    participant C as Compliance
+    participant P as Procurement
+    participant W as Works Council
+    participant I as IT Infra
+    participant Comp as Policy Compiler
+    participant GW as Gateway
+
+    R->>C: Tool X for payments team
+    C->>P: Subprocessor list?
+    P-->>C: DPA unsigned
+    C->>W: BR annex required
+    W-->>C: Fingerprint-only logs OK
+    I->>C: Route sensitive to local Qwen
+    C->>Comp: Policy Proposal v3
+    Comp->>GW: rules.json + hash
+```
+
+### 4.4 Boardroom termination conditions
+
+| Outcome | Condition |
+|---------|-----------|
+| **APPROVED** | All agents sign-off OR Compliance overrides with documented exception |
+| **DENIED** | Hard red line (prohibited practice, no DPA path) |
+| **PENDING_HUMAN** | Deadlock → escalate to human DPO/IT (demo: show queue) |
+| **PENDING_EXTERNAL** | `BETRIEBSVEREINBARUNG_PENDING` — workflow outside product |
+
+Max rounds: **6** (hackathon); then force `PENDING_HUMAN`.
+
+### 4.5 LLM stack (hackathon)
+
+| Component | Proposed | Rationale |
+|-----------|----------|-----------|
+| Boardroom agents | **Qwen-Max** (cloud) | Hackathon sponsor alignment |
+| Policy compiler | **Code** (no LLM) | Safety |
+| Gateway PII | **Library** (presidio / regex) | Deterministic |
+| Embeddings for tool registry | Optional later | Not MVP |
+
+---
+
+## 5. Data stores
+
+| Store | Contents | Retention |
+|-------|----------|-----------|
+| **Tool Registry** | Vendor metadata, DPA status, endpoints | Until decommission |
+| **Policy Store** | Versioned `rules.json` + proposal history | Indefinite (audit) |
+| **Audit Log** | `gateway-audit-event` records | ≥6 months (configurable class) |
+| **Request Queue** | In-flight boardroom negotiations | 90 days |
+| **Org Config** | Red lines, entity country, BR status | Admin-managed |
+
+MVP: SQLite or JSON files. Production path: Postgres + immutable log object store.
+
+---
+
+## 6. UI surfaces (hackathon)
+
+| Surface | User | MVP depth |
+|---------|------|-----------|
+| **Employee request form** | Employee | Tool pick + use case description |
+| **Boardroom live view** | Judge / admin | Agent messages + emerging policy JSON |
+| **Policy diff** | DPO | Before/after rules highlight |
+| **Gateway trace** | IT | Sample inference with audit event |
+| **Strategy explorer** | Pitch | Existing `prototypes/trustflow_strategy_explorer.html` |
+
+Single-page demo app acceptable; link out to strategy explorer for narrative.
+
+---
+
+## 7. Security & compliance architecture
+
+| Concern | Approach |
+|---------|----------|
+| Secrets | API keys in vault; never in policy JSON |
+| Prompt content | Fingerprints in audit log by default; raw opt-in with BR approval |
+| Tenant isolation | `system_id` per deployment |
+| EU AI Act Art. 50 | Gateway injects disclosure header when `disclosure_shown` |
+| BetrVG | Product tracks status; legal process stays outside software |
+| Eval safety | Boardroom outputs schema-validated; compiler is gate |
+
+---
+
+## 8. Non-goals (hackathon MVP)
+
+- Full SSO integration (mock user/dept)
+- Production Fortinet/Umbrella integration (reference in narrative only)
+- Real Betriebsrat e-signature
+- Multi-tenant SaaS billing
+- Automated DPIA document generation
+- G2/review ingestion pipeline
+
+---
+
+## 9. Extension points (post-hackathon)
+
+1. **HRIS connector** — auto-detect high-risk use cases  
+2. **SIEM export** — audit log streaming  
+3. **Microsoft Graph** — Copilot license + usage sync  
+4. **Fake-door LP** — R4 PMF funnel  
+5. **Langfuse eval harness** — boardroom regression tests on persona scenarios  
+
+---
+
+## 10. Related documents
+
+| Doc | Purpose |
+|-----|---------|
+| [`schemas/policy-artifact.schema.json`](schemas/policy-artifact.schema.json) | Compiled policy shape |
+| [`schemas/gateway-audit-event.schema.json`](schemas/gateway-audit-event.schema.json) | Audit event shape |
+| [`plans/boardroom_protocol.md`](plans/boardroom_protocol.md) | Agent message protocol |
+| [`plans/hackathon_mvp_scope.md`](plans/hackathon_mvp_scope.md) | What's in / out for demo |
+| [`WORK_PLAN.md`](WORK_PLAN.md) | Phased delivery |
+| [`BLOCKED_ON_SHIRLEY.md`](BLOCKED_ON_SHIRLEY.md) | Decisions only you can make |

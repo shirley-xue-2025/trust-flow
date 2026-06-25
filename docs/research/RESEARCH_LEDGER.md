@@ -10,11 +10,11 @@ Last updated: 2026-06-25
 
 | ID | Question | Status | Owner | Blocker for |
 |----|----------|--------|-------|-------------|
-| R1 | What audit fields are **legally required** for productivity AI vs high-risk? | in_progress | — | Gateway schema, Compliance agent memory |
-| R2 | Where is the Betriebsrat **hard stop** for DE enterprises? | in_progress | — | Agent negotiation scripts, deny_reason codes |
+| R1 | What audit fields are **legally required** for productivity AI vs high-risk? | verified (planning) | — | Gateway schema, Compliance agent memory |
+| R2 | Where is the Betriebsrat **hard stop** for DE enterprises? | verified (planning) | — | Agent negotiation scripts, deny_reason codes |
 | R3 | What pain points appear in real EU enterprise discourse? | verified (v1) | — | Synthetic DPO persona, PMF narrative |
 | R4 | Will buyers click "Book demo" on a compliance-first landing page? | open | — | Fake-door test (post-research) |
-| R5 | Hidden actors in approval chain beyond DPO/Legal/IT? | open | — | Agent society completeness |
+| R5 | Hidden actors in approval chain beyond DPO/Legal/IT? | verified | — | Agent society completeness |
 
 ---
 
@@ -108,6 +108,8 @@ Employee request
 ```
 
 Validate via R3 evidence + synthetic DPO roleplay (next phase).
+
+**Validated:** [`stakeholders/journey_map.md`](stakeholders/journey_map.md) — Procurement, BR, Finance added; maps to 5 agents.
 
 ---
 

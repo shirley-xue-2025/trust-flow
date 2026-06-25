@@ -1,0 +1,69 @@
+[
+  {
+    "scenario_id": "S01",
+    "name": "Happy path — Copilot summarization, BR signed",
+    "request": {
+      "tool_id": "microsoft-copilot-365",
+      "use_case_category": "summarization",
+      "entity_country": "DE",
+      "betriebsvereinbarung_status": "signed",
+      "vendor_dpa_status": "signed"
+    },
+    "expected_session_outcome": "APPROVED",
+    "expected_gateway_outcome": "allowed"
+  },
+  {
+    "scenario_id": "S02",
+    "name": "BR pending — wide rollout blocked",
+    "request": {
+      "tool_id": "claude-code",
+      "use_case_category": "code_completion",
+      "entity_country": "DE",
+      "betriebsvereinbarung_status": "pending",
+      "vendor_dpa_status": "signed"
+    },
+    "expected_session_outcome": "PENDING_EXTERNAL",
+    "expected_deny_code": "BETRIEBSVEREINBARUNG_PENDING"
+  },
+  {
+    "scenario_id": "S03",
+    "name": "Annex III HR screening — denied",
+    "request": {
+      "tool_id": "chatgpt-enterprise",
+      "use_case_category": "hr_screening",
+      "annex_iii_risk": true,
+      "entity_country": "DE",
+      "betriebsvereinbarung_status": "signed",
+      "vendor_dpa_status": "signed"
+    },
+    "expected_session_outcome": "DENIED",
+    "expected_deny_code": "HIGH_RISK_USE_DENIED"
+  },
+  {
+    "scenario_id": "S04",
+    "name": "Payment schema → local route",
+    "request": {
+      "tool_id": "claude-code",
+      "use_case_category": "code_completion",
+      "data_classes": ["payment_api_schemas"],
+      "entity_country": "DE",
+      "betriebsvereinbarung_status": "signed",
+      "vendor_dpa_status": "signed"
+    },
+    "expected_session_outcome": "APPROVED",
+    "expected_routing": "LOCAL_QWEN_72B"
+  },
+  {
+    "scenario_id": "S05",
+    "name": "No DPA — procurement veto",
+    "request": {
+      "tool_id": "chatgpt-enterprise",
+      "use_case_category": "summarization",
+      "entity_country": "DE",
+      "betriebsvereinbarung_status": "signed",
+      "vendor_dpa_status": "pending"
+    },
+    "expected_session_outcome": "DENIED",
+    "expected_deny_code": "VENDOR_DPA_PENDING"
+  }
+]

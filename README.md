@@ -2,7 +2,7 @@
 
 Safe AI adoption for European enterprises — a parameterized negotiation gateway between business teams and compliance stakeholders.
 
-**Status:** Research & validation phase (pre-build). See [`SESSION_LATEST.md`](SESSION_LATEST.md).
+**Status:** Pre-build planning complete — see [`SESSION_LATEST.md`](SESSION_LATEST.md) and [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md).
 
 ## Clone (collaborators)
 
@@ -17,11 +17,12 @@ No special SSH setup required — use your own GitHub account after accepting th
 
 | Path | Purpose |
 |------|---------|
-| [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | Where new files go |
-| [`docs/DEFINITIONS.md`](docs/DEFINITIONS.md) | Canonical terms |
-| [`docs/research/`](docs/research/) | Research ledger + regulatory notes |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product architecture |
+| [`docs/WORK_PLAN.md`](docs/WORK_PLAN.md) | Phased roadmap |
+| [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md) | Decisions needing Shirley |
+| [`docs/research/`](docs/research/) | Research, personas, roleplay |
+| [`docs/fixtures/`](docs/fixtures/) | Seed data for demo + evals |
 | [`prototypes/`](prototypes/) | Static pitch / strategy HTML |
-| [`session_logs/`](session_logs/) | Dated session handovers |
 
 ## What's **not** in this repo
 

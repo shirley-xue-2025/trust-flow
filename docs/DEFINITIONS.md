@@ -15,15 +15,17 @@ A dual-layer system for enterprise AI tool adoption:
 
 ### Agent Society (hackathon framing)
 
-Three agent roles in the boardroom:
+Five agent roles in the boardroom (Procurement may merge with Compliance in thin MVP):
 
 | Agent | Role | Persistence |
 |-------|------|-------------|
 | **Workflow Runner** | Advocates for a specific employee/tool request | Ephemeral per request |
 | **Corporate Compliance** | GDPR, EU AI Act, audit trail requirements | Permanent |
 | **IT & Infra** | Cost, sovereignty, routing (cloud vs local model) | Permanent |
+| **Procurement & Vendor Risk** | DPA, subprocessor list, VRM | Permanent |
+| **Works Council Liaison** | Betriebsvereinbarung, DE co-determination | Permanent (DE entities) |
 
-Output of negotiation: a **compiled policy** (see Policy Artifact).
+Output of negotiation: a **compiled policy** (see Policy Artifact). Full protocol: `docs/plans/boardroom_protocol.md`.
 
 ---
 
@@ -33,7 +35,7 @@ Machine-readable ruleset pushed to the edge gateway. Working name: `rules.json`.
 
 Must be **versioned**, **hashable**, and **attributable** (which agents/versions produced it, when).
 
-See `docs/schemas/gateway-audit-event.schema.json` for runtime log shape; policy schema TBD when gateway is built.
+See `docs/schemas/gateway-audit-event.schema.json` for runtime log shape; `docs/schemas/policy-artifact.schema.json` for compiled policy shape.
 
 ---
 
@@ -87,8 +89,8 @@ For TrustFlow product design: any enterprise AI gateway with **per-user audit lo
 
 ## Open definitions (TBD after validation)
 
-- Exact policy JSON schema fields (beyond prototype in strategy explorer)
-- FinTech-specific retention (Art. 26(6) financial institution carve-out)
-- Mapping from tool category → required log fields
+- FinTech-specific retention (Art. 26(6) financial institution carve-out) — see BLOCKED B13
+- Mapping from tool category → required log fields — partial in policy schema `audit.required_fields`
+- Deployment model (customer-hosted vs SaaS) — see BLOCKED B02
 
-Track in `docs/research/RESEARCH_LEDGER.md`.
+Track in `docs/research/RESEARCH_LEDGER.md` and `docs/BLOCKED_ON_SHIRLEY.md`.
