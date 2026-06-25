@@ -2,21 +2,17 @@
 
 ## Shipped
 
-- Ring 2 workspace `~/Projects/Trust Flow/` with `AGENTS.md`, `memory/`
-- Ring 3 repo `trust-flow/` initialized locally with day-1 scaffolds
+- Local workspace + git repo scaffold (`trust-flow/`)
 - Research: R1 (EU AI Act), R2 (Betriebsrat), R3 plan, evidence batch 001 (5 items)
 - Gateway audit JSON schema draft
 - Strategy explorer in `prototypes/`
-
-## Blocked
-
-- `git push` — remote repo not found (create/verify on GitHub + auth as xc.shirley+github@gmail.com)
+- Pushed to https://github.com/shirley-xue-2025/trust-flow (`main`)
 
 ## Next session
 
-1. Push scaffold to GitHub for teammate
-2. Review evidence batch 001 tags; add community sources
-3. Draft synthetic DPO persona after sample approval
+1. Review evidence batch 001 tags; add community sources
+2. Draft synthetic DPO persona after sample approval
+3. Invite teammate as collaborator
 4. Mark R1 `verified` after external sanity check (optional: counsel)
 
 ## Decisions
@@ -25,3 +21,4 @@
 - **Single audit schema** for all risk tiers; enforce field subsets per tier at gateway
 - **Betriebsvereinbarung** as first-class `deny_reason_code`, not only PII rules
 - Digital Omnibus: plan for Art. 50 Aug 2026 + defensive high-risk posture until OJ publication
+- **Local vs repo:** private `memory/` and machine git notes stay outside the repo; teammates clone `trust-flow/` only

@@ -4,18 +4,28 @@ Safe AI adoption for European enterprises — a parameterized negotiation gatewa
 
 **Status:** Research & validation phase (pre-build). See [`SESSION_LATEST.md`](SESSION_LATEST.md).
 
-## What this repo is
+## Clone (collaborators)
 
-Shared, teammate-facing project home (Ring 3). Personal notes and session scratch live in the parent workspace `~/Projects/Trust Flow/` and are never committed here.
+```bash
+git clone https://github.com/shirley-xue-2025/trust-flow.git
+cd trust-flow
+```
 
-## Quick start
+No special SSH setup required — use your own GitHub account after accepting the collaborator invite.
 
-| Doc | Purpose |
-|-----|---------|
+## What's in this repo
+
+| Path | Purpose |
+|------|---------|
 | [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | Where new files go |
-| [`docs/DEFINITIONS.md`](docs/DEFINITIONS.md) | Canonical terms (agents, policy schema, risk tiers) |
-| [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEARCH_LEDGER.md) | Open questions, evidence, validation status |
-| [`prototypes/trustflow_strategy_explorer.html`](prototypes/trustflow_strategy_explorer.html) | Hackathon strategy / pitch explorer |
+| [`docs/DEFINITIONS.md`](docs/DEFINITIONS.md) | Canonical terms |
+| [`docs/research/`](docs/research/) | Research ledger + regulatory notes |
+| [`prototypes/`](prototypes/) | Static pitch / strategy HTML |
+| [`session_logs/`](session_logs/) | Dated session handovers |
+
+## What's **not** in this repo
+
+Personal workspace files (`memory/`, local `AGENTS.md`, machine-specific git notes) live in the parent folder on each contributor's machine and are never committed here.
 
 ## Hackathon context
 
