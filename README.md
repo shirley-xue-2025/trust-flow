@@ -17,6 +17,7 @@ No special SSH setup required — use your own GitHub account after accepting th
 
 | Path | Purpose |
 |------|---------|
+| [`PROJECT_TRACKER.md`](PROJECT_TRACKER.md) | **Who's working on what** + changelog |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product architecture |
 | [`docs/WORK_PLAN.md`](docs/WORK_PLAN.md) | Phased roadmap |
 | [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md) | Decisions needing Shirley |

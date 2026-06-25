@@ -3,8 +3,9 @@
 ## Read order (new session)
 
 1. `SESSION_LATEST.md` — what's in flight
-2. `docs/research/RESEARCH_LEDGER.md` — open validation items
-3. `docs/DEFINITIONS.md` — before naming concepts in code or docs
+2. `PROJECT_TRACKER.md` — who owns what, links to deliverables
+3. `docs/research/RESEARCH_LEDGER.md` — open validation items
+4. `docs/DEFINITIONS.md` — before naming concepts in code or docs
 
 ## Build discipline
 

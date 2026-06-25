@@ -6,6 +6,7 @@ Every new artifact must land in one of these buckets. If none fit, update this d
 
 ```
 trust-flow/                    ← this git repo (shared)
+├── PROJECT_TRACKER.md         ← shared work log (owners, status, links)
 ├── AGENTS.md
 ├── SESSION_LATEST.md
 ├── README.md
@@ -38,6 +39,7 @@ On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trus
 | Pitch / explorer HTML | `prototypes/` | `docs/` |
 | Gateway or agent code | `src/` | `prototypes/` |
 | Session handover (dated) | `session_logs/SESSION_*.md` | Root (except `SESSION_LATEST.md`) |
+| Work ownership & session changelog | `PROJECT_TRACKER.md` | `memory/` (private duplicate) |
 | Personal notes, SSH/git setup, private scratch | **Local workspace outside repo** | **This repo** |
 
 ## Do not commit
