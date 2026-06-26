@@ -24,7 +24,15 @@ RUN npm run build --workspace shared \
 
 # ---- Runtime stage: nginx serving the SPA ----------------------------------
 FROM nginx:alpine AS runtime
+# apache2-utils provides htpasswd, used by the startup script to build the
+# basic-auth file when a passcode is configured.
+RUN apk add --no-cache apache2-utils
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Default auth include (off); the entrypoint script overwrites it when a
+# passcode is set. Shipped so nginx always has a valid include.
+COPY deploy/auth.inc /etc/nginx/conf.d/auth.inc
+COPY deploy/40-basic-auth.sh /docker-entrypoint.d/40-basic-auth.sh
+RUN chmod +x /docker-entrypoint.d/40-basic-auth.sh
 COPY --from=build /app/web/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

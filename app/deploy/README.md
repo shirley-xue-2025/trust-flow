@@ -30,8 +30,24 @@ documents these.
 | `PORT` | no | `8080` | Backend listen port (set by compose; nginx proxies to it). |
 | `TRUSTFLOW_DATA_DIR` | no | `/data` | Policy store + audit dir (mounted volume; set by compose). |
 | `LOG_LEVEL` | no | `info` | Backend log level. |
+| `BASIC_AUTH_USER` | no | _(empty)_ | Set with `BASIC_AUTH_PASSWORD` to gate the whole site behind a shared passcode (HTTP basic auth). |
+| `BASIC_AUTH_PASSWORD` | no | _(empty)_ | The shared passcode. Both empty ⇒ site is open. |
 
 Never commit a real key. `app/.env` is git-ignored.
+
+### Access gate (recommended for the public box)
+
+Set **both** `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` in `app/.env` to require a
+shared passcode on the entire site (SPA + API), so randoms can't burn your API
+budget. Share the user/passcode with judges in your Devpost write-up. Verify:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://<host>/            # 401 (gated)
+curl -s -o /dev/null -w "%{http_code}\n" -u judge:PASS http://<host>/   # 200
+```
+
+Leave both unset to run open (e.g. local testing). The password is hashed into an
+htpasswd file inside the container at startup — never baked into the image.
 
 ---
 

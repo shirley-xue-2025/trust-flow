@@ -38,6 +38,11 @@ services:
       dockerfile: web/Dockerfile
     depends_on:
       - backend
+    environment:
+      # Shared-passcode gate. Set BOTH (from app/.env) to require HTTP basic auth
+      # on the public deployment; leave unset to run open (local/dev).
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-}
+      BASIC_AUTH_PASSWORD: ${BASIC_AUTH_PASSWORD:-}
     ports:
       - "80:80"
     networks:
