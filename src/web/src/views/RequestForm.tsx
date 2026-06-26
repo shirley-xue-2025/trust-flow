@@ -58,7 +58,7 @@ export default function RequestForm({
             className="primary"
             onClick={() =>
               onSubmit({
-                request_id: `req_${Date.now()}`,
+                request_id: crypto.randomUUID(),
                 tool_id: toolId,
                 use_case_category: useCase,
                 department: dept,

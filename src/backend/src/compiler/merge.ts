@@ -27,6 +27,24 @@ import type {
 
 const APPROVING_STANCES: Stance[] = ['approve', 'conditional_approve'];
 
+// Valid value sets — the compiler is the GATE between untrusted LLM output and
+// the enforced policy. Any demand/concession value outside these is dropped, so a
+// hallucinated field value can never produce a schema-invalid or mis-routing
+// policy. (Routing targets are validated against the org's routing_targets.)
+const PII_ACTIONS = new Set(['BLOCK', 'MASK', 'PSEUDONYMIZE', 'ALLOW']);
+const RETENTION_CLASSES = new Set(['standard_6mo', 'financial_sector', 'high_risk_extended']);
+
+interface SanitizeCtx {
+  /** Uppercase routing targets the org actually defines, plus BLOCKED. */
+  validRoutes: Set<string>;
+}
+
+/** Normalize a routing value to a known target, or undefined if unrecognized. */
+function normalizeRoute(value: unknown, valid: Set<string>): string | undefined {
+  const s = String(value).toUpperCase();
+  return valid.has(s) ? s : undefined;
+}
+
 export interface MergeResult {
   /** The assembled (not-yet-floor-checked, not-yet-hashed) policy artifact. */
   draft: PolicyArtifact;
@@ -47,30 +65,43 @@ function signoffStatus(stance: Stance): AgentSignoff['status'] {
   return 'conditional';
 }
 
-/** Set a dotted field path on the draft artifact (deterministic, typed-ish). */
-function applyField(draft: PolicyArtifact, field: string, value: unknown): void {
+/**
+ * Set a dotted field path on the draft artifact — but ONLY for known fields with
+ * VALID values. This is the sanitizer boundary: any unrecognized field or
+ * out-of-enum value from the LLM is silently dropped, guaranteeing the compiled
+ * policy stays schema-valid and the gateway never mis-routes.
+ */
+function applyField(draft: PolicyArtifact, field: string, value: unknown, ctx: SanitizeCtx): void {
   const parts = field.split('.');
   if (parts[0] === 'pii_masking' && parts[1]) {
-    draft.pii_masking[parts[1]] = value as PolicyArtifact['pii_masking'][string];
+    const action = String(value).toUpperCase();
+    if (PII_ACTIONS.has(action)) {
+      draft.pii_masking[parts[1]] = action as PolicyArtifact['pii_masking'][string];
+    }
     return;
   }
   if (parts[0] === 'routing') {
-    if (parts[1] === 'default') draft.routing.default = String(value);
-    else if (parts[1] === 'sensitive') draft.routing.sensitive = String(value);
+    const route = normalizeRoute(value, ctx.validRoutes);
+    if (route) {
+      if (parts[1] === 'default') draft.routing.default = route;
+      else if (parts[1] === 'sensitive') draft.routing.sensitive = route;
+    }
     return;
   }
   if (parts[0] === 'audit') {
     if (parts[1] === 'raw_prompt_logging') draft.audit.raw_prompt_logging = Boolean(value);
     else if (parts[1] === 'manager_dashboard_allowed')
       draft.audit.manager_dashboard_allowed = Boolean(value);
-    else if (parts[1] === 'retention_class')
+    else if (parts[1] === 'retention_class' && RETENTION_CLASSES.has(String(value)))
       draft.audit.retention_class = value as PolicyArtifact['audit']['retention_class'];
     return;
   }
   if (parts[0] === 'budget') {
     draft.budget ??= {};
-    if (parts[1] === 'max_tokens_per_day') draft.budget.max_tokens_per_day = Number(value);
-    else if (parts[1] === 'pool_id') draft.budget.pool_id = String(value);
+    if (parts[1] === 'max_tokens_per_day') {
+      const n = Number(value);
+      if (Number.isFinite(n) && n > 0) draft.budget.max_tokens_per_day = n;
+    } else if (parts[1] === 'pool_id') draft.budget.pool_id = String(value);
     return;
   }
   if (parts[0] === 'gates') {
@@ -82,10 +113,13 @@ function applyField(draft: PolicyArtifact, field: string, value: unknown): void 
     if (parts[1] === 'disclosure_required') draft.gates.disclosure_required = Boolean(value);
     return;
   }
-  if (field === 'risk_tier') draft.risk_tier = value as PolicyArtifact['risk_tier'];
-  else if (field === 'tool_id') draft.tool_id = String(value);
-  else if (field === 'use_case_category') draft.use_case_category = String(value);
+  // risk_tier, tool_id, use_case_category are GROUND TRUTH seeded from the request
+  // (risk tier from annex_iii_risk per the rule table, not LLM classification).
+  // Ignoring agent attempts to set them prevents weakening a high-risk tier to
+  // dodge the HIGH_RISK_USE_DENIED veto — same principle as gate statuses.
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Build the empty seed artifact from the request + org config. */
 function seedDraft(request: RequestPacket, org: OrgConfig): PolicyArtifact {
@@ -94,7 +128,9 @@ function seedDraft(request: RequestPacket, org: OrgConfig): PolicyArtifact {
     policy_id: `pol_${request.tool_id}_${request.use_case_category}`,
     version: 1,
     compiled_at: '', // filled by compile.ts
-    request_id: request.request_id,
+    // request_id is `format: uuid` in the schema; only carry it through when valid
+    // (it is optional) so a non-UUID id can't make the whole policy schema-invalid.
+    request_id: request.request_id && UUID_RE.test(request.request_id) ? request.request_id : undefined,
     risk_tier: request.annex_iii_risk ? 'high_risk' : 'limited_risk',
     tool_id: request.tool_id,
     use_case_category: request.use_case_category,
@@ -135,6 +171,12 @@ export function mergeTranscript(
   const denyOverrides: DenyReasonCode[] = [];
   const vetoes: DenyReasonCode[] = [];
 
+  // Only routes the org actually defines are accepted (plus BLOCKED), normalized
+  // to uppercase — so a hallucinated or mis-cased route value is dropped.
+  const ctx: SanitizeCtx = {
+    validRoutes: new Set([...Object.keys(org.routing_targets), 'BLOCKED']),
+  };
+
   // Final stance per agent (last envelope wins).
   const finalStance = new Map<string, Stance>();
 
@@ -143,12 +185,12 @@ export function mergeTranscript(
 
     // 1. Apply concessions from approving agents.
     if (APPROVING_STANCES.includes(env.stance)) {
-      for (const c of env.concessions ?? []) applyField(draft, c.field, c.value);
+      for (const c of env.concessions ?? []) applyField(draft, c.field, c.value, ctx);
     }
 
     // 2. Collect + apply demands. Hard demands are tracked for floor conflict.
     for (const d of env.demands ?? []) {
-      applyField(draft, d.field, d.value);
+      applyField(draft, d.field, d.value, ctx);
       if (d.hard) hardDemands.set(d.field, d.value);
     }
   }

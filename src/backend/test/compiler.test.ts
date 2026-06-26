@@ -95,3 +95,66 @@ describe('hash', () => {
     expect(approve.policy_version_hash).not.toBe(local.policy_version_hash);
   });
 });
+
+describe('compiler: sanitizes untrusted LLM output', () => {
+  it('keeps the policy schema-valid despite malformed demands', () => {
+    // Mirrors a real live run: invalid PII action, bad retention enum, mis-cased route.
+    const transcript = [
+      env({
+        agent: 'corporate_compliance',
+        round: 2,
+        stance: 'conditional_approve',
+        demands: [
+          { field: 'pii_masking.de', value: true, hard: true },
+          { field: 'audit.retention_class', value: 'forever', hard: true },
+        ],
+      }),
+      env({
+        agent: 'it_infra',
+        round: 4,
+        stance: 'approve',
+        concessions: [{ field: 'routing.default', value: 'local_qwen_72b' }],
+      }),
+    ];
+    const r = compile(transcript, baseRequest, ORG, { session_id: 'san1' });
+    expect(r.schemaValid).toBe(true);
+    expect(r.policy.pii_masking.de).toBeUndefined(); // invalid action dropped
+    expect(r.policy.audit.retention_class).toBe('standard_6mo'); // invalid enum dropped → seed
+    expect(r.policy.routing.default).toBe('LOCAL_QWEN_72B'); // mis-cased route normalized
+  });
+
+  it('drops an unknown routing target rather than mis-routing', () => {
+    const transcript = [
+      env({
+        agent: 'it_infra',
+        round: 4,
+        stance: 'approve',
+        concessions: [{ field: 'routing.default', value: 'chatgpt-enterprise' }],
+      }),
+    ];
+    const r = compile(transcript, baseRequest, ORG, { session_id: 'san2' });
+    expect(r.policy.routing.default).toBe('CLOUD_QWEN_MAX'); // seeded default preserved
+    expect(r.schemaValid).toBe(true);
+  });
+
+  it('ignores an agent trying to weaken a high-risk tier to dodge the veto', () => {
+    const annexRequest: RequestPacket = {
+      ...baseRequest,
+      request_id: 'san3',
+      use_case_category: 'hr_screening',
+      annex_iii_risk: true,
+    };
+    const transcript = [
+      env({
+        agent: 'workflow_runner',
+        round: 0,
+        stance: 'approve',
+        demands: [{ field: 'risk_tier', value: 'limited_risk', hard: true }],
+      }),
+    ];
+    const r = compile(transcript, annexRequest, ORG, { session_id: 'san3' });
+    expect(r.policy.risk_tier).toBe('high_risk'); // ground truth preserved
+    expect(r.outcome).toBe('DENIED');
+    expect(r.deny_code).toBe('HIGH_RISK_USE_DENIED');
+  });
+});
