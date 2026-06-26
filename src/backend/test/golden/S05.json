@@ -1,0 +1,38 @@
+[
+  {
+    "session_id": "S05",
+    "round": 0,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "demands": [
+      { "field": "tool_id", "value": "chatgpt-enterprise" },
+      { "field": "use_case_category", "value": "summarization" }
+    ],
+    "natural_language": "Team wants ChatGPT Enterprise for document summarization."
+  },
+  {
+    "session_id": "S05",
+    "round": 1,
+    "agent": "procurement",
+    "stance": "reject",
+    "claims": [{ "type": "vendor", "ref": "DPA", "text": "OpenAI DPA for this entity is unsigned; no approval until executed." }],
+    "demands": [{ "field": "gates.vendor_dpa_status", "value": "signed", "hard": true }],
+    "evidence_ids": ["R0011"],
+    "natural_language": "The DPA with OpenAI is not signed for our entity. Procurement veto: no approval until the DPA is executed and the subprocessor list is attached."
+  },
+  {
+    "session_id": "S05",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "conditional_reject",
+    "demands": [{ "field": "audit.raw_prompt_logging", "value": false, "hard": true }],
+    "natural_language": "Even setting risk aside, I cannot clear a US transfer without a signed DPA and TIA."
+  },
+  {
+    "session_id": "S05",
+    "round": 5,
+    "agent": "procurement",
+    "stance": "reject",
+    "natural_language": "Veto stands until the DPA is signed."
+  }
+]

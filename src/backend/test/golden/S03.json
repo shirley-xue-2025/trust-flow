@@ -1,0 +1,38 @@
+[
+  {
+    "session_id": "S03",
+    "round": 0,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "demands": [
+      { "field": "tool_id", "value": "chatgpt-enterprise" },
+      { "field": "use_case_category", "value": "hr_screening" }
+    ],
+    "natural_language": "HR wants ChatGPT Enterprise to screen and rank job applicants automatically."
+  },
+  {
+    "session_id": "S03",
+    "round": 1,
+    "agent": "procurement",
+    "stance": "pass",
+    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
+    "natural_language": "DPA is signed — but defer to Compliance on the use case itself."
+  },
+  {
+    "session_id": "S03",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "reject",
+    "claims": [{ "type": "regulatory", "ref": "Annex III", "text": "Automated applicant screening is high-risk and needs Art. 14 human oversight; not approvable as a productivity tool." }],
+    "demands": [{ "field": "risk_tier", "value": "high_risk", "hard": true }],
+    "evidence_ids": ["R1"],
+    "natural_language": "HR screening is Annex III high-risk. This is not a limited-risk productivity request — I reject it. Route to the human-oversight workflow."
+  },
+  {
+    "session_id": "S03",
+    "round": 5,
+    "agent": "corporate_compliance",
+    "stance": "reject",
+    "natural_language": "Reject stands. High-risk use denied without an Art. 14 oversight regime."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "session_id": "S02",
+    "round": 0,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "demands": [
+      { "field": "tool_id", "value": "claude-code" },
+      { "field": "use_case_category", "value": "code_completion" }
+    ],
+    "natural_language": "Payments engineering wants Claude Code for boilerplate. Company-wide rollout requested."
+  },
+  {
+    "session_id": "S02",
+    "round": 1,
+    "agent": "procurement",
+    "stance": "approve",
+    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
+    "natural_language": "Anthropic DPA is executed for this entity. Procurement clears it."
+  },
+  {
+    "session_id": "S02",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "conditional_approve",
+    "demands": [
+      { "field": "audit.raw_prompt_logging", "value": false, "hard": true },
+      { "field": "audit.retention_class", "value": "financial_sector" }
+    ],
+    "concessions": [{ "field": "risk_tier", "value": "limited_risk" }],
+    "evidence_ids": ["R0008"],
+    "natural_language": "Code completion is limited-risk. Fingerprint-only logs, financial-sector retention."
+  },
+  {
+    "session_id": "S02",
+    "round": 3,
+    "agent": "works_council",
+    "stance": "reject",
+    "claims": [{ "type": "process", "ref": "§87(1) No.6 BetrVG", "text": "No signed Betriebsvereinbarung; company-wide rollout blocked." }],
+    "demands": [{ "field": "gates.betriebsvereinbarung_status", "value": "signed", "hard": true }],
+    "evidence_ids": ["E001", "E004"],
+    "natural_language": "Claude Code logs user activity. Without a signed Betriebsvereinbarung we cannot approve a company-wide rollout. This goes to the works-council process."
+  },
+  {
+    "session_id": "S02",
+    "round": 4,
+    "agent": "it_infra",
+    "stance": "conditional_approve",
+    "concessions": [
+      { "field": "routing.default", "value": "LOCAL_QWEN_72B" },
+      { "field": "budget.max_tokens_per_day", "value": 500000 }
+    ],
+    "natural_language": "Infra is ready: local route + 500k token cap once the gate clears."
+  },
+  {
+    "session_id": "S02",
+    "round": 5,
+    "agent": "works_council",
+    "stance": "reject",
+    "natural_language": "Position unchanged: external Betriebsvereinbarung process must complete first."
+  }
+]
