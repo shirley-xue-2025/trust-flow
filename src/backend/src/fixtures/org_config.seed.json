@@ -1,0 +1,23 @@
+{
+  "org_id": "demo_fintech_de",
+  "display_name": "NordPay AG (fictional)",
+  "entity_country": "DE",
+  "has_works_council": true,
+  "betriebsvereinbarung_status": "pending",
+  "policy_floor": {
+    "audit": {
+      "raw_prompt_logging": false,
+      "manager_dashboard_allowed": false
+    },
+    "deny_prohibited_practices": true,
+    "min_retention_class": "standard_6mo"
+  },
+  "departments": [
+    { "id": "payments_engineering", "budget_pool_id": "dept_payments", "max_tokens_per_day": 500000 },
+    { "id": "customer_support", "budget_pool_id": "dept_support", "max_tokens_per_day": 200000 }
+  ],
+  "routing_targets": {
+    "CLOUD_QWEN_MAX": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+    "LOCAL_QWEN_72B": "http://localhost:11434/v1"
+  }
+}
