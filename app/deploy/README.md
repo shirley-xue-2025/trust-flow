@@ -74,6 +74,11 @@ Stop with `Ctrl-C`; `docker compose down` to remove containers (the
 
 ## B. Alibaba Cloud ECS
 
+> **First time? Follow the full walkthrough in
+> [`ALICLOUD_DEPLOY.md`](ALICLOUD_DEPLOY.md)** — account setup, ECS provisioning,
+> security group, Docker install, the passcode gate, HTTPS, and GitHub CI. The
+> steps below are the condensed version.
+
 1. **Create an ECS instance** — Ubuntu 22.04, 2 vCPU / 4 GB (no GPU; the local
    model is stubbed). **Pick an EU region (e.g. Frankfurt / `eu-central-1`)** so
    the EU data-residency narrative is literally true.
