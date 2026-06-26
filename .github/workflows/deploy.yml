@@ -1,0 +1,36 @@
+name: Deploy to Alibaba ECS
+
+# Manual trigger only (Actions tab → Run workflow) so a stray push can't break a
+# live demo. Flip to `on: push` later if you want continuous deploys.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag to deploy on the box
+        required: false
+        default: main
+
+# Requires repository secrets: ECS_HOST, ECS_USER, ECS_SSH_KEY, (optional) ECS_PORT.
+# The box must already have the repo cloned at ~/trustflow with app/.env present
+# (this workflow only pulls code + rebuilds — it never handles secrets).
+jobs:
+  deploy:
+    name: ssh deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull + rebuild on the ECS box
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          port: ${{ secrets.ECS_PORT || 22 }}
+          script: |
+            set -e
+            cd ~/trustflow
+            git fetch --all --prune
+            git checkout "${{ github.event.inputs.ref }}"
+            git pull --ff-only origin "${{ github.event.inputs.ref }}"
+            cd app
+            docker compose up -d --build
+            docker compose ps

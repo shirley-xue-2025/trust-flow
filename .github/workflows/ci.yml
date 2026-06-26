@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main, platform]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: build + test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+
+  docker-build:
+    name: docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Builds both images exactly as the ECS box would — catches Dockerfile /
+      # nginx / entrypoint breakage. No push, no secrets.
+      - name: docker compose build
+        working-directory: app
+        run: docker compose build
