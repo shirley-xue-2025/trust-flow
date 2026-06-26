@@ -17,6 +17,7 @@
     "dev:backend": "npm run dev --workspace backend",
     "dev:web": "npm run dev --workspace web",
     "dev": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace web\"",
+    "dev:network": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"VITE_NETWORK=1 npm run dev --workspace web\"",
     "build": "npm run build:shared && npm run build --workspace backend && npm run build --workspace web"
   },
   "devDependencies": {
