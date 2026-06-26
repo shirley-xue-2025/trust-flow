@@ -1,0 +1,52 @@
+# TrustFlow — single-host deployment (backend + nginx-served web).
+#
+# Run from the `src/` directory:   docker compose up --build
+# Then open http://localhost  (or http://<ECS-public-ip> on the cloud box).
+#
+# Secrets are passed via a deploy `.env` placed NEXT TO this file (src/.env),
+# never baked into images. See deploy/.env.deploy.example for the template and
+# deploy/README.md for the full runbook. With no DASHSCOPE_API_KEY the app still
+# runs every S0x scenario via golden-transcript replay.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      # Compose substitutes these from src/.env (or the host env). The :- default
+      # keeps the stack bootable with no key — replay scenarios still work.
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-https://dashscope-intl.aliyuncs.com/compatible-mode/v1}
+      QWEN_MODEL: ${QWEN_MODEL:-qwen-max}
+      PORT: "8080"
+      TRUSTFLOW_DATA_DIR: /data
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      # Named volume for the policy store + audit JSONL, so data survives
+      # restarts. Mounted at the backend's data dir.
+      - trustflow_data:/data
+    networks:
+      - trustflow
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - trustflow
+    restart: unless-stopped
+
+networks:
+  trustflow:
+    driver: bridge
+
+volumes:
+  trustflow_data:
