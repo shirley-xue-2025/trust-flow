@@ -1,9 +1,9 @@
 # TrustFlow — single-host deployment (backend + nginx-served web).
 #
-# Run from the `src/` directory:   docker compose up --build
+# Run from the `app/` directory:   docker compose up --build
 # Then open http://localhost  (or http://<ECS-public-ip> on the cloud box).
 #
-# Secrets are passed via a deploy `.env` placed NEXT TO this file (src/.env),
+# Secrets are passed via a deploy `.env` placed NEXT TO this file (app/.env),
 # never baked into images. See deploy/.env.deploy.example for the template and
 # deploy/README.md for the full runbook. With no DASHSCOPE_API_KEY the app still
 # runs every S0x scenario via golden-transcript replay.
@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      # Compose substitutes these from src/.env (or the host env). The :- default
+      # Compose substitutes these from app/.env (or the host env). The :- default
       # keeps the stack bootable with no key — replay scenarios still work.
       DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
       QWEN_BASE_URL: ${QWEN_BASE_URL:-https://dashscope-intl.aliyuncs.com/compatible-mode/v1}

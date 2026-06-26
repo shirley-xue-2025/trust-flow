@@ -23,7 +23,7 @@ trust-flow/                    ← this git repo (shared)
 │   └── research/
 ├── prototypes/
 ├── session_logs/
-└── src/                       ← future application code
+└── app/                       ← application code (Node/TS monorepo)
 ```
 
 On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trust Flow/`) that holds private `memory/` — that parent is **not** version-controlled and is **not** cloned by teammates.
@@ -32,12 +32,12 @@ On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trus
 
 | You are creating… | Put it in… | Never put it in… |
 |-------------------|------------|------------------|
-| Regulatory / market research (shareable) | `docs/research/` | `src/`, `prototypes/` |
+| Regulatory / market research (shareable) | `docs/research/` | `app/`, `prototypes/` |
 | Canonical term or schema | `docs/DEFINITIONS.md` or `docs/schemas/` | Inline in code only |
-| Architecture / work plan | `docs/ARCHITECTURE.md`, `docs/WORK_PLAN.md` | `src/` |
-| Demo fixtures & eval seeds | `docs/fixtures/` | `src/` without migration plan |
+| Architecture / work plan | `docs/ARCHITECTURE.md`, `docs/WORK_PLAN.md` | `app/` |
+| Demo fixtures & eval seeds | `docs/fixtures/` | `app/` without migration plan |
 | Pitch / explorer HTML | `prototypes/` | `docs/` |
-| Gateway or agent code | `src/` | `prototypes/` |
+| Gateway or agent code | `app/` | `prototypes/` |
 | Session handover (dated) | `session_logs/SESSION_*.md` | Root (except `SESSION_LATEST.md`) |
 | Work ownership & session changelog | `PROJECT_TRACKER.md` | `memory/` (private duplicate) |
 | Personal notes, SSH/git setup, private scratch | **Local workspace outside repo** | **This repo** |

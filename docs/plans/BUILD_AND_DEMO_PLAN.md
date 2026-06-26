@@ -8,7 +8,7 @@
 
 ## Context
 
-What the colleague delivered is a complete **pre-build spec + research package** — there is **no application code yet** (`src/` does not exist). This is a greenfield build against a fully frozen set of contracts (policy schema, audit schema, boardroom protocol, eval scenarios S01–S05, seed fixtures). Build directly against those.
+What the colleague delivered is a complete **pre-build spec + research package** — there is **no application code yet** (`app/` does not exist). This is a greenfield build against a fully frozen set of contracts (policy schema, audit schema, boardroom protocol, eval scenarios S01–S05, seed fixtures). Build directly against those.
 
 ---
 
@@ -34,10 +34,10 @@ What the colleague delivered is a complete **pre-build spec + research package**
 
 The pitch is **"deterministic enforcement at the edge; generative negotiation only for policy authoring."** The code must make that contrast visible (30% technical depth). Hard rule: **the LLM never writes `rules.json` directly** — it emits a *proposal*, and a pure-function **compiler** (no LLM) validates, floor-checks, hashes, and materializes it. That boundary is the engineering story.
 
-## 1.2 Repo layout (all app code under `src/`, per `PROJECT_STRUCTURE.md`)
+## 1.2 Repo layout (all app code under `app/`, per `PROJECT_STRUCTURE.md`)
 
 ```
-src/
+app/
 ├── package.json                 # npm workspaces root
 ├── shared/                      # imported by backend AND frontend
 │   ├── types.ts                 # TS types mirrored from the 2 JSON schemas

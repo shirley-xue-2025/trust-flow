@@ -17,7 +17,7 @@ validated, signed, and enforces it.*
 ## Layout
 
 ```
-src/
+app/
 ├── shared/        TS types mirrored from the 2 JSON schemas + canonical hash
 ├── backend/       Fastify REST+SSE, boardroom, compiler, gateway, file stores
 │   └── test/      vitest + hand-authored golden transcripts (S01–S05)
@@ -27,7 +27,7 @@ src/
 ## Run it (no API key needed)
 
 ```bash
-cd src
+cd app
 npm install
 npm run test          # 20 tests, S01–S05 green, NO network / NO key
 npm run dev           # backend :8080 + web :5173 (Vite proxies /v1 → backend)

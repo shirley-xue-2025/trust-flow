@@ -24,7 +24,7 @@ tmp/
 # Evidence raw dumps with PII risk (review before any commit)
 **/evidence/raw/
 
-# --- Node / TypeScript app (src/) ---
+# --- Node / TypeScript app (app/) ---
 
 # Dependencies
 node_modules/
@@ -38,7 +38,7 @@ build/
 
 # Vite
 .vite/
-src/web/dist/
+app/web/dist/
 
 # Test / coverage
 coverage/

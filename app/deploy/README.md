@@ -18,7 +18,7 @@ relative `/v1` paths, so no API URL is baked into the web image.
 
 ## Required environment variables
 
-Passed to the **backend** container via `src/.env` (compose variable
+Passed to the **backend** container via `app/.env` (compose variable
 substitution). Template: `deploy/env.deploy.example`. Root `.env.example` also
 documents these.
 
@@ -31,7 +31,7 @@ documents these.
 | `TRUSTFLOW_DATA_DIR` | no | `/data` | Policy store + audit dir (mounted volume; set by compose). |
 | `LOG_LEVEL` | no | `info` | Backend log level. |
 
-Never commit a real key. `src/.env` is git-ignored.
+Never commit a real key. `app/.env` is git-ignored.
 
 ---
 
@@ -39,7 +39,7 @@ Never commit a real key. `src/.env` is git-ignored.
 
 ```bash
 git clone <public-repo-url> trustflow
-cd trustflow/src
+cd trustflow/app
 
 # Optional: live qwen-max. Skip entirely to run replay-only.
 cp deploy/env.deploy.example .env
@@ -89,7 +89,7 @@ Stop with `Ctrl-C`; `docker compose down` to remove containers (the
 
    ```bash
    git clone <public-repo-url> trustflow
-   cd trustflow/src
+   cd trustflow/app
    ```
 
 5. **Create `.env`** with the key (never committed):
@@ -127,7 +127,7 @@ fine for the demo.
 sudo apt-get install -y certbot
 docker compose stop web          # free port 80 for the standalone challenge
 sudo certbot certonly --standalone -d trustflow.example.com
-# Then add a 443 server block to src/nginx.conf referencing the issued certs
+# Then add a 443 server block to app/nginx.conf referencing the issued certs
 # (/etc/letsencrypt/live/<domain>/{fullchain.pem,privkey.pem}), mount
 # /etc/letsencrypt into the web container, publish 443:443 in compose, and
 # `docker compose up -d --build web`.
@@ -146,5 +146,5 @@ sudo certbot certonly --standalone -d trustflow.example.com
 - **Audit/policies vanish on restart**: ensure the `trustflow_data` volume is
   mounted at `/data` and `TRUSTFLOW_DATA_DIR=/data`.
 - **`live_qwen:false` unexpectedly**: `DASHSCOPE_API_KEY` not reaching the
-  backend — check `src/.env` and `docker compose config`.
+  backend — check `app/.env` and `docker compose config`.
 ```
