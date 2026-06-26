@@ -70,15 +70,19 @@ export async function* runRounds(opts: RoundEngineOpts): AsyncGenerator<Boardroo
     approvedTools: approvedTools(),
   };
 
+  // Accumulate the transcript so each agent negotiates against prior turns
+  // instead of emitting an isolated monologue (see buildUserPrompt threading).
+  const transcript: BoardroomEnvelope[] = [];
   for (const { round, agents } of roundSchedule(request.entity_country ?? org.entity_country)) {
     for (const agent of agents) {
       const env = await qwenAgentTurn({
         systemPrompt: buildSystemPrompt(agent, ctx),
-        userPrompt: buildUserPrompt(agent, round),
+        userPrompt: buildUserPrompt(agent, round, transcript),
         session_id,
         round,
         agent,
       });
+      transcript.push(env);
       yield env;
     }
   }

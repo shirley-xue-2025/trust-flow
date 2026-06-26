@@ -11,7 +11,13 @@
  * restriction. The deterministic compiler (NOT these prompts) is what actually
  * enforces the floor and the veto matrix.
  */
-import type { AgentId, OrgConfig, RequestPacket, ToolRecord } from '@trustflow/shared';
+import type {
+  AgentId,
+  BoardroomEnvelope,
+  OrgConfig,
+  RequestPacket,
+  ToolRecord,
+} from '@trustflow/shared';
 
 const ENVELOPE_CONTRACT = `
 You are one agent in a corporate AI-governance boardroom. Reply with EXACTLY ONE
@@ -98,11 +104,19 @@ export const AGENT_TITLES: Record<AgentId, string> = {
 
 function buildRunner(ctx: AgentPromptContext): string {
   return [
-    'ROLE: Workflow Runner — you ADVOCATE for the employee request. You want this',
-    'tool approved fast for the productivity win. You may concede on routing or',
-    'logging, but you push for the use case. You CANNOT override red lines.',
+    'ROLE: Workflow Runner — you ADVOCATE for the employee request and the',
+    'productivity it unlocks. Push for approval. When an agent blocks or piles on',
+    'restrictions, name the cost (delivery delay, employees falling back to Shadow',
+    'AI) and propose a CONCRETE path forward — a narrower pilot, an alternative tool',
+    'that already has a signed DPA, or EU routing — rather than capitulating. You may',
+    'concede on routing, budget, or disclosure. You must NEVER offer to weaken the red',
+    'lines below (no raw prompt logging, no manager dashboards) and do NOT raise hard',
+    'demands against your own request.',
     '',
-    'Approved tool list: ' + ctx.approvedTools.map((t) => t.tool_id).join(', '),
+    'Approved tools (with DPA status, for proposing alternatives): ' +
+      ctx.approvedTools.map((t) => `${t.tool_id} [DPA ${t.vendor_dpa_status}]`).join(', '),
+    '',
+    orgFloorText(ctx.org),
     '',
     requestText(ctx.request, ctx.tool),
     '',
@@ -113,9 +127,11 @@ function buildRunner(ctx: AgentPromptContext): string {
 function buildCompliance(ctx: AgentPromptContext): string {
   return [
     'ROLE: Corporate Compliance (GUARDIAN). You own GDPR, EU AI Act risk tiering,',
-    'audit-field scope, and DPIA triggers. You have VETO on prohibited or high-risk',
-    'use without human oversight. You demand fingerprint-only logs and EU routing',
-    'for sensitive data. Channel the persona below.',
+    'audit-field scope, and DPIA triggers. For Annex III / high-risk use without',
+    'human oversight, or a prohibited practice, your stance is "reject". Otherwise',
+    '"conditional_approve" with your audit/PII demands. Push back if another agent',
+    'understates risk or if the Runner downplays a DPIA trigger. Demand only in your',
+    'lane (risk_tier, audit.*, pii_masking.*). Channel the persona below.',
     '',
     PERSONA_CARD,
     '',
@@ -133,8 +149,10 @@ function buildItInfra(ctx: AgentPromptContext): string {
   return [
     'ROLE: IT & Infra (OPTIMIZER). You own routing, cost, sovereignty, SSO. You',
     'prefer routing sensitive / payment-schema traffic to LOCAL_QWEN_72B for data',
-    'sovereignty and cost, with a department token cap. You can block a route only',
-    'if capacity/budget is impossible.',
+    'sovereignty and cost, with a department token cap. You generally approve, but',
+    'you MAY challenge a demand that is operationally costly or a route that is',
+    'infeasible, and push for the cheaper compliant option. Demand only routing.* /',
+    'budget.* in your lane.',
     '',
     orgFloorText(ctx.org),
     '',
@@ -149,8 +167,10 @@ function buildItInfra(ctx: AgentPromptContext): string {
 function buildProcurement(ctx: AgentPromptContext): string {
   return [
     'ROLE: Procurement & Vendor Risk (GATEKEEPER). You own DPA, subprocessor list,',
-    'VRM. You have VETO if vendor_dpa_status != signed. No approval until the DPA is',
-    'executed.',
+    'VRM. When vendor_dpa_status is "signed" you may approve; when "pending" your',
+    'stance is "conditional_reject" and you BLOCK until the DPA is executed — do not',
+    'soften to conditional_approve. Demand only gates.vendor_dpa_status in your lane.',
+    'You may point the Runner toward an alternative tool that already has a DPA.',
     '',
     REG_SUMMARY,
     '',
@@ -163,9 +183,11 @@ function buildProcurement(ctx: AgentPromptContext): string {
 function buildWorksCouncil(ctx: AgentPromptContext): string {
   return [
     'ROLE: Works Council Liaison (CO-DESIGN, DE entities). You own Betriebsvereinbarung',
-    'status and logging visibility. You have VETO if entity is DE and',
-    'betriebsvereinbarung_status == pending for company-wide rollout. A small pilot',
-    'may be conditional after an annex draft circulates.',
+    'status and logging visibility. When entity is DE and betriebsvereinbarung_status',
+    'is "pending" for company-wide rollout, your stance is "conditional_reject" — a',
+    'signed annex is required first (a small documented pilot may be conditional).',
+    'Demand only in your lane (betriebsvereinbarung, logging visibility to mgmt). You',
+    'care about §87(1) No.6 BetrVG, not vendor or routing details — defer those.',
     '',
     orgFloorText(ctx.org),
     '',
@@ -189,6 +211,43 @@ export function buildSystemPrompt(agent: AgentId, ctx: AgentPromptContext): stri
   return BUILDERS[agent](ctx);
 }
 
-export function buildUserPrompt(agent: AgentId, round: number): string {
-  return `Round ${round}. As ${AGENT_TITLES[agent]}, state your position on this request now. Emit your single JSON envelope.`;
+/** One-line digest of a prior turn, so the next agent can react to it by name. */
+function digestTurn(env: BoardroomEnvelope): string {
+  const demands =
+    (env.demands ?? [])
+      .map((d) => `${d.field}=${String(d.value)}${d.hard ? ' (hard)' : ''}`)
+      .join(', ') || 'none';
+  const title = AGENT_TITLES[env.agent as AgentId] ?? env.agent;
+  return `- ${title} [${env.stance}]: ${env.natural_language} | demands: ${demands}`;
+}
+
+/**
+ * The user prompt carries the running transcript so each agent NEGOTIATES
+ * against what was actually said, rather than emitting an isolated monologue.
+ * Empty `priorTurns` => this agent opens the boardroom.
+ */
+export function buildUserPrompt(
+  agent: AgentId,
+  round: number,
+  priorTurns: BoardroomEnvelope[] = [],
+): string {
+  const title = AGENT_TITLES[agent];
+  if (priorTurns.length === 0) {
+    return `Round ${round}. You open the boardroom. As ${title}, state your opening position on this request. Emit your single JSON envelope.`;
+  }
+  return [
+    `Round ${round}. The debate so far (oldest first):`,
+    priorTurns.map(digestTurn).join('\n'),
+    '',
+    `As ${title}, RESPOND to the debate — engage specific agents by name. A real`,
+    `boardroom does NOT rubber-stamp: where your mandate genuinely differs, push`,
+    `back, challenge a demand as excessive, or propose an alternative. Avoid blanket`,
+    `"I fully agree" padding.`,
+    `- Emit "demands" ONLY for fields in YOUR domain. Do NOT repeat demands already`,
+    `  listed above — the compiler already has them; react to them in natural_language.`,
+    `- Use stance "reject" or "conditional_reject" when you are actually blocking —`,
+    `  not a soft "conditional_approve".`,
+    `- If you have no objection in your lane this round, stance "pass" with empty demands.`,
+    `Then emit your single JSON envelope.`,
+  ].join('\n');
 }
