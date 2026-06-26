@@ -1,0 +1,25 @@
+{
+  "name": "trustflow",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TrustFlow — deterministic AI governance gateway + generative policy boardroom",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "backend",
+    "web"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace shared",
+    "test": "npm run build:shared && npm run test --workspace backend",
+    "smoke": "npm run build:shared && npm run smoke --workspace backend",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:web": "npm run dev --workspace web",
+    "dev": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace web\"",
+    "build": "npm run build:shared && npm run build --workspace backend && npm run build --workspace web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustflow.dev/schemas/policy-artifact.schema.json",
+  "title": "TrustFlow Policy Artifact",
+  "description": "Compiled rules pushed to Layer A gateway after boardroom negotiation and deterministic validation.",
+  "type": "object",
+  "required": [
+    "policy_id",
+    "version",
+    "compiled_at",
+    "risk_tier",
+    "tool_id",
+    "pii_masking",
+    "routing",
+    "audit",
+    "gates"
+  ],
+  "properties": {
+    "policy_id": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "compiled_at": { "type": "string", "format": "date-time" },
+    "request_id": { "type": "string", "format": "uuid" },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "boardroom_session_id": { "type": "string" },
+        "agent_signoffs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agent", "status"],
+            "properties": {
+              "agent": { "type": "string" },
+              "status": { "type": "string", "enum": ["approve", "conditional", "reject"] },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "risk_tier": {
+      "type": "string",
+      "enum": ["prohibited", "high_risk", "limited_risk", "minimal"]
+    },
+    "tool_id": { "type": "string" },
+    "use_case_category": {
+      "type": "string",
+      "examples": ["code_completion", "summarization", "support_chat", "hr_screening"]
+    },
+    "pii_masking": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["BLOCK", "MASK", "PSEUDONYMIZE", "ALLOW"]
+      }
+    },
+    "routing": {
+      "type": "object",
+      "required": ["default"],
+      "properties": {
+        "default": { "type": "string" },
+        "sensitive": { "type": "string" },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["if", "route"],
+            "properties": {
+              "if": { "type": "string", "description": "Deterministic predicate name" },
+              "route": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "pool_id": { "type": "string" },
+        "max_tokens_per_day": { "type": "integer" },
+        "max_cost_eur_per_month": { "type": "number" }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "required": ["retention_class", "required_fields"],
+      "properties": {
+        "retention_class": {
+          "type": "string",
+          "enum": ["standard_6mo", "financial_sector", "high_risk_extended"]
+        },
+        "required_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "raw_prompt_logging": { "type": "boolean", "default": false },
+        "manager_dashboard_allowed": { "type": "boolean", "default": false }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "description": "Non-technical preconditions that must be satisfied",
+      "properties": {
+        "betriebsvereinbarung_status": {
+          "type": "string",
+          "enum": ["not_required", "pending", "signed"]
+        },
+        "vendor_dpa_status": {
+          "type": "string",
+          "enum": ["pending", "signed", "not_applicable"]
+        },
+        "disclosure_required": { "type": "boolean" }
+      }
+    },
+    "deny_overrides": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Deny codes that still block even if policy exists"
+    }
+  }
+}
