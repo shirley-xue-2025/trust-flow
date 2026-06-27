@@ -1,34 +1,124 @@
 # TrustFlow
 
-Safe AI adoption for European enterprises — a parameterized negotiation gateway between business teams and compliance stakeholders.
+**Safe AI adoption for European enterprises.** When a business team wants to use a
+new AI tool, TrustFlow runs a structured negotiation between five role-played
+stakeholder agents, then compiles their agreement into a signed, machine-enforced
+policy — so the enterprise can say *yes* to AI without losing control of compliance.
 
-**Status:** Pre-build planning complete — see [`SESSION_LATEST.md`](SESSION_LATEST.md) and [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md).
+> Qwen Cloud Global AI Hackathon — **Track 3: Agent Society**.
+> Built on Qwen Cloud (`qwen-max` via DashScope), deployed on Alibaba Cloud.
 
-## Clone (collaborators)
+---
+
+## The problem
+
+European enterprises are stuck between two bad options: ban AI tools (and watch
+shadow-AI spread anyway) or allow them and accept uncontrolled exposure to GDPR,
+the EU AI Act, and works-council (Betriebsvereinbarung) obligations. The bottleneck
+isn't the model — it's **governance**: every new use case needs sign-off from
+compliance, IT, procurement, and worker representatives, and that negotiation is
+slow, ad-hoc, and unauditable.
+
+TrustFlow turns that negotiation into software.
+
+## The idea — a dual-layer architecture
+
+This is the differentiator, and the whole design hangs off one boundary:
+
+- **Layer B — the Agent Boardroom** *(generative)* — the **only** place an LLM runs.
+  Five Qwen-powered agents with distinct mandates debate a request across multiple
+  rounds, react to each other's arguments, raise conditions, and converge. They emit
+  **structured proposals**, never executable rules.
+
+- **Deterministic compiler** *(the gate — no LLM)* — pure code merges the agents'
+  demands and concessions, **floor-checks** them against the organization's
+  non-negotiable red lines, validates against a JSON schema, hashes the result, and
+  signs it. Agents can *propose*; only deterministic code can *decide*.
+
+- **Layer A — the Edge Gateway** *(deterministic enforcement)* — pure code again:
+  PII scanning, model routing, and audit logging on every inference. **No LLM sits
+  in the enforcement path.**
+
+> An LLM proposed the policy; deterministic code validated, signed, and enforces it.
+> That contrast — creative negotiation up top, hard guarantees at the bottom — is the
+> point of the project.
+
+### The five agents
+
+| Agent | Mandate |
+|---|---|
+| **Workflow Runner** | Advocates for the business use case; proposes alternatives |
+| **Corporate Compliance** | GDPR / EU AI Act red lines; can conditionally reject |
+| **IT / Infrastructure** | Routing, data residency, technical feasibility |
+| **Procurement** | Vendor DPA status, contractual exposure |
+| **Works Council Liaison** | Worker representation, Betriebsvereinbarung status |
+
+---
+
+## Quickstart (no API key needed)
+
+The application code lives in [`app/`](app/). Replay mode runs the full pipeline —
+boardroom → compiler → gateway — against hand-authored golden transcripts, with **no
+network and no key**, so judges can see everything working immediately.
 
 ```bash
-git clone https://github.com/shirley-xue-2025/trust-flow.git
-cd trust-flow
+cd app
+npm install
+npm run test     # golden-transcript suite (scenarios S01–S05), no network / no key
+npm run dev      # backend :8080 + web :5173
 ```
 
-No special SSH setup required — use your own GitHub account after accepting the collaborator invite.
+Open <http://localhost:5173> → **1 · Request** → pick a replay scenario (S01–S05).
+The boardroom streams live over SSE, the compiler produces the hashed policy, and the
+Playground sends prompts through the gateway (try the IBAN sample → `PII_BLOCK`).
 
-## What's in this repo
+**Live Qwen negotiation** (optional, needs the hackathon voucher key): put
+`DASHSCOPE_API_KEY=sk-...` in a git-ignored `app/.env`, then `npm run smoke` for a
+one-shot live round-trip, or use the "Submit to boardroom (live)" button. Full
+instructions: [`app/README.md`](app/README.md).
+
+### Demo scenarios (asserted by the test suite)
+
+| Scenario | Outcome | What it shows |
+|---|---|---|
+| S01 | APPROVED | Copilot summarization, works-council agreement signed |
+| S02 | PENDING_EXTERNAL | Blocked on `BETRIEBSVEREINBARUNG_PENDING` |
+| S03 | DENIED | `HIGH_RISK_USE_DENIED` (EU AI Act Annex III) |
+| S04 | APPROVED | Routed to on-prem `LOCAL_QWEN_72B` |
+| S05 | DENIED | `VENDOR_DPA_PENDING` |
+
+---
+
+## Deployment
+
+TrustFlow is deployed on **Alibaba Cloud** (ECS) via Docker Compose — a multi-stage
+backend image and an nginx reverse proxy with SSE pass-through and an optional shared
+passcode gate. Step-by-step guide:
+[`app/deploy/ALICLOUD_DEPLOY.md`](app/deploy/ALICLOUD_DEPLOY.md).
+
+---
+
+## Repository map
 
 | Path | Purpose |
 |------|---------|
-| [`PROJECT_TRACKER.md`](PROJECT_TRACKER.md) | **Who's working on what** + changelog |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product architecture |
-| [`docs/WORK_PLAN.md`](docs/WORK_PLAN.md) | Phased roadmap |
-| [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md) | Decisions needing Shirley |
-| [`docs/research/`](docs/research/) | Research, personas, roleplay |
-| [`docs/fixtures/`](docs/fixtures/) | Seed data for demo + evals |
-| [`prototypes/`](prototypes/) | Static pitch / strategy HTML |
+| [`app/`](app/) | Application monorepo (shared types, Fastify backend, React/Vite web) |
+| [`app/README.md`](app/README.md) | How to run, endpoints, live-Qwen setup |
+| [`app/deploy/`](app/deploy/) | Docker, nginx, Alibaba Cloud deploy guide |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product & system architecture |
+| [`docs/plans/BUILD_AND_DEMO_PLAN.md`](docs/plans/BUILD_AND_DEMO_PLAN.md) | Implementation, deploy & demo plan |
+| [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) | Agent negotiation protocol |
+| [`docs/schemas/`](docs/schemas/) | JSON schemas (proposal envelope, policy artifact) |
+| [`docs/fixtures/`](docs/fixtures/) | Org config seed + demo/eval data |
+| [`docs/research/`](docs/research/) | Market & regulatory research, personas |
+| [`PROJECT_TRACKER.md`](PROJECT_TRACKER.md) | Work ownership + changelog |
 
-## What's **not** in this repo
+---
 
-Personal workspace files (`memory/`, local `AGENTS.md`, machine-specific git notes) live in the parent folder on each contributor's machine and are never committed here.
+## Hackathon compliance
 
-## Hackathon context
-
-Track 3: Agent Society — dual-layer architecture (deterministic edge gateway + agent boardroom for policy negotiation).
+- **Qwen Cloud API** — all agent reasoning runs on `qwen-max` via the DashScope
+  OpenAI-compatible endpoint (live-verified).
+- **Alibaba Cloud** — hosted on ECS via Docker Compose.
+- **Track 3 — Agent Society** — five collaborating agents with distinct roles,
+  emergent multi-round negotiation, and real-world EU-governance applicability.
