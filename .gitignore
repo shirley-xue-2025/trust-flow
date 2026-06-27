@@ -23,3 +23,36 @@ tmp/
 
 # Evidence raw dumps with PII risk (review before any commit)
 **/evidence/raw/
+
+# --- Node / TypeScript app (app/) ---
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Vite
+.vite/
+app/web/dist/
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime-generated stores (policy store, audit log, sessions) — never commit live data
+data/
+**/data/policy-store/
+**/data/audit/
+**/*.audit.jsonl

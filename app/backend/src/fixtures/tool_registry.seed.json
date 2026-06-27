@@ -1,0 +1,44 @@
+{
+  "tools": [
+    {
+      "tool_id": "microsoft-copilot-365",
+      "display_name": "Microsoft 365 Copilot",
+      "vendor": "microsoft",
+      "data_residency_options": ["EU", "US"],
+      "audit_log_capability": true,
+      "default_endpoints": ["https://copilot.microsoft.com"],
+      "vendor_dpa_status": "signed",
+      "notes": "Corpus R0002 — common 'approved path' for MS shops"
+    },
+    {
+      "tool_id": "chatgpt-enterprise",
+      "display_name": "ChatGPT Enterprise",
+      "vendor": "openai",
+      "data_residency_options": ["EU", "US"],
+      "audit_log_capability": true,
+      "default_endpoints": ["https://chatgpt.com"],
+      "vendor_dpa_status": "pending",
+      "notes": "Practitioner batch — DPA must be explicit"
+    },
+    {
+      "tool_id": "claude-code",
+      "display_name": "Claude Code",
+      "vendor": "anthropic",
+      "data_residency_options": ["US"],
+      "audit_log_capability": true,
+      "default_endpoints": ["https://api.anthropic.com"],
+      "vendor_dpa_status": "pending",
+      "notes": "Scenario 001 demo tool"
+    },
+    {
+      "tool_id": "local-qwen-72b",
+      "display_name": "Local Qwen 72B",
+      "vendor": "internal",
+      "data_residency_options": ["on_prem"],
+      "audit_log_capability": true,
+      "default_endpoints": ["http://localhost:11434"],
+      "vendor_dpa_status": "not_applicable",
+      "notes": "Sovereign routing target"
+    }
+  ]
+}

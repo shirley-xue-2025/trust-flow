@@ -1,0 +1,67 @@
+[
+  {
+    "session_id": "S04",
+    "round": 0,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "demands": [
+      { "field": "tool_id", "value": "claude-code" },
+      { "field": "use_case_category", "value": "code_completion" }
+    ],
+    "natural_language": "Payments team needs Claude Code on payment API schemas. Pilot already cleared the works council; DPA signed."
+  },
+  {
+    "session_id": "S04",
+    "round": 1,
+    "agent": "procurement",
+    "stance": "approve",
+    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
+    "natural_language": "Anthropic DPA executed with EU addendum. Procurement clears it."
+  },
+  {
+    "session_id": "S04",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "conditional_approve",
+    "claims": [{ "type": "regulatory", "ref": "R1", "text": "Code completion is limited-risk, but payment schemas must stay in the EU." }],
+    "demands": [
+      { "field": "audit.raw_prompt_logging", "value": false, "hard": true },
+      { "field": "audit.manager_dashboard_allowed", "value": false, "hard": true },
+      { "field": "audit.retention_class", "value": "financial_sector" },
+      { "field": "routing.sensitive", "value": "LOCAL_QWEN_72B", "hard": true }
+    ],
+    "concessions": [{ "field": "risk_tier", "value": "limited_risk" }],
+    "evidence_ids": ["R0008", "R1"],
+    "natural_language": "I approve only if payment-schema traffic routes to the local sovereign node, fingerprint-only logs, financial-sector retention."
+  },
+  {
+    "session_id": "S04",
+    "round": 3,
+    "agent": "works_council",
+    "stance": "approve",
+    "concessions": [{ "field": "gates.betriebsvereinbarung_status", "value": "signed" }],
+    "evidence_ids": ["E001"],
+    "natural_language": "Pilot annex is signed for the payments team. No co-determination blocker."
+  },
+  {
+    "session_id": "S04",
+    "round": 4,
+    "agent": "it_infra",
+    "stance": "approve",
+    "claims": [{ "type": "cost", "text": "Local Qwen 72B has capacity for the payments pool." }],
+    "concessions": [
+      { "field": "routing.default", "value": "LOCAL_QWEN_72B" },
+      { "field": "routing.sensitive", "value": "LOCAL_QWEN_72B" },
+      { "field": "budget.max_tokens_per_day", "value": 500000 }
+    ],
+    "evidence_ids": ["R0003"],
+    "natural_language": "Routing payment schemas to LOCAL_QWEN_72B with a 500k/day cap on the payments pool. Sovereign and cheaper."
+  },
+  {
+    "session_id": "S04",
+    "round": 5,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "natural_language": "Consensus: approved with the sovereign local route for payment data."
+  }
+]

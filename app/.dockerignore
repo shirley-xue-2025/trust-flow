@@ -1,0 +1,9 @@
+# Keep the Docker build context small and reproducible: never ship host-built
+# artifacts or secrets into the image. Dockerfiles build dist/ from source.
+**/node_modules
+**/dist
+data
+.env
+**/.env
+*.log
+.git
