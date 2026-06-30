@@ -51,6 +51,7 @@
 | S5 | Seed fixtures + evals | Agent | 🟢 Done | [`docs/fixtures/`](docs/fixtures/) |
 | S6 | Evidence collection script | Agent | 🟢 Done | [`scripts/collect_evidence.py`](scripts/collect_evidence.py) |
 | S7 | Strategy explorer (pitch) | Shirley | 🟢 Done | [`prototypes/trustflow_strategy_explorer.html`](prototypes/trustflow_strategy_explorer.html) |
+| P1 | Competitor adaptation prototypes (HTML) | Agent | 🟢 Done | [`prototypes/competitor_adaptations/`](prototypes/competitor_adaptations/) |
 | R6 | Competitor analysis — TrendAI & Naaia | Agent | 🟡 Desk v1 | [`04`](docs/research/04_competitor_trendai.md) · [`05`](docs/research/05_competitor_naaia.md) · [`06`](docs/research/06_competitor_inspiration_for_trustflow.md) |
 
 Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEARCH_LEDGER.md)
