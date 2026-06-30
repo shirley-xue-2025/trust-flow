@@ -125,12 +125,17 @@ Website states *“Automated real time policy enforcement & continuous monitorin
 
 ## 4. User experience observations
 
+**Visual reference:** UI fragments from marketing Lotties in [`competitors/naaia/`](../competitors/naaia/) · index [`competitors/README.md`](../competitors/README.md). **No public full-console screenshots** — demo-only product.
+
 | Surface | Pattern | Notes |
 |---------|---------|-------|
 | **Marketing** | “Govern AI risks. Build Trusted AI.” / “Compliance as a **Great experience**” | EU-first, trust & certification badges |
 | **Segmentation** | Enterprise / Public sector / SME tiers | Same platform, scaled narrative |
 | **Primary CTA** | “Get a demo” / “Talk to an expert” — **no self-serve** | 30-min personalized walkthrough |
 | **Onboarding story** | Register AI products → Assess → Core action plan → Track events | Linear lifecycle, not employee request |
+| **Action card UX** | Date + assignee avatars + EU AI Act chip + linked obligation count | See `01-action-plan-card-impact-assessment.png` |
+| **Task / evidence UX** | Green Done pill + “Applicable on N products” scope label | See `02-compliance-task-done-badge.png` |
+| **Registry UX** | Per-asset progress bar (70%) with Provider + High-risk labels | See `03-registry-eu-ai-act-progress-70pct.png` |
 | **Language** | English + French; strong EU AI Act vocabulary | Good reference for TrustFlow copy |
 | **Integrations** | “Technology-agnostic, ecosystem-integrated”, strong API (Azure listing) | Interop without owning the proxy |
 | **Pricing** | Opaque — quote via sales | Typical enterprise GRC |

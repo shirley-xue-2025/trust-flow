@@ -59,6 +59,8 @@ quadrantChart
 
 ## 3. UX patterns worth adopting
 
+**Screenshots:** [`competitors/README.md`](competitors/README.md) — 7 TrendAI + 4 Naaia curated images with UX notes.
+
 ### 3.1 From TrendAI — “control plane clarity”
 
 1. **Rule builder taxonomy** — Group controls by prompt vs response vs access vs agent tool call. TrustFlow admin UI should mirror this structure when editing compiled policy.

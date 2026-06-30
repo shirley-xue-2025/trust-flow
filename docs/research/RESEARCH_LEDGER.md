@@ -118,7 +118,7 @@ Validate via R3 evidence + synthetic DPO roleplay (next phase).
 
 **Hypothesis:** The market splits into **security enforcement** (TrendAI) and **compliance documentation** (Naaia). TrustFlow wins by combining **stakeholder negotiation → compiled gateway policy**, with DE Betriebsrat gates neither emphasizes.
 
-**Desk research (2026-06-30):**
+**Desk research (2026-06-30):** Includes curated public screenshots — [`competitors/README.md`](competitors/README.md).
 
 | Vendor | Layer | Key takeaway for TrustFlow |
 |--------|-------|----------------------------|

@@ -128,10 +128,14 @@ When inline proxy is not feasible, TrendAI offers a **self-hosted collector** th
 
 ## 4. User experience observations
 
+**Visual reference:** Curated screenshots in [`competitors/trendai/`](../competitors/trendai/) · index [`competitors/README.md`](../competitors/README.md)
+
 | Surface | Pattern | Friction |
 |---------|---------|----------|
 | **Marketing** | “AI Fearlessly” — security as **innovation enabler**, not blocker | Enterprise sales-led; free trial for platform |
 | **Admin UX** | Unified Vision One console; AI rules nested under ZTSA / AI Security | Steep — full XDR platform, not a single-purpose AI approval tool |
+| **Dashboard UX** | Dark-mode SOC: AI Guard 3-way split (harmful / sensitive / prompt attack); AI Security Blueprint counts-first | See `01-ai-guard-dashboard-blocked-content.png`, `03-ai-security-blueprint.png` |
+| **Cloud AI-SPM UX** | PASS/FAIL cards + Bedrock rule table + XDR entity graph on guardrail tampering | See `04`–`06` in visual ref |
 | **Employee UX** | Inline block/warn at access layer; user may not see *why* beyond security message | No employee-facing “request access” story |
 | **Policy model** | Allow/block/monitor per inspection type | Deterministic — aligns with TrustFlow Layer A philosophy |
 | **Evidence** | Interaction logging for compliance & investigations | Audit trail yes; legal artifact generation no |
