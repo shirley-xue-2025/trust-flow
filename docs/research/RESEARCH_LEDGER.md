@@ -2,7 +2,7 @@
 
 Master checklist for facts we must verify before building the boardroom core. Status: **open** | **in_progress** | **verified** | **deferred**.
 
-Last updated: 2026-06-25
+Last updated: 2026-06-30
 
 ---
 
@@ -15,6 +15,7 @@ Last updated: 2026-06-25
 | R3 | What pain points appear in real EU enterprise discourse? | verified (v1) | — | Synthetic DPO persona, PMF narrative |
 | R4 | Will buyers click "Book demo" on a compliance-first landing page? | open | — | Fake-door test (post-research) |
 | R5 | Hidden actors in approval chain beyond DPO/Legal/IT? | verified | — | Agent society completeness |
+| R6 | What can we learn from TrendAI & Naaia (security + compliance UX)? | in_progress (desk v1) | Agent | Positioning, MVP UI, gateway rule taxonomy |
 
 ---
 
@@ -113,6 +114,27 @@ Validate via R3 evidence + synthetic DPO roleplay (next phase).
 
 ---
 
+## R6 — Competitor analysis (TrendAI + Naaia)
+
+**Hypothesis:** The market splits into **security enforcement** (TrendAI) and **compliance documentation** (Naaia). TrustFlow wins by combining **stakeholder negotiation → compiled gateway policy**, with DE Betriebsrat gates neither emphasizes.
+
+**Desk research (2026-06-30):**
+
+| Vendor | Layer | Key takeaway for TrustFlow |
+|--------|-------|----------------------------|
+| **TrendAI** (Trend Micro enterprise) | Inline ZTSA, AI-SPM, Agentic Governance Gateway | Adopt inspection rule matrix, OWASP mapping, out-of-band collectors |
+| **Naaia** (EU AIMS) | Repository → Assess → Core action plans → Event Tracker | Adopt qualification wizard, compliance score, auditor export, Mix & Match framing |
+
+**Still open:**
+
+- [ ] Naaia demo — confirm whether “real-time enforcement” is proxy or monitoring-only (R6b)
+- [ ] TrendAI Agentic Governance Gateway live UX (R6a)
+- [ ] DE enterprise reference for either vendor on Copilot-style rollouts (R6c)
+
+**Detail:** [`04_competitor_trendai.md`](04_competitor_trendai.md) · [`05_competitor_naaia.md`](05_competitor_naaia.md) · [`06_competitor_inspiration_for_trustflow.md`](06_competitor_inspiration_for_trustflow.md)
+
+---
+
 ## Evidence index
 
 | File | Type |
@@ -120,4 +142,7 @@ Validate via R3 evidence + synthetic DPO roleplay (next phase).
 | `01_eu_ai_act_audit_trail.md` | Regulatory translation |
 | `02_betriebsrat_co_determination.md` | DE labor law |
 | `03_market_evidence_plan.md` | Scraping protocol |
+| `04_competitor_trendai.md` | Competitor — security / enforcement |
+| `05_competitor_naaia.md` | Competitor — EU compliance / GRC |
+| `06_competitor_inspiration_for_trustflow.md` | Competitor synthesis → product |
 | `evidence/` | Raw excerpts (future) |

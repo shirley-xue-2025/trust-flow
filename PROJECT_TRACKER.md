@@ -3,7 +3,7 @@
 **Purpose:** Shared view of who is working on what, current phase, and links to deliverables.  
 **Update rule:** When you start, finish, or hand off work — edit **Active workstreams** and append **Changelog** with your name and date.
 
-**Last updated:** 2026-06-25 · Shirley + Agent (Cursor)
+**Last updated:** 2026-06-30 · Agent (Cursor)
 
 ---
 
@@ -30,6 +30,7 @@
 | W05 | Phase 3 — Gateway simulator | **Unassigned** | ⏸ Waiting on W04 | [`docs/schemas/gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
 | W06 | Phase 4 — Demo UI | **Unassigned** | ⏸ Waiting on W01 | [`docs/plans/hackathon_mvp_scope.md`](docs/plans/hackathon_mvp_scope.md) |
 | W07 | Phase 5 — Fake-door LP | **Shirley** | ⏸ Deferred | [`docs/research/pmf/fake_door_copy.md`](docs/research/pmf/fake_door_copy.md) |
+| W08 | Competitor analysis — TrendAI & Naaia | **Agent** | 🟡 Desk v1 done | [`docs/research/06_competitor_inspiration_for_trustflow.md`](docs/research/06_competitor_inspiration_for_trustflow.md) |
 
 **Status key:** 🟢 Done · 🟡 In progress / review · 🔴 Blocked · ⏸ Waiting · ⚪ Not started
 
@@ -50,6 +51,7 @@
 | S5 | Seed fixtures + evals | Agent | 🟢 Done | [`docs/fixtures/`](docs/fixtures/) |
 | S6 | Evidence collection script | Agent | 🟢 Done | [`scripts/collect_evidence.py`](scripts/collect_evidence.py) |
 | S7 | Strategy explorer (pitch) | Shirley | 🟢 Done | [`prototypes/trustflow_strategy_explorer.html`](prototypes/trustflow_strategy_explorer.html) |
+| R6 | Competitor analysis — TrendAI & Naaia | Agent | 🟡 Desk v1 | [`04`](docs/research/04_competitor_trendai.md) · [`05`](docs/research/05_competitor_naaia.md) · [`06`](docs/research/06_competitor_inspiration_for_trustflow.md) |
 
 Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEARCH_LEDGER.md)
 
@@ -72,6 +74,7 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
+| 2026-06-30 | Agent | R6 competitor analysis: TrendAI + Naaia (security, compliance, UX) | branch `cursor/competitor-analysis-trendai-naaia-1462` |
 | 2026-06-25 | Agent | PROJECT_TRACKER.md for teammate coordination | commit `9a9be60` |
 | 2026-06-25 | Agent | Pre-build: architecture, work plan, roleplay, fixtures | commit `8814c1f` |
 | 2026-06-25 | Agent | R3 corpus (55 items) + DPO persona v0.1 | commit `781aac6` |
