@@ -33,7 +33,24 @@ npm run test          # 20 tests, S01–S05 green, NO network / NO key
 npm run dev           # backend :8080 + web :5173 (Vite proxies /v1 → backend)
 ```
 
-Open http://localhost:5173 → tab "1 · Request" → pick a replay scenario (S01–S05).
+Open http://localhost:5173 → **Employee portal** (default) or `/demo` for the judge walkthrough.
+
+### Employee portal (`/`)
+
+Role-based flow for employees:
+
+1. **Dashboard** — approved tools, in-review count, recent requests
+2. **New request** — submit tool access with business justification
+3. **My requests** — track status (negotiating → approved / denied / pending external)
+4. **Tool workspace** — chat through the governed gateway after approval
+
+Uses **shadcn/ui + Tailwind**. Backend: `POST/GET /v1/employee/requests`, `GET /v1/employee/tools`.
+
+Quick test: New request → **S04 — Approved, local route** (replay, no API key) → open tool workspace.
+
+### Demo console (`/demo`)
+
+Tab "1 · Request" → pick a replay scenario (S01–S05).
 The boardroom streams over SSE, the compiler produces the hashed policy, and the
 Playground sends prompts through the gateway (try the IBAN sample → `PII_BLOCK`).
 

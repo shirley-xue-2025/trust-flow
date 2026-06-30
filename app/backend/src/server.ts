@@ -10,6 +10,7 @@
  *   GET  /v1/scenarios, /v1/org        demo metadata
  */
 import './env.js'; // auto-load .env before anything reads process.env
+import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import type { RequestPacket } from '@trustflow/shared';
@@ -24,6 +25,16 @@ import { hasGolden } from './boardroom/golden.js';
 import { runInference } from './gateway/enforce.js';
 import { readAudit, readPolicyById } from './store/index.js';
 import { hasApiKey } from './qwen/client.js';
+import {
+  createEmployeeRequest,
+  getEmployeeRequest,
+  listEmployeeRequests,
+  nextStepsForRecord,
+  toolDisplayName,
+  updateEmployeeRequest,
+} from './employee/requests.js';
+import { runEmployeeBoardroom } from './employee/runBoardroom.js';
+import type { EmployeeProfile } from '@trustflow/shared';
 
 export function buildServer() {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
@@ -38,6 +49,193 @@ export function buildServer() {
   app.get('/v1/org', async () => ORG);
   app.get('/v1/tools', async () => REGISTRY);
   app.get('/v1/scenarios', async () => SCENARIOS);
+
+  // --- Employee portal -------------------------------------------------------
+  const DEMO_EMPLOYEE: EmployeeProfile = {
+    user_id: 'emp_payments_42',
+    display_name: 'Alex Weber',
+    email: 'alex.weber@nordpay.example',
+    department: 'payments_engineering',
+    role: 'senior_developer',
+  };
+
+  app.get('/v1/employee/profile', async () => DEMO_EMPLOYEE);
+
+  app.get('/v1/employee/requests', async (req) => {
+    const actorId = (req.query as { actor_id?: string }).actor_id ?? DEMO_EMPLOYEE.user_id;
+    return { requests: listEmployeeRequests(actorId) };
+  });
+
+  app.get('/v1/employee/requests/:id', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const record = getEmployeeRequest(id);
+    if (!record) return reply.code(404).send({ error: 'request not found' });
+    const steps = record.next_steps ?? nextStepsForRecord(record, REGISTRY);
+    return { ...record, next_steps: steps };
+  });
+
+  // body: { tool_id, use_case_category, department?, data_classes?, business_justification?, replay? }
+  app.post('/v1/employee/requests', async (req, reply) => {
+    const body = req.body as {
+      tool_id: string;
+      use_case_category: string;
+      department?: string;
+      data_classes?: string[];
+      annex_iii_risk?: boolean;
+      business_justification?: string;
+      betriebsvereinbarung_status?: RequestPacket['betriebsvereinbarung_status'];
+      vendor_dpa_status?: RequestPacket['vendor_dpa_status'];
+      replay?: string;
+      actor?: Partial<EmployeeProfile>;
+    };
+
+    if (!body.tool_id || !body.use_case_category) {
+      return reply.code(400).send({ error: 'tool_id and use_case_category required' });
+    }
+
+    const replay = body.replay;
+    if (replay && !hasGolden(replay)) {
+      return reply.code(404).send({ error: `no golden transcript ${replay}` });
+    }
+
+    const actor = { ...DEMO_EMPLOYEE, ...body.actor };
+    const requestId = randomUUID();
+    const packet: RequestPacket = {
+      request_id: requestId,
+      tool_id: body.tool_id,
+      use_case_category: body.use_case_category,
+      department: body.department ?? actor.department,
+      data_classes: body.data_classes ?? [],
+      annex_iii_risk: body.annex_iii_risk ?? body.use_case_category === 'hr_screening',
+      entity_country: ORG.entity_country,
+      betriebsvereinbarung_status: body.betriebsvereinbarung_status ?? ORG.betriebsvereinbarung_status,
+      vendor_dpa_status:
+        body.vendor_dpa_status ??
+        REGISTRY.tools.find((t) => t.tool_id === body.tool_id)?.vendor_dpa_status,
+    };
+
+    if (replay) {
+      const scenario = getScenario(replay);
+      if (scenario?.request) Object.assign(packet, scenario.request, { request_id: requestId });
+    }
+
+    const record = createEmployeeRequest({
+      actor_id: actor.user_id,
+      actor_name: actor.display_name,
+      department: packet.department ?? actor.department,
+      role: actor.role,
+      tool_id: packet.tool_id,
+      tool_display_name: toolDisplayName(REGISTRY, packet.tool_id),
+      use_case_category: packet.use_case_category,
+      business_justification: body.business_justification,
+      packet,
+    });
+
+    void runEmployeeBoardroom(record.request_id, ORG, REGISTRY, { replayScenarioId: replay }).catch(
+      (err) => {
+        updateEmployeeRequest(record.request_id, {
+          status: 'denied',
+          outcome: 'DENIED',
+          next_steps: [`Negotiation failed: ${(err as Error).message}`],
+        });
+      },
+    );
+
+    return {
+      request_id: record.request_id,
+      status: 'submitted',
+    };
+  });
+
+  // SSE stream of boardroom turns for an employee request (re-run or poll existing session).
+  app.get('/v1/employee/requests/:id/stream', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const record = getEmployeeRequest(id);
+    if (!record) return reply.code(404).send({ error: 'request not found' });
+
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+
+    const send = (event: string, data: unknown) => {
+      reply.raw.write(`event: ${event}\n`);
+      reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    if (record.status !== 'negotiating' && record.status !== 'submitted') {
+      send('result', record);
+      reply.raw.end();
+      return;
+    }
+
+    try {
+      const session = createSession(record.packet);
+      const replay = (req.query as { replay?: string }).replay;
+      await runSession(session, ORG, {
+        replayScenarioId: replay,
+        onTurn: (env) => send('turn', env),
+      });
+
+      const outcome = session.outcome ?? 'DENIED';
+      const updated = updateEmployeeRequest(id, {
+        session_id: session.session_id,
+        status:
+          outcome === 'APPROVED'
+            ? 'approved'
+            : outcome === 'DENIED'
+              ? 'denied'
+              : outcome === 'PENDING_EXTERNAL'
+                ? 'pending_external'
+                : outcome === 'PENDING_HUMAN'
+                  ? 'pending_human'
+                  : 'negotiating',
+        outcome,
+        deny_code: session.deny_code,
+        routing_decision: session.routing_decision,
+        policy_id: session.policy?.policy_id,
+        policy_version_hash: session.policy_version_hash,
+        next_steps: nextStepsForRecord(
+          {
+            ...record,
+            status:
+              outcome === 'APPROVED'
+                ? 'approved'
+                : outcome === 'DENIED'
+                  ? 'denied'
+                  : outcome === 'PENDING_EXTERNAL'
+                    ? 'pending_external'
+                    : 'pending_human',
+            deny_code: session.deny_code,
+          },
+          REGISTRY,
+        ),
+      });
+      send('result', updated);
+    } catch (err) {
+      send('error', { message: (err as Error).message });
+    } finally {
+      reply.raw.end();
+    }
+  });
+
+  app.get('/v1/employee/tools', async (req) => {
+    const actorId = (req.query as { actor_id?: string }).actor_id ?? DEMO_EMPLOYEE.user_id;
+    const approved = listEmployeeRequests(actorId).filter((r) => r.status === 'approved' && r.policy_id);
+    return {
+      tools: approved.map((r) => ({
+        request_id: r.request_id,
+        tool_id: r.tool_id,
+        tool_display_name: r.tool_display_name,
+        policy_id: r.policy_id,
+        policy_version_hash: r.policy_version_hash,
+        use_case_category: r.use_case_category,
+        routing_decision: r.routing_decision,
+      })),
+    };
+  });
 
   // --- Start a boardroom session --------------------------------------------
   // body: a RequestPacket. query: ?replay=S0X (uses the golden transcript and,
