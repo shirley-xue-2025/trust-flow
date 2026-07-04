@@ -13,9 +13,12 @@ import { getBoardroomSession, getAuditForRequest, getPolicy } from '@/governance
 import { RequestTimeline } from '@/employee/components/RequestTimeline';
 import { StatusBadge, isTerminalStatus } from '@/employee/components/StatusBadge';
 import { BoardroomTranscript } from '@/components/trust/BoardroomTranscript';
+import { StakeholderSummaryCard } from '@/components/trust/StakeholderSummaryCard';
 import { ComplianceScoreCard } from '@/components/trust/ComplianceScoreCard';
 import { PolicyTrustCard } from '@/components/trust/PolicyTrustCard';
 import { AuditTrustList } from '@/components/trust/AuditTrustList';
+import { AdvocatePanel } from '@/employee/components/AdvocatePanel';
+import { EmployeeResolutionPanel } from '@/employee/components/EmployeeResolutionPanel';
 import { computeComplianceScore } from '@/lib/complianceScore';
 import type { GatewayAuditEvent, PolicyArtifact } from '@trustflow/shared';
 
@@ -26,6 +29,7 @@ export default function RequestDetailPage() {
   const [policy, setPolicy] = useState<PolicyArtifact | null>(null);
   const [audit, setAudit] = useState<GatewayAuditEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -79,7 +83,9 @@ export default function RequestDetailPage() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [id]);
+  }, [id, reloadKey]);
+
+  const reload = () => setReloadKey((k) => k + 1);
 
   if (error) {
     return (
@@ -101,7 +107,16 @@ export default function RequestDetailPage() {
   const inProgress = !isTerminalStatus(record.status);
   const score = computeComplianceScore(record, policy);
   const defaultTab =
-    record.status === 'negotiating' || record.status === 'submitted' ? 'negotiation' : 'overview';
+    record.status === 'negotiating' || record.status === 'submitted'
+      ? 'negotiation'
+      : record.status === 'denied_pending_employee' || record.status === 'agent_recommended_deny'
+        ? 'overview'
+        : 'overview';
+
+  const showDenyPath =
+    record.status === 'denied_pending_employee' ||
+    record.status === 'agent_recommended_deny' ||
+    record.status === 'denied';
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -123,12 +138,24 @@ export default function RequestDetailPage() {
         <StatusBadge status={record.status} className="self-start" />
       </div>
 
-      {inProgress && (
+      {record.parent_request_id && (
+        <Alert>
+          <AlertTitle>Linked to prior request</AlertTitle>
+          <AlertDescription>
+            Alternative proposal for{' '}
+            <Link to={`/employee/requests/${record.parent_request_id}`} className="underline">
+              parent request
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {inProgress && record.status !== 'pending_signoff' && (
         <Card>
           <CardContent className="flex items-center gap-4 pt-6">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <div className="flex-1 space-y-2">
-              <p className="text-sm font-medium">Agent boardroom in session</p>
+              <p className="text-sm font-medium">Stakeholder review in progress</p>
               <Progress value={transcript.length > 0 ? Math.min(90, 20 + transcript.length * 12) : 15} className="h-2" />
               <p className="text-xs text-muted-foreground">
                 You can follow the negotiation below — Compliance, Procurement, IT, and Works Council
@@ -138,6 +165,20 @@ export default function RequestDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      {record.status === 'pending_signoff' && (
+        <Alert>
+          <AlertTitle>Waiting for human sign-off</AlertTitle>
+          <AlertDescription>
+            Stakeholders recommended approval. DPO and IT must sign off before you can use this tool.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {showDenyPath && <AdvocatePanel requestId={record.request_id} />}
+      {showDenyPath && <EmployeeResolutionPanel record={record} onUpdated={reload} />}
+
+      <StakeholderSummaryCard turns={transcript} />
 
       <ComplianceScoreCard score={score} />
 

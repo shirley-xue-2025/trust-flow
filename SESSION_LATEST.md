@@ -6,17 +6,15 @@
 
 ## Current state — 2026-07-04
 
-**Phase:** Product built (employee + governance + glassbox). **PRD v0.2 locked**; **technical spec v0.1 drafted** for HITL state + governance queues. **Uncommitted local work** from design-review fixes + product unification.
+**Phase:** **Demo-ready** — HITL product flow end-to-end (seed data, advocate, appeals, governance queues).
 
-**👉 Spec (implement next):** [`docs/plans/spec_hitl_state_model_and_governance_apis.md`](docs/plans/spec_hitl_state_model_and_governance_apis.md)
+**👉 Demo script:** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
 
-**👉 PRD:** [`docs/plans/prd_human_in_the_loop_and_negotiation_transparency.md`](docs/plans/prd_human_in_the_loop_and_negotiation_transparency.md)
+**👉 Spec:** [`docs/plans/spec_hitl_state_model_and_governance_apis.md`](docs/plans/spec_hitl_state_model_and_governance_apis.md)
 
 **👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md`](session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md)
 
-**👉 Tracker:** [`PROJECT_TRACKER.md`](PROJECT_TRACKER.md)
-
-**Next:** Epic B types + `requestState` + `GET /v1/governance/queues` (or commit uncommitted UI work first).
+**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed`
 
 ---
 

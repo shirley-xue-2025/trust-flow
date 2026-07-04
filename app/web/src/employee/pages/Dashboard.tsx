@@ -18,8 +18,16 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
       .catch(() => setApprovedCount(0));
   }, [profile.user_id]);
 
-  const pending = requests.filter((r) => r.status === 'submitted' || r.status === 'negotiating').length;
+  const pending = requests.filter(
+    (r) => r.status === 'submitted' || r.status === 'negotiating' || r.status === 'pending_signoff',
+  ).length;
   const recent = requests.slice(0, 5);
+
+  const demoLinks = [
+    { id: 'demo-s04-pending-signoff', label: 'Claude Code — pending sign-off' },
+    { id: 'demo-s05-denied', label: 'ChatGPT — denied (appeal demo)' },
+    { id: 'demo-s02-external', label: 'Claude Code — BR external gate' },
+  ];
 
   return (
     <div className="space-y-8">
@@ -54,7 +62,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
             <CardTitle className="text-3xl">{pending}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Agent boardroom negotiating policy</p>
+            <p className="text-xs text-muted-foreground">Stakeholder review or pending sign-off</p>
           </CardContent>
         </Card>
         <Card>
@@ -84,6 +92,23 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Demo scenarios (pre-seeded)</CardTitle>
+          <CardDescription>
+            Cold-start requests with full negotiation transcripts — reset via{' '}
+            <code className="text-xs">POST /v1/demo/reseed</code>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {demoLinks.map((d) => (
+            <Button key={d.id} variant="outline" size="sm" asChild>
+              <Link to={`/employee/requests/${d.id}`}>{d.label}</Link>
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

@@ -73,6 +73,26 @@ export async function getGovernanceQueues(params?: {
   return (await fetch(`${GOV}/queues${suffix}`)).json();
 }
 
+export async function decideGovernanceAppeal(
+  appealId: string,
+  body: {
+    decision: 'grant' | 'deny';
+    rationale: string;
+    registry_patch?: { betriebsvereinbarung_status?: 'signed' | 'pending' };
+  },
+): Promise<unknown> {
+  const res = await fetch(`${GOV}/appeals/${appealId}/decide`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Reviewer-Id': 'katrin.mueller@nordpay.example',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'appeal decide failed');
+  return res.json();
+}
+
 export async function decideHumanReview(
   requestId: string,
   reviewId: string,

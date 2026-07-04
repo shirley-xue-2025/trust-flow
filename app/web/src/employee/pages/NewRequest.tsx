@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import type { EmployeeProfile } from '@trustflow/shared';
 import type { ToolRecord } from '@trustflow/shared';
 import { Loader2 } from 'lucide-react';
@@ -26,6 +26,8 @@ const USE_CASES = [
 
 export default function NewRequestPage({ profile }: { profile: EmployeeProfile }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const parentRequestId = searchParams.get('parent') ?? undefined;
   const [tools, setTools] = useState<ToolRecord[]>([]);
   const [toolId, setToolId] = useState('claude-code');
   const [useCase, setUseCase] = useState('code_completion');
@@ -56,6 +58,7 @@ export default function NewRequestPage({ profile }: { profile: EmployeeProfile }
         data_classes: paymentData ? ['payment_api_schemas'] : [],
         annex_iii_risk: useCase === 'hr_screening',
         business_justification: justification,
+        parent_request_id: parentRequestId,
         replay,
       });
       navigate(`/employee/requests/${request_id}`);
@@ -79,6 +82,19 @@ export default function NewRequestPage({ profile }: { profile: EmployeeProfile }
         <Alert variant="destructive">
           <AlertTitle>Submission failed</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {parentRequestId && (
+        <Alert>
+          <AlertTitle>Proposing an alternative</AlertTitle>
+          <AlertDescription>
+            This request will be linked to{' '}
+            <Link to={`/employee/requests/${parentRequestId}`} className="underline">
+              the denied request
+            </Link>
+            .
+          </AlertDescription>
         </Alert>
       )}
 

@@ -29,7 +29,7 @@
 | W04 | Phase 2 — Boardroom core | **Unassigned** | ⏸ Waiting on W01 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) |
 | W05 | Phase 3 — Gateway simulator | **Unassigned** | ⏸ Waiting on W04 | [`docs/schemas/gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
 | W06 | Phase 4 — Demo UI | **Agent** | 🟡 In progress | Employee + governance portals; glassbox at `/glassbox` |
-| W08 | HITL + negotiation transparency | **Shirley** | 🟡 Spec drafted | PRD: [`prd_human_in_the_loop…`](docs/plans/prd_human_in_the_loop_and_negotiation_transparency.md) · Spec: [`spec_hitl_state_model_and_governance_apis.md`](docs/plans/spec_hitl_state_model_and_governance_apis.md) |
+| W08 | HITL + negotiation transparency | **Shirley** | 🟢 Demo-ready | [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · PRD + spec + full flow |
 | W07 | Phase 5 — Fake-door LP | **Shirley** | ⏸ Deferred | [`docs/research/pmf/fake_door_copy.md`](docs/research/pmf/fake_door_copy.md) |
 
 **Status key:** 🟢 Done · 🟡 In progress / review · 🔴 Blocked · ⏸ Waiting · ⚪ Not started

@@ -35,6 +35,7 @@ export interface SubmitRequestBody {
   betriebsvereinbarung_status?: RequestPacket['betriebsvereinbarung_status'];
   vendor_dpa_status?: RequestPacket['vendor_dpa_status'];
   replay?: string;
+  parent_request_id?: string;
 }
 
 export async function submitEmployeeRequest(
@@ -85,3 +86,69 @@ export async function runEmployeeInference(body: {
 }
 
 export type { InferenceResponse, GatewayAuditEvent };
+
+export interface AdvocateExplanation {
+  summary: string;
+  bullets: string[];
+  suggested_alternatives: { tool_id: string; display_name: string; reason: string }[];
+  disclosure: string;
+}
+
+export interface AdvocatePayload {
+  explanation: AdvocateExplanation;
+  reply?: string;
+}
+
+export async function getAdvocateExplanation(requestId: string): Promise<AdvocatePayload> {
+  const res = await fetch(`${BASE}/requests/${requestId}/advocate`);
+  if (!res.ok) throw new Error((await res.json()).error ?? 'advocate failed');
+  return res.json();
+}
+
+export async function postAdvocateMessage(requestId: string, message: string): Promise<AdvocatePayload> {
+  const res = await fetch(`${BASE}/requests/${requestId}/advocate`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ message }),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'advocate failed');
+  return res.json();
+}
+
+export async function acceptEmployeeDeny(requestId: string): Promise<EmployeeRequestRecord> {
+  const res = await fetch(`${BASE}/requests/${requestId}/accept-deny`, { method: 'POST' });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'accept failed');
+  const data = await res.json();
+  return data.record;
+}
+
+export async function submitEmployeeAppeal(
+  requestId: string,
+  body: { appeal_type: string; statement: string },
+): Promise<{ record: EmployeeRequestRecord; appeal_id: string }> {
+  const res = await fetch(`${BASE}/requests/${requestId}/appeal`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'appeal failed');
+  return res.json();
+}
+
+export async function proposeAlternativeRequest(
+  requestId: string,
+  body: {
+    tool_id: string;
+    use_case_category: string;
+    business_justification?: string;
+    replay?: string;
+  },
+): Promise<{ parent: EmployeeRequestRecord; child: EmployeeRequestRecord }> {
+  const res = await fetch(`${BASE}/requests/${requestId}/propose-alternative`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'propose failed');
+  return res.json();
+}

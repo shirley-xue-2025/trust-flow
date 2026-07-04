@@ -42,11 +42,27 @@ import { deriveDisplayStatus } from './employee/requestState.js';
 import {
   activateRequestPolicy,
   buildGovernanceQueue,
+  decideAppealForRequest,
   decideReviewForRequest,
   governanceOverviewStats,
   governanceRequestDetail,
 } from './governance/service.js';
-import type { EmployeeProfile } from '@trustflow/shared';
+import {
+  acceptDeny,
+  getAdvocatePayload,
+  proposeAlternative,
+  submitAppeal,
+} from './employee/resolution.js';
+import { seedDemoIfEmpty, forceReseedDemo } from './demo/seed.js';
+import type { AppealType, EmployeeProfile } from '@trustflow/shared';
+
+const DEMO_EMPLOYEE: EmployeeProfile = {
+  user_id: 'emp_payments_42',
+  display_name: 'Alex Weber',
+  email: 'alex.weber@nordpay.example',
+  department: 'payments_engineering',
+  role: 'senior_developer',
+};
 
 export function buildServer() {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
@@ -63,13 +79,6 @@ export function buildServer() {
   app.get('/v1/scenarios', async () => SCENARIOS);
 
   // --- Employee portal -------------------------------------------------------
-  const DEMO_EMPLOYEE: EmployeeProfile = {
-    user_id: 'emp_payments_42',
-    display_name: 'Alex Weber',
-    email: 'alex.weber@nordpay.example',
-    department: 'payments_engineering',
-    role: 'senior_developer',
-  };
 
   app.get('/v1/employee/profile', async () => DEMO_EMPLOYEE);
 
@@ -98,6 +107,7 @@ export function buildServer() {
       betriebsvereinbarung_status?: RequestPacket['betriebsvereinbarung_status'];
       vendor_dpa_status?: RequestPacket['vendor_dpa_status'];
       replay?: string;
+      parent_request_id?: string;
       actor?: Partial<EmployeeProfile>;
     };
 
@@ -141,6 +151,7 @@ export function buildServer() {
       use_case_category: packet.use_case_category,
       business_justification: body.business_justification,
       packet,
+      parent_request_id: body.parent_request_id,
     });
 
     void runEmployeeBoardroom(record.request_id, ORG, REGISTRY, { replayScenarioId: replay }).catch(
@@ -161,6 +172,63 @@ export function buildServer() {
       request_id: record.request_id,
       status: 'submitted',
     };
+  });
+
+  app.get('/v1/employee/requests/:id/advocate', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const payload = getAdvocatePayload(id, REGISTRY);
+    if (!payload) return reply.code(404).send({ error: 'request not found' });
+    return payload;
+  });
+
+  app.post('/v1/employee/requests/:id/advocate', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const body = req.body as { message?: string };
+    if (!body.message?.trim()) return reply.code(400).send({ error: 'message required' });
+    const payload = getAdvocatePayload(id, REGISTRY, body.message.trim());
+    if (!payload) return reply.code(404).send({ error: 'request not found' });
+    return payload;
+  });
+
+  app.post('/v1/employee/requests/:id/accept-deny', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const record = acceptDeny(id);
+    if (!record) return reply.code(404).send({ error: 'request not found' });
+    return { record };
+  });
+
+  app.post('/v1/employee/requests/:id/appeal', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const body = req.body as { appeal_type?: AppealType; statement?: string };
+    if (!body.appeal_type || !body.statement) {
+      return reply.code(400).send({ error: 'appeal_type and statement required' });
+    }
+    const result = submitAppeal(id, DEMO_EMPLOYEE.user_id, body.appeal_type, body.statement);
+    if ('error' in result) return reply.code(result.code).send({ error: result.error });
+    return result;
+  });
+
+  app.post('/v1/employee/requests/:id/propose-alternative', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const body = req.body as {
+      tool_id?: string;
+      use_case_category?: string;
+      business_justification?: string;
+      data_classes?: string[];
+      replay?: string;
+    };
+    if (!body.tool_id || !body.use_case_category) {
+      return reply.code(400).send({ error: 'tool_id and use_case_category required' });
+    }
+    const result = await proposeAlternative(id, DEMO_EMPLOYEE.user_id, ORG, REGISTRY, {
+      tool_id: body.tool_id,
+      use_case_category: body.use_case_category,
+      business_justification: body.business_justification,
+      data_classes: body.data_classes,
+      replay: body.replay,
+    });
+    if ('error' in result) return reply.code(result.code).send({ error: result.error });
+    return result;
   });
 
   // SSE stream of boardroom turns for an employee request (re-run or poll existing session).
@@ -409,6 +477,41 @@ export function buildServer() {
     return result;
   });
 
+  app.post('/v1/governance/appeals/:id/decide', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const body = req.body as {
+      decision?: 'grant' | 'deny';
+      rationale?: string;
+      registry_patch?: { betriebsvereinbarung_status?: 'signed' | 'pending' };
+    };
+    const reviewerId =
+      (req.headers['x-reviewer-id'] as string | undefined) ?? 'katrin.mueller@nordpay.example';
+    if (!body.decision || !body.rationale) {
+      return reply.code(400).send({ error: 'decision and rationale required' });
+    }
+    const result = await decideAppealForRequest(
+      id,
+      body.decision,
+      body.rationale,
+      reviewerId,
+      ORG,
+      REGISTRY,
+      body.registry_patch,
+    );
+    if ('error' in result) return reply.code(result.code).send({ error: result.error });
+    return result;
+  });
+
+  app.post('/v1/demo/reseed', async () => {
+    const count = await forceReseedDemo(ORG, REGISTRY, {
+      user_id: DEMO_EMPLOYEE.user_id,
+      display_name: DEMO_EMPLOYEE.display_name,
+      department: DEMO_EMPLOYEE.department,
+      role: DEMO_EMPLOYEE.role,
+    });
+    return { reseeded: true, count };
+  });
+
   // --- Governed inference through the gateway -------------------------------
   // body: { policy_id, prompt, request? }
   app.post('/v1/inference', async (req, reply) => {
@@ -466,6 +569,14 @@ const isMain =
 if (isMain) {
   const port = Number(process.env.PORT ?? 8080);
   const app = buildServer();
+  void seedDemoIfEmpty(ORG, REGISTRY, {
+    user_id: DEMO_EMPLOYEE.user_id,
+    display_name: DEMO_EMPLOYEE.display_name,
+    department: DEMO_EMPLOYEE.department,
+    role: DEMO_EMPLOYEE.role,
+  }).then((r) => {
+    if (r.seeded) app.log.info(`Demo seeded ${r.count} requests`);
+  });
   app
     .listen({ port, host: '0.0.0.0' })
     .then(() => app.log.info(`TrustFlow backend on :${port} (live_qwen=${hasApiKey()})`))

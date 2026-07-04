@@ -26,8 +26,10 @@ import {
   reviewsSummary,
   spawnHumanReviews,
 } from '../store/humanReviews.js';
-import { getPendingAppealForRequest, listAppeals } from '../store/appeals.js';
+import { getPendingAppealForRequest, listAppeals, decideAppeal, getAppeal } from '../store/appeals.js';
 import { activatePolicy, listPolicies, readPolicyById } from '../store/index.js';
+import { runEmployeeBoardroom } from '../employee/runBoardroom.js';
+import type { ToolRegistry } from '@trustflow/shared';
 
 export type GovernanceQueue =
   | 'all'
@@ -308,4 +310,118 @@ export function ensureReviewsForRequest(requestId: string, transcript = [] as im
   if (!record) return [];
   if (listHumanReviews(requestId).length) return listHumanReviews(requestId);
   return spawnHumanReviews(requestId, record.packet, transcript);
+}
+
+export async function decideAppealForRequest(
+  appealId: string,
+  decision: 'grant' | 'deny',
+  rationale: string,
+  reviewerId: string,
+  org: OrgConfig,
+  registry: ToolRegistry,
+  registryPatch?: { betriebsvereinbarung_status?: 'signed' | 'pending' },
+): Promise<
+  | { record: EmployeeRequestRecord; appeal: AppealRecord; next_step: string }
+  | { error: string; code: number }
+> {
+  if (rationale.trim().length < 20) {
+    return { error: 'rationale must be at least 20 characters', code: 400 };
+  }
+
+  const appeal = getAppeal(appealId);
+  if (!appeal) return { error: 'appeal not found', code: 404 };
+  if (appeal.status !== 'pending') return { error: 'appeal already decided', code: 409 };
+
+  const record = getEmployeeRequest(appeal.request_id);
+  if (!record) return { error: 'request not found', code: 404 };
+
+  if (decision === 'deny') {
+    decideAppeal(appealId, 'deny', rationale.trim());
+    const updated = updateEmployeeRequest(appeal.request_id, {
+      employee_resolution: 'accepted',
+      human_decision: 'rejected',
+    });
+    emitAuditEvent({
+      event_type: 'appeal_decision',
+      policy_id: record.policy_id ?? 'none',
+      policy_version_hash: record.policy_version_hash ?? 'none',
+      actor_id: record.actor_id,
+      tool_id: record.tool_id,
+      model_provider: 'none',
+      model_id: 'none',
+      routing_decision: 'BLOCKED',
+      outcome: 'denied',
+      human_reviewer_id: reviewerId,
+    });
+    return {
+      record: serializeEmployeeRequest(updated!),
+      appeal: getAppeal(appealId)!,
+      next_step: 'denied_closed',
+    };
+  }
+
+  let grantRouting: AppealRecord['grant_routing'] = 'human_reviews';
+  let nextStep = 'human_reviews';
+
+  if (appeal.appeal_type === 'procedural') {
+    const packet = { ...record.packet };
+    if (registryPatch?.betriebsvereinbarung_status) {
+      packet.betriebsvereinbarung_status = registryPatch.betriebsvereinbarung_status;
+    } else if (appeal.appeal_type === 'procedural') {
+      packet.betriebsvereinbarung_status = 'signed';
+    }
+    updateEmployeeRequest(appeal.request_id, {
+      packet,
+      employee_resolution: 'not_applicable',
+      human_decision: 'pending',
+    });
+    const refreshed = getEmployeeRequest(appeal.request_id)!;
+    spawnHumanReviews(appeal.request_id, refreshed.packet, refreshed.transcript_snapshot ?? []);
+    grantRouting = 'human_reviews';
+    nextStep = 'human_reviews';
+  } else if (appeal.appeal_type === 'factual' || appeal.appeal_type === 'alternative_scope') {
+    grantRouting = 'reopen_boardroom';
+    nextStep = 'boardroom_round';
+    const replay = appeal.appeal_type === 'factual' ? 'S01' : 'S04';
+    decideAppeal(appealId, 'grant', rationale.trim(), grantRouting);
+    await runEmployeeBoardroom(appeal.request_id, org, registry, { replayScenarioId: replay });
+    const updated = getEmployeeRequest(appeal.request_id)!;
+    emitAuditEvent({
+      event_type: 'appeal_decision',
+      policy_id: updated.policy_id ?? 'none',
+      policy_version_hash: updated.policy_version_hash ?? 'none',
+      actor_id: updated.actor_id,
+      tool_id: updated.tool_id,
+      model_provider: 'none',
+      model_id: 'none',
+      routing_decision: 'BLOCKED',
+      outcome: 'allowed',
+      human_reviewer_id: reviewerId,
+    });
+    return {
+      record: serializeEmployeeRequest(updated),
+      appeal: getAppeal(appealId)!,
+      next_step: nextStep,
+    };
+  }
+
+  decideAppeal(appealId, 'grant', rationale.trim(), grantRouting);
+  emitAuditEvent({
+    event_type: 'appeal_decision',
+    policy_id: record.policy_id ?? 'none',
+    policy_version_hash: record.policy_version_hash ?? 'none',
+    actor_id: record.actor_id,
+    tool_id: record.tool_id,
+    model_provider: 'none',
+    model_id: 'none',
+    routing_decision: 'BLOCKED',
+    outcome: 'allowed',
+    human_reviewer_id: reviewerId,
+  });
+
+  return {
+    record: serializeEmployeeRequest(getEmployeeRequest(appeal.request_id)!),
+    appeal: getAppeal(appealId)!,
+    next_step: nextStep,
+  };
 }

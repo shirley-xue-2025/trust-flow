@@ -46,6 +46,12 @@ export default function DemoApp() {
         <span className="glassbox-label">Internal technical view</span>
       </header>
 
+      <p className="muted" style={{ margin: '0 0 1rem', fontSize: '0.85rem' }}>
+        Production employee/governance flows require{' '}
+        <Link to="/governance/queues?queue=signoff&role=dpo">human sign-off</Link> before gateway
+        activation — this view shows live agent machinery only.
+      </p>
+
       <nav className="tabs">
         {TABS.map((t) => (
           <button key={t.id} className={tab === t.id ? 'active' : ''} onClick={() => setTab(t.id)}>

@@ -9,6 +9,7 @@ import { ComplianceScoreCard } from '@/components/trust/ComplianceScoreCard';
 import { PolicyTrustCard } from '@/components/trust/PolicyTrustCard';
 import { AuditTrustList } from '@/components/trust/AuditTrustList';
 import { HumanReviewPanel } from '@/governance/components/HumanReviewPanel';
+import { AppealReviewPanel } from '@/governance/components/AppealReviewPanel';
 import {
   GovernanceRoleSwitcher,
   type GovernanceReviewerRole,
@@ -87,6 +88,10 @@ export default function GovernanceRequestOversight() {
         viewerRole={viewerRole}
         onUpdated={reload}
       />
+
+      {detail.appeal && (
+        <AppealReviewPanel appeal={detail.appeal} onUpdated={reload} />
+      )}
 
       <ComplianceScoreCard score={score} />
 
