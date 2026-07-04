@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustFlow · Request & Qualification Wizard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f4f7fb; }
+    .step-active { background: #4A7C77; color: white; }
+    .step-done { background: #d1e7e4; color: #2d5a55; }
+    .step-pending { background: #e5e7eb; color: #6b7280; }
+    .chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .chip-eu { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .chip-risk-low { background: #ecfdf5; color: #047857; }
+    .chip-risk-high { background: #fef2f2; color: #b91c1c; }
+    .progress-bar { height: 8px; border-radius: 9999px; background: #e5e7eb; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #4A7C77, #6ba39d); transition: width 0.4s ease; }
+  </style>
+</head>
+<body class="antialiased text-gray-800">
+  <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="text-sm text-teal-700 font-medium">← All prototypes</a>
+      <span class="text-gray-300">|</span>
+      <span class="font-bold text-teal-800">TrustFlow</span>
+    </div>
+    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold">Adapted from Naaia Assess</span>
+  </nav>
+
+  <div class="max-w-3xl mx-auto px-6 py-10">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Request access to an AI tool</h1>
+      <p class="text-gray-600 text-sm">Qualification wizard runs <em>before</em> the agent boardroom — inspired by Naaia’s Assess engine, but employee-initiated (a gap neither TrendAI nor Naaia cover).</p>
+    </header>
+
+    <!-- Step indicator -->
+    <div class="flex gap-2 mb-8" id="stepIndicator">
+      <div class="step-active flex-1 text-center text-xs font-semibold py-2 rounded-lg" data-step="1">1 · Tool</div>
+      <div class="step-pending flex-1 text-center text-xs font-semibold py-2 rounded-lg" data-step="2">2 · Use case</div>
+      <div class="step-pending flex-1 text-center text-xs font-semibold py-2 rounded-lg" data-step="3">3 · Qualify</div>
+      <div class="step-pending flex-1 text-center text-xs font-semibold py-2 rounded-lg" data-step="4">4 · Submit</div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8" id="wizardPanel">
+      <!-- Step 1 -->
+      <section id="step1">
+        <h2 class="font-semibold text-lg mb-4">Which AI tool do you need?</h2>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-4 border-2 border-teal-600 bg-teal-50/50 rounded-xl cursor-pointer tool-opt">
+            <input type="radio" name="tool" value="claude-code" checked class="mt-1">
+            <div>
+              <p class="font-semibold">Claude Code</p>
+              <p class="text-sm text-gray-500">Anthropic · Code completion · US residency</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 tool-opt">
+            <input type="radio" name="tool" value="copilot" class="mt-1">
+            <div>
+              <p class="font-semibold">GitHub Copilot Enterprise</p>
+              <p class="text-sm text-gray-500">Microsoft · Already in registry (approved)</p>
+            </div>
+          </label>
+          <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 tool-opt">
+            <input type="radio" name="tool" value="chatgpt" class="mt-1">
+            <div>
+              <p class="font-semibold">ChatGPT Enterprise</p>
+              <p class="text-sm text-gray-500">OpenAI · Shadow AI detected last week</p>
+            </div>
+          </label>
+        </div>
+        <button onclick="goStep(2)" class="mt-6 w-full bg-teal-700 text-white font-semibold py-3 rounded-xl hover:bg-teal-800">Continue</button>
+      </section>
+
+      <!-- Step 2 -->
+      <section id="step2" class="hidden">
+        <h2 class="font-semibold text-lg mb-4">Describe your use case</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <input type="text" value="Payments Engineering" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" readonly>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Use case category</label>
+            <select id="useCase" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" onchange="updateQualify()">
+              <option value="code_completion">Code completion / internal tooling</option>
+              <option value="summarization">Document summarization</option>
+              <option value="hr_screening">HR candidate screening</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data classes involved</label>
+            <div class="flex flex-wrap gap-2">
+              <label class="chip chip-eu cursor-pointer"><input type="checkbox" checked class="mr-1 data-class" value="source"> Internal source code</label>
+              <label class="chip chip-eu cursor-pointer"><input type="checkbox" checked class="mr-1 data-class" value="payment"> Payment API schemas</label>
+              <label class="chip chip-eu cursor-pointer"><input type="checkbox" class="mr-1 data-class" value="pii"> Customer PII</label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Why now? (Runner narrative)</label>
+            <textarea class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm h-20">SEPA instant rails in Q3 — we lose a day per engineer on boilerplate. Not feeding production credentials.</textarea>
+          </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button onclick="goStep(1)" class="flex-1 border border-gray-200 font-semibold py-3 rounded-xl">Back</button>
+          <button onclick="goStep(3); updateQualify()" class="flex-1 bg-teal-700 text-white font-semibold py-3 rounded-xl">Qualify risk</button>
+        </div>
+      </section>
+
+      <!-- Step 3 -->
+      <section id="step3" class="hidden">
+        <h2 class="font-semibold text-lg mb-2">Qualification result</h2>
+        <p class="text-sm text-gray-500 mb-6">Auto-generated — same role Naaia Assess plays, scoped to this request.</p>
+
+        <div class="space-y-4 mb-6">
+          <div class="flex flex-wrap gap-2">
+            <span class="chip chip-eu">🇪🇺 EU AI Act</span>
+            <span id="riskChip" class="chip chip-risk-low">Limited risk</span>
+            <span class="chip bg-gray-100 text-gray-700">Deployer (not provider)</span>
+          </div>
+
+          <div class="border border-gray-100 rounded-xl p-4 bg-gray-50">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="font-medium">Pre-boardroom readiness</span>
+              <span id="readyPct" class="font-bold text-teal-700">35%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="readyBar" style="width:35%"></div></div>
+          </div>
+
+          <div id="gateList" class="space-y-2 text-sm"></div>
+
+          <div class="border-l-4 border-amber-400 bg-amber-50 p-4 rounded-r-xl text-sm">
+            <p class="font-semibold text-amber-900">Estimated boardroom gates</p>
+            <p class="text-amber-800 mt-1" id="gateSummary">Procurement (DPA), Works Council (§87 BetrVG), Compliance (routing + audit), IT Infra (local model path).</p>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="goStep(2)" class="flex-1 border border-gray-200 font-semibold py-3 rounded-xl">Back</button>
+          <button onclick="goStep(4)" class="flex-1 bg-teal-700 text-white font-semibold py-3 rounded-xl">Submit to boardroom</button>
+        </div>
+      </section>
+
+      <!-- Step 4 -->
+      <section id="step4" class="hidden text-center py-4">
+        <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">✓</div>
+        <h2 class="text-xl font-bold mb-2">Request demo-001 queued</h2>
+        <p class="text-gray-600 text-sm mb-6 max-w-md mx-auto">Five agents will negotiate a policy proposal. Human tasks (DPA, Betriebsvereinbarung) stay visible alongside compiled gateway rules.</p>
+        <a href="04_bridge_end_to_end.html" class="inline-block bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl hover:bg-teal-800">See boardroom outcome →</a>
+        <p class="text-xs text-gray-400 mt-4"><a href="02_compliance_command_center.html" class="text-teal-600 underline">Compliance center</a> · <a href="03_gateway_control_plane.html" class="text-teal-600 underline">Gateway rules</a></p>
+      </section>
+    </div>
+
+    <aside class="mt-8 p-4 bg-white/80 rounded-xl border border-dashed border-gray-300 text-xs text-gray-500">
+      <strong class="text-gray-700">What we adapted from Naaia:</strong> qualification engine output (operator role, risk tier, framework chips), progress %, obligation-style gate list.
+      <strong class="text-gray-700">TrustFlow addition:</strong> employee-initiated flow + explicit Betriebsrat / procurement gates before negotiation starts.
+    </aside>
+  </div>
+
+  <script>
+    let current = 1;
+    function goStep(n) {
+      current = n;
+      [1,2,3,4].forEach(i => document.getElementById('step'+i).classList.toggle('hidden', i !== n));
+      document.querySelectorAll('#stepIndicator [data-step]').forEach(el => {
+        const s = +el.dataset.step;
+        el.className = 'flex-1 text-center text-xs font-semibold py-2 rounded-lg ' +
+          (s < n ? 'step-done' : s === n ? 'step-active' : 'step-pending');
+      });
+    }
+    function updateQualify() {
+      const uc = document.getElementById('useCase').value;
+      const riskChip = document.getElementById('riskChip');
+      const gates = document.getElementById('gateList');
+      let pct = 35, risk = 'Limited risk', riskClass = 'chip-risk-low';
+      let items = [
+        { ok: false, text: 'Vendor DPA unsigned (Procurement gate)', code: 'VENDOR_DPA_PENDING' },
+        { ok: false, text: 'Betriebsvereinbarung pending (Works Council)', code: 'BETRIEBSVEREINBARUNG_PENDING' },
+        { ok: true, text: 'Not Annex III high-risk use case', code: 'OK' },
+        { ok: true, text: 'Art. 50 transparency applicable (limited risk)', code: 'OK' },
+      ];
+      if (uc === 'hr_screening') {
+        pct = 15; risk = 'High risk (Annex III)'; riskClass = 'chip-risk-high';
+        items.unshift({ ok: false, text: 'Annex III HR screening — full Art. 12 logging required', code: 'HIGH_RISK' });
+      }
+      riskChip.textContent = risk;
+      riskChip.className = 'chip ' + riskClass;
+      document.getElementById('readyPct').textContent = pct + '%';
+      document.getElementById('readyBar').style.width = pct + '%';
+      gates.innerHTML = items.map(g => `
+        <div class="flex items-center gap-2 p-2 rounded-lg ${g.ok ? 'bg-green-50' : 'bg-red-50'}">
+          <span>${g.ok ? '✓' : '○'}</span>
+          <span class="flex-1">${g.text}</span>
+          <code class="text-xs text-gray-500">${g.code}</code>
+        </div>`).join('');
+    }
+    document.querySelectorAll('.tool-opt').forEach(l => {
+      l.addEventListener('click', () => {
+        document.querySelectorAll('.tool-opt').forEach(x => x.classList.remove('border-teal-600','bg-teal-50/50','border-2'));
+        document.querySelectorAll('.tool-opt').forEach(x => x.classList.add('border','border-gray-200'));
+        l.classList.remove('border','border-gray-200');
+        l.classList.add('border-2','border-teal-600','bg-teal-50/50');
+      });
+    });
+    updateQualify();
+  </script>
+</body>
+</html>

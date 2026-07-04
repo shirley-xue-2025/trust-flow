@@ -24,6 +24,9 @@ tmp/
 # Evidence raw dumps with PII risk (review before any commit)
 **/evidence/raw/
 
+# Competitor scrape raw assets (Lottie JSON, uncurated); see docs/research/competitors/README.md
+docs/research/competitors/raw/
+
 # --- Node / TypeScript app (app/) ---
 
 # Dependencies
