@@ -46,6 +46,8 @@ app/web/dist/
 # Test / coverage
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
 
 # Logs
 *.log

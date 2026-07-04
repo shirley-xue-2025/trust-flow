@@ -3,10 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getGovernanceQueues, type GovernanceQueueItem } from '@/governance/api';
-import {
-  GovernanceRoleSwitcher,
-  type GovernanceReviewerRole,
-} from '@/governance/GovernanceRoleSwitcher';
+import { useGovernanceRole } from '@/governance/useGovernanceRole';
 import { StatusBadge } from '@/employee/components/StatusBadge';
 import type { EmployeeRequestStatus } from '@trustflow/shared';
 
@@ -22,8 +19,8 @@ type QueueTab = (typeof QUEUE_TABS)[number]['id'];
 
 export default function GovernanceQueuesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { role } = useGovernanceRole();
   const queue = (searchParams.get('queue') as QueueTab) || 'signoff';
-  const role = (searchParams.get('role') as GovernanceReviewerRole) || 'dpo';
 
   const [items, setItems] = useState<GovernanceQueueItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -50,43 +47,37 @@ export default function GovernanceQueuesPage() {
     setSearchParams({ queue: next, role });
   }
 
-  function setRole(next: GovernanceReviewerRole) {
-    setSearchParams({ queue, role: next });
-  }
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Queues</h1>
         <p className="text-muted-foreground">
-          Unified oversight — filter by queue type and your reviewer role.
+          Items for your selected reviewer role — switch DPO, Procurement, or IT Security in the header.
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-1 rounded-lg border bg-muted/30 p-1">
-          {QUEUE_TABS.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setQueue(id)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                queue === id
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <GovernanceRoleSwitcher value={role} onChange={setRole} />
+      <div className="flex flex-wrap gap-1 rounded-lg border bg-muted/30 p-1">
+        {QUEUE_TABS.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setQueue(id)}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              queue === id
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>
-            {QUEUE_TABS.find((t) => t.id === queue)?.label ?? 'Queue'} ({total})
+            {QUEUE_TABS.find((t) => t.id === queue)?.label ?? 'Queue'}
+            {!loading && ` (${total})`}
           </CardTitle>
           <CardDescription>
             {role === 'all'
@@ -103,7 +94,31 @@ export default function GovernanceQueuesPage() {
           ) : items.length === 0 ? (
             <p className="text-sm text-muted-foreground">No items in this queue.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <ul className="space-y-3 md:hidden">
+                {items.map((item) => (
+                  <li key={`${item.request_id}-${item.kind}-m`} className="rounded-lg border p-4">
+                    <Link
+                      to={`/governance/requests/${item.request_id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {item.actor_name}
+                    </Link>
+                    <p className="text-xs text-muted-foreground">
+                      {item.department.replace(/_/g, ' ')} · {item.tool_display_name}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <StatusBadge
+                        status={(item.display_status ?? 'pending_signoff') as EmployeeRequestStatus}
+                      />
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(item.submitted_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-muted-foreground">
@@ -146,7 +161,8 @@ export default function GovernanceQueuesPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

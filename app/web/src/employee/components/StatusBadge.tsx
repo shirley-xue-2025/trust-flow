@@ -59,3 +59,8 @@ export function isTerminalStatus(status: EmployeeRequestStatus): boolean {
     status !== 'appeal_pending'
   );
 }
+
+/** Poll only while negotiation or sign-off may still change. */
+export function shouldPollRequest(status: EmployeeRequestStatus): boolean {
+  return status === 'submitted' || status === 'negotiating' || status === 'pending_signoff';
+}

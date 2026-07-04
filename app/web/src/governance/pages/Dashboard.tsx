@@ -5,10 +5,13 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getGovernanceOverview, type GovernanceOverview } from '@/governance/api';
+import { governanceLink, useGovernanceRole } from '@/governance/useGovernanceRole';
+import type { GovernanceReviewerRole } from '@/governance/GovernanceRoleSwitcher';
 import { StatusBadge } from '@/employee/components/StatusBadge';
 import { AuditTrustList } from '@/components/trust/AuditTrustList';
 
 export default function GovernanceDashboard() {
+  const { role } = useGovernanceRole();
   const [data, setData] = useState<GovernanceOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +47,7 @@ export default function GovernanceDashboard() {
         </div>
         {pendingSignoff > 0 && (
           <Button asChild>
-            <Link to="/governance/queues?queue=signoff&role=dpo">
+            <Link to={governanceLink('/governance/queues', role, { queue: 'signoff' })}>
               {pendingSignoff} pending sign-off{pendingSignoff === 1 ? '' : 's'}
             </Link>
           </Button>
@@ -72,7 +75,7 @@ export default function GovernanceDashboard() {
           <CardDescription>Click a row for negotiation transcript, policy, and audit evidence.</CardDescription>
         </CardHeader>
         <CardContent>
-          <RequestTable requests={data.requests} />
+          <RequestTable requests={data.requests} role={role} />
         </CardContent>
       </Card>
 
@@ -99,7 +102,13 @@ function StatCard({ title, value, hint }: { title: string; value: number; hint: 
   );
 }
 
-function RequestTable({ requests }: { requests: EmployeeRequestRecord[] }) {
+function RequestTable({
+  requests,
+  role,
+}: {
+  requests: EmployeeRequestRecord[];
+  role: GovernanceReviewerRole;
+}) {
   if (requests.length === 0) {
     return <p className="text-sm text-muted-foreground">No employee requests yet.</p>;
   }
@@ -119,7 +128,7 @@ function RequestTable({ requests }: { requests: EmployeeRequestRecord[] }) {
           {requests.map((r) => (
             <tr key={r.request_id} className="border-b last:border-0">
               <td className="py-3 pr-4">
-                <Link to={`/governance/requests/${r.request_id}`} className="font-medium hover:underline">
+                <Link to={governanceLink(`/governance/requests/${r.request_id}`, role)} className="font-medium hover:underline">
                   {r.actor_name}
                 </Link>
                 <p className="text-xs text-muted-foreground">{r.department.replace(/_/g, ' ')}</p>

@@ -3,10 +3,10 @@ import { cn } from '@/lib/utils';
 export type GovernanceReviewerRole = 'all' | 'dpo' | 'procurement' | 'it';
 
 const ROLES: { id: GovernanceReviewerRole; label: string }[] = [
-  { id: 'all', label: 'All' },
+  { id: 'all', label: 'All roles' },
   { id: 'dpo', label: 'DPO' },
   { id: 'procurement', label: 'Procurement' },
-  { id: 'it', label: 'IT' },
+  { id: 'it', label: 'IT Security' },
 ];
 
 export function GovernanceRoleSwitcher({

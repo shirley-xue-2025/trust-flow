@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { AppealType, EmployeeRequestRecord } from '@trustflow/shared';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -34,16 +34,23 @@ export function EmployeeResolutionPanel({
   record: EmployeeRequestRecord;
   onUpdated: () => void;
 }) {
+  const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [appealOpen, setAppealOpen] = useState(false);
   const [appealType, setAppealType] = useState<AppealType>('factual');
   const [statement, setStatement] = useState('');
 
+  const resolution = record.employee_resolution ?? 'pending';
+  const alternativeSubmitted = resolution === 'alternative_submitted';
+  const appealSubmitted = resolution === 'appealed';
+  const accepted = resolution === 'accepted';
+
   const show =
     record.status === 'denied_pending_employee' ||
     record.status === 'agent_recommended_deny' ||
-    record.status === 'denied';
+    record.status === 'denied' ||
+    record.status === 'appeal_pending';
 
   if (!show) return null;
 
@@ -67,37 +74,70 @@ export function EmployeeResolutionPanel({
         <CardDescription>Accept the decision, appeal to your DPO, or propose an alternative.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2">
+        {alternativeSubmitted && (
+          <Alert>
+            <AlertTitle>Alternative submitted</AlertTitle>
+            <AlertDescription>
+              A linked request for Microsoft 365 Copilot is in review. Check{' '}
+              <Link to="/employee/requests" className="underline">
+                My requests
+              </Link>{' '}
+              for the child request.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {appealSubmitted && (
+          <Alert>
+            <AlertTitle>Appeal submitted</AlertTitle>
+            <AlertDescription>Your DPO will review your appeal in the governance queue.</AlertDescription>
+          </Alert>
+        )}
+
+        {accepted && (
+          <Alert>
+            <AlertTitle>Decision accepted</AlertTitle>
+            <AlertDescription>This request is closed.</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="relative z-10 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Button
-            variant="outline"
-            disabled={!!busy}
-            onClick={() => run('accept', () => acceptEmployeeDeny(record.request_id))}
+            type="button"
+            className="w-full sm:w-auto"
+            disabled={!!busy || alternativeSubmitted || appealSubmitted || accepted}
+            onClick={() =>
+              run('alt', async () => {
+                const result = await proposeAlternativeRequest(record.request_id, {
+                  tool_id: 'microsoft-copilot-365',
+                  use_case_category: record.use_case_category,
+                  replay: 'S01',
+                });
+                navigate(`/employee/requests/${result.child.request_id}`);
+              })
+            }
           >
-            {busy === 'accept' ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Accept decision'}
+            {busy === 'alt' ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Propose alternative'}
           </Button>
           <Button
-            variant="secondary"
-            disabled={!!busy}
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={!!busy || alternativeSubmitted || appealSubmitted || accepted}
             onClick={() => setAppealOpen((v) => !v)}
           >
             Appeal
           </Button>
           <Button
-            variant="secondary"
-            disabled={!!busy}
-            onClick={() =>
-              run('alt', () =>
-                proposeAlternativeRequest(record.request_id, {
-                  tool_id: 'microsoft-copilot-365',
-                  use_case_category: record.use_case_category,
-                  replay: 'S01',
-                }),
-              )
-            }
+            type="button"
+            variant="ghost"
+            className="w-full sm:w-auto"
+            disabled={!!busy || alternativeSubmitted || appealSubmitted || accepted}
+            onClick={() => run('accept', () => acceptEmployeeDeny(record.request_id))}
           >
-            {busy === 'alt' ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Propose alternative'}
+            {busy === 'accept' ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Accept decision'}
           </Button>
-          <Button variant="ghost" size="sm" asChild>
+          <Button type="button" variant="ghost" size="sm" className="w-full sm:w-auto" asChild>
             <Link to={`/employee/requests/new?parent=${record.request_id}`}>Customize alternative…</Link>
           </Button>
         </div>

@@ -10,19 +10,16 @@ import { PolicyTrustCard } from '@/components/trust/PolicyTrustCard';
 import { AuditTrustList } from '@/components/trust/AuditTrustList';
 import { HumanReviewPanel } from '@/governance/components/HumanReviewPanel';
 import { AppealReviewPanel } from '@/governance/components/AppealReviewPanel';
-import {
-  GovernanceRoleSwitcher,
-  type GovernanceReviewerRole,
-} from '@/governance/GovernanceRoleSwitcher';
 import { getGovernanceRequest, type GovernanceRequestDetail } from '@/governance/api';
+import { governanceLink, useGovernanceRole } from '@/governance/useGovernanceRole';
 import { computeComplianceScore } from '@/lib/complianceScore';
 import { DENY_LABELS } from '@/lib/agentLabels';
 
 export default function GovernanceRequestOversight() {
   const { id } = useParams<{ id: string }>();
+  const { role } = useGovernanceRole();
   const [detail, setDetail] = useState<GovernanceRequestDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [viewerRole, setViewerRole] = useState<GovernanceReviewerRole>('dpo');
 
   const reload = useCallback(() => {
     if (!id) return;
@@ -47,15 +44,12 @@ export default function GovernanceRequestOversight() {
   const { record } = detail;
   const score = computeComplianceScore(record, detail.policy?.policy ?? null);
   const transcript = detail.session?.transcript ?? [];
-  const defaultTab =
-    record.status === 'pending_signoff' || record.status === 'agent_recommended_approve'
-      ? 'signoff'
-      : 'negotiation';
+  const defaultTab = 'negotiation';
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <Button variant="ghost" size="sm" asChild className="-ml-2">
-        <Link to="/governance/queues?queue=signoff&role=dpo">
+        <Link to={governanceLink('/governance/queues', role, { queue: 'signoff' })}>
           <ArrowLeft className="h-4 w-4" />
           Back to queues
         </Link>
@@ -68,10 +62,7 @@ export default function GovernanceRequestOversight() {
             {record.actor_name} · {record.use_case_category.replace(/_/g, ' ')}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <StatusBadge status={record.status} />
-          <GovernanceRoleSwitcher value={viewerRole} onChange={setViewerRole} />
-        </div>
+        <StatusBadge status={record.status} className="self-start" />
       </div>
 
       {record.deny_code && (
@@ -85,7 +76,7 @@ export default function GovernanceRequestOversight() {
         record={record}
         reviews={detail.human_reviews ?? []}
         activation={detail.activation}
-        viewerRole={viewerRole}
+        viewerRole={role}
         onUpdated={reload}
       />
 
@@ -97,17 +88,10 @@ export default function GovernanceRequestOversight() {
 
       <Tabs defaultValue={defaultTab}>
         <TabsList>
-          <TabsTrigger value="signoff">Sign-off</TabsTrigger>
           <TabsTrigger value="negotiation">Boardroom</TabsTrigger>
           <TabsTrigger value="policy">Policy</TabsTrigger>
           <TabsTrigger value="audit">Gateway audit</TabsTrigger>
         </TabsList>
-        <TabsContent value="signoff" className="mt-4">
-          <p className="text-sm text-muted-foreground">
-            Policy activation: <strong>{detail.policy?.activation_status ?? record.policy_activation}</strong>
-            {detail.activation?.can_activate ? ' — ready to release' : ' — awaiting reviews'}
-          </p>
-        </TabsContent>
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
             Full stakeholder negotiation — what Legal, Procurement, IT, and Works Council said before

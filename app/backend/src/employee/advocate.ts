@@ -58,7 +58,12 @@ export function advocateChatReply(
 ): string {
   const q = message.toLowerCase();
   if (q.includes('why') || q.includes('denied') || q.includes('block')) {
-    return explanation.summary;
+    const blocker = explanation.bullets.find((b) => b.startsWith('Primary blocker'));
+    const procurement = explanation.bullets.find((b) => b.startsWith('Procurement'));
+    if (blocker && procurement) {
+      return `${blocker.replace('Primary blocker: ', 'The main blocker is ')} ${procurement}`;
+    }
+    return blocker ?? `Stakeholders did not approve this request because: ${explanation.bullets[1] ?? denyLabelFromRecord(record)}`;
   }
   if (q.includes('alternative') || q.includes('copilot') || q.includes('other tool')) {
     if (explanation.suggested_alternatives.length === 0) {
@@ -76,6 +81,10 @@ export function advocateChatReply(
     return explanation.bullets.find((b) => b.startsWith('Works council')) ?? 'Works council agreement may be required before rollout.';
   }
   return `${explanation.summary} Ask about “why”, “alternatives”, or “appeal” for more detail.`;
+}
+
+function denyLabelFromRecord(record: EmployeeRequestRecord): string {
+  return record.deny_code ? DENY_LABELS[record.deny_code] ?? record.deny_code : 'policy gates were not met';
 }
 
 function truncate(text: string, max: number): string {

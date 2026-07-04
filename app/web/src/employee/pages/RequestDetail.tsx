@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getEmployeeRequest } from '@/employee/api';
 import { getBoardroomSession, getAuditForRequest, getPolicy } from '@/governance/api';
 import { RequestTimeline } from '@/employee/components/RequestTimeline';
-import { StatusBadge, isTerminalStatus } from '@/employee/components/StatusBadge';
+import { StatusBadge, isTerminalStatus, shouldPollRequest } from '@/employee/components/StatusBadge';
 import { BoardroomTranscript } from '@/components/trust/BoardroomTranscript';
 import { StakeholderSummaryCard } from '@/components/trust/StakeholderSummaryCard';
 import { ComplianceScoreCard } from '@/components/trust/ComplianceScoreCard';
@@ -76,7 +76,7 @@ export default function RequestDetailPage() {
     void load();
     const interval = setInterval(async () => {
       const r = await load();
-      if (r && isTerminalStatus(r.status)) clearInterval(interval);
+      if (r && (isTerminalStatus(r.status) || !shouldPollRequest(r.status))) clearInterval(interval);
     }, 2000);
 
     return () => {
@@ -116,10 +116,11 @@ export default function RequestDetailPage() {
   const showDenyPath =
     record.status === 'denied_pending_employee' ||
     record.status === 'agent_recommended_deny' ||
-    record.status === 'denied';
+    record.status === 'denied' ||
+    record.status === 'appeal_pending';
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 pb-28 md:pb-8">
       <Button variant="ghost" size="sm" asChild className="-ml-2">
         <Link to="/employee/requests">
           <ArrowLeft className="h-4 w-4" />
@@ -150,7 +151,7 @@ export default function RequestDetailPage() {
         </Alert>
       )}
 
-      {inProgress && record.status !== 'pending_signoff' && (
+      {inProgress && record.status !== 'pending_signoff' && !showDenyPath && (
         <Card>
           <CardContent className="flex items-center gap-4 pt-6">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />

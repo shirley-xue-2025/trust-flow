@@ -3,7 +3,7 @@
 **Purpose:** Shared view of who is working on what, current phase, and links to deliverables.  
 **Update rule:** When you start, finish, or hand off work — edit **Active workstreams** and append **Changelog** with your name and date.
 
-**Last updated:** 2026-07-04 · Shirley + Agent (Cursor)
+**Last updated:** 2026-07-05 · Shirley + Agent (Cursor)
 
 ---
 
@@ -28,8 +28,8 @@
 | W03 | GitHub collaborator invite | **Shirley** | 🟡 Pending | Repo: [shirley-xue-2025/trust-flow](https://github.com/shirley-xue-2025/trust-flow) |
 | W04 | Phase 2 — Boardroom core | **Unassigned** | ⏸ Waiting on W01 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) |
 | W05 | Phase 3 — Gateway simulator | **Unassigned** | ⏸ Waiting on W04 | [`docs/schemas/gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
-| W06 | Phase 4 — Demo UI | **Agent** | 🟡 In progress | Employee + governance portals; glassbox at `/glassbox` |
-| W08 | HITL + negotiation transparency | **Shirley** | 🟢 Demo-ready | [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · PRD + spec + full flow |
+| W06 | Phase 4 — Demo UI | **Agent** | 🟢 Done | Employee + governance portals; Playwright e2e; header role switcher |
+| W08 | HITL + negotiation transparency | **Shirley** | 🟢 Demo-ready | [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · PRD + spec + full flow + polish |
 | W07 | Phase 5 — Fake-door LP | **Shirley** | ⏸ Deferred | [`docs/research/pmf/fake_door_copy.md`](docs/research/pmf/fake_door_copy.md) |
 
 **Status key:** 🟢 Done · 🟡 In progress / review · 🔴 Blocked · ⏸ Waiting · ⚪ Not started
@@ -73,7 +73,8 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
-| 2026-07-04 | Shirley + Agent | PRD v0.2: HITL multi-role sign-off, Advocate, appeal types, negotiation transparency; design-review CSS/accessibility fixes; product unification (uncommitted) | `docs/plans/prd_human_in_the_loop_and_negotiation_transparency.md`, `session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md` |
+| 2026-07-05 | Shirley + Agent | Design-review fixes; propose-alternative mobile/navigation; Playwright e2e (22 tests); governance header role switcher (DPO/Procurement/IT) | `session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md` |
+| 2026-07-04 | Shirley + Agent | HITL demo flow: state model, governance queues, advocate, appeals, seed data, demo script | `ac2583d`, `docs/DEMO_SCRIPT.md` |
 | 2026-07-04 | Shirley + Agent | Merged PR #3 (employee portal) + #4 (competitor research); synced main | `9305fc5` |
 | 2026-06-25 | Agent | PROJECT_TRACKER.md for teammate coordination | commit `9a9be60` |
 | 2026-06-25 | Agent | Pre-build: architecture, work plan, roleplay, fixtures | commit `8814c1f` |

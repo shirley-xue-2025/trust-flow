@@ -15,17 +15,19 @@ export default function EmployeeLayout({ profile }: { profile: EmployeeProfile }
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="container flex h-16 items-center justify-between gap-2 sm:gap-4">
+          <div className="flex min-w-0 shrink items-center gap-2 sm:gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Shield className="h-5 w-5" />
             </div>
-            <div>
-              <p className="text-sm font-semibold leading-none text-foreground">TrustFlow</p>
-              <p className="text-xs text-muted-foreground">Employee portal</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold leading-none text-foreground">TrustFlow</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Employee portal</p>
             </div>
           </div>
+          <div className="shrink-0">
           <ProductRoleSwitcher />
+          </div>
           <div className="hidden text-right md:block">
             <p className="text-sm font-medium">{profile.display_name}</p>
             <p className="text-xs text-muted-foreground">
@@ -35,7 +37,7 @@ export default function EmployeeLayout({ profile }: { profile: EmployeeProfile }
         </div>
       </header>
 
-      <div className="container flex gap-8 py-8 pb-24 md:pb-8">
+      <div className="container flex gap-8 py-8 pb-32 md:pb-8">
         <aside className="hidden w-56 shrink-0 md:block">
           <nav className="space-y-1">
             {NAV.map(({ to, label, icon: Icon, end }) => (

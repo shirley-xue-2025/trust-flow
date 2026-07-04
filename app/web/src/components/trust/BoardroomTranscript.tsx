@@ -52,9 +52,9 @@ export function BoardroomTranscript({
               <p className="mt-2 text-xs text-muted-foreground">
                 Demands:{' '}
                 {t.demands!.map((d, j) => (
-                  <span key={j} className={d.hard ? 'font-medium text-destructive' : ''}>
+                  <span key={j} className={d.hard ? 'font-semibold text-foreground' : ''}>
                     {d.field}={String(d.value)}
-                    {d.hard ? ' (hard)' : ''}
+                    {d.hard ? ' (required)' : ''}
                     {j < t.demands!.length - 1 ? '; ' : ''}
                   </span>
                 ))}

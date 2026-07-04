@@ -111,7 +111,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Recent requests</CardTitle>
             <CardDescription>Track approval status and next steps</CardDescription>

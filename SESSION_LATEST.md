@@ -4,17 +4,17 @@
 
 ---
 
-## Current state — 2026-07-04
+## Current state — 2026-07-05
 
-**Phase:** **Demo-ready** — HITL product flow end-to-end (seed data, advocate, appeals, governance queues).
+**Phase:** **Demo-ready + polished** — HITL flow, design-review fixes, Playwright e2e, governance role switcher in header.
 
 **👉 Demo script:** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
 
 **👉 Spec:** [`docs/plans/spec_hitl_state_model_and_governance_apis.md`](docs/plans/spec_hitl_state_model_and_governance_apis.md)
 
-**👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md`](session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md)
+**👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md`](session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md)
 
-**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed`
+**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **E2E:** `cd app && npm run test:e2e`
 
 ---
 
@@ -28,4 +28,4 @@
 
 ---
 
-*Previous handover: `session_logs/SESSION_HANDOVER_2026-06-25_governance_wrap.md`*
+*Previous handover: `session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md`*
