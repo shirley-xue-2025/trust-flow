@@ -279,3 +279,47 @@ export type SessionState =
   | 'COMPILED';
 
 export type SessionOutcome = 'APPROVED' | 'DENIED' | 'PENDING_HUMAN' | 'PENDING_EXTERNAL';
+
+// ---------------------------------------------------------------------------
+// Employee portal (human requester — not boardroom agents)
+// ---------------------------------------------------------------------------
+
+export interface EmployeeProfile {
+  user_id: string;
+  display_name: string;
+  email: string;
+  department: string;
+  role: string;
+}
+
+export type EmployeeRequestStatus =
+  | 'submitted'
+  | 'negotiating'
+  | 'approved'
+  | 'denied'
+  | 'pending_external'
+  | 'pending_human';
+
+export interface EmployeeRequestRecord {
+  request_id: string;
+  actor_id: string;
+  actor_name: string;
+  department: string;
+  role: string;
+  tool_id: string;
+  tool_display_name: string;
+  use_case_category: string;
+  business_justification?: string;
+  packet: RequestPacket;
+  session_id?: string;
+  status: EmployeeRequestStatus;
+  outcome?: SessionOutcome;
+  deny_code?: string;
+  routing_decision?: string;
+  policy_id?: string;
+  policy_version_hash?: string;
+  transcript_length?: number;
+  submitted_at: string;
+  updated_at: string;
+  next_steps?: string[];
+}

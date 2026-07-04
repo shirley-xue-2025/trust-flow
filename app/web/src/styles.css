@@ -22,9 +22,11 @@ code, pre, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; 
 a { color: var(--accent); }
 
 .app { max-width: 1200px; margin: 0 auto; padding: 16px; }
-header.top { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+header.top { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
 header.top h1 { font-size: 20px; margin: 0; }
-header.top .sub { color: var(--muted); font-size: 13px; }
+header.top .sub { color: var(--muted); font-size: 13px; flex: 1; }
+header.top .demo-employee-link { color: var(--accent); font-size: 13px; text-decoration: none; margin-left: auto; }
+header.top .demo-employee-link:hover { text-decoration: underline; }
 
 nav.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
 nav.tabs button {
