@@ -44,7 +44,10 @@
         "request_denied",
         "budget_cap_hit",
         "human_override",
-        "policy_compiled"
+        "policy_compiled",
+        "human_sign_off",
+        "appeal_decision",
+        "policy_activated"
       ]
     },
     "system_id": {
@@ -126,7 +129,7 @@
     },
     "deny_reason_code": {
       "type": "string",
-      "examples": ["BETRIEBSVEREINBARUNG_PENDING", "PII_BLOCK", "TOOL_NOT_APPROVED", "BUDGET_EXCEEDED"]
+      "examples": ["BETRIEBSVEREINBARUNG_PENDING", "PII_BLOCK", "TOOL_NOT_APPROVED", "BUDGET_EXCEEDED", "POLICY_NOT_ACTIVATED"]
     },
     "human_reviewer_id": {
       "type": "string",

@@ -69,7 +69,7 @@ function highestRound(transcript: BoardroomEnvelope[]): number {
 export async function runSession(
   session: BoardroomSession,
   org: OrgConfig,
-  opts: { replayScenarioId?: string; onTurn?: (env: BoardroomEnvelope) => void } = {},
+  opts: { replayScenarioId?: string; onTurn?: (env: BoardroomEnvelope) => void; requestId?: string } = {},
 ): Promise<BoardroomSession> {
   session.state = 'NEGOTIATING';
 
@@ -107,7 +107,10 @@ export async function runSession(
   session.routing_decision = result.routing_decision;
 
   // Persist the compiled artifact (always — see module doc).
-  writePolicy(result.policy, result.policy_version_hash);
+  writePolicy(result.policy, result.policy_version_hash, {
+    activation_status: 'draft',
+    request_id: opts.requestId ?? session.request.request_id,
+  });
   session.state = 'COMPILED';
 
   return session;

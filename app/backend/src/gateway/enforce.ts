@@ -59,7 +59,11 @@ function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-export function runInference(req: InferenceRequest, ctx: GatewayContext): InferenceResult {
+export function runInference(
+  req: InferenceRequest,
+  ctx: GatewayContext,
+  opts: { activation_status?: 'draft' | 'active' | 'revoked' } = {},
+): InferenceResult {
   const { policy, request, prompt } = req;
   const actor_id = req.actor_id ?? 'emp_demo';
   const tool = ctx.registry.tools.find((t) => t.tool_id === policy.tool_id);
@@ -91,6 +95,11 @@ export function runInference(req: InferenceRequest, ctx: GatewayContext): Infere
     });
     return { outcome: 'denied', deny_reason_code: code, routing_decision: 'BLOCKED', audit_event };
   };
+
+  // Policy must be human-activated before gateway enforcement (HITL spec).
+  if (opts.activation_status && opts.activation_status !== 'active') {
+    return deny('POLICY_NOT_ACTIVATED');
+  }
 
   // 4a. tool approved? (in registry, with a signed-or-na DPA at policy level)
   if (!tool) return deny('TOOL_NOT_APPROVED');

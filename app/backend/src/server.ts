@@ -11,6 +11,8 @@
  */
 import './env.js'; // auto-load .env before anything reads process.env
 import { randomUUID } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import type { RequestPacket } from '@trustflow/shared';
@@ -28,12 +30,22 @@ import { hasApiKey } from './qwen/client.js';
 import {
   createEmployeeRequest,
   getEmployeeRequest,
+  isApprovedForGateway,
   listEmployeeRequests,
   nextStepsForRecord,
+  serializeEmployeeRequest,
   toolDisplayName,
   updateEmployeeRequest,
 } from './employee/requests.js';
-import { runEmployeeBoardroom } from './employee/runBoardroom.js';
+import { runEmployeeBoardroom, finalizeRequestFromSession } from './employee/runBoardroom.js';
+import { deriveDisplayStatus } from './employee/requestState.js';
+import {
+  activateRequestPolicy,
+  buildGovernanceQueue,
+  decideReviewForRequest,
+  governanceOverviewStats,
+  governanceRequestDetail,
+} from './governance/service.js';
 import type { EmployeeProfile } from '@trustflow/shared';
 
 export function buildServer() {
@@ -63,7 +75,7 @@ export function buildServer() {
 
   app.get('/v1/employee/requests', async (req) => {
     const actorId = (req.query as { actor_id?: string }).actor_id ?? DEMO_EMPLOYEE.user_id;
-    return { requests: listEmployeeRequests(actorId) };
+    return { requests: listEmployeeRequests(actorId).map(serializeEmployeeRequest) };
   });
 
   app.get('/v1/employee/requests/:id', async (req, reply) => {
@@ -71,7 +83,7 @@ export function buildServer() {
     const record = getEmployeeRequest(id);
     if (!record) return reply.code(404).send({ error: 'request not found' });
     const steps = record.next_steps ?? nextStepsForRecord(record, REGISTRY);
-    return { ...record, next_steps: steps };
+    return serializeEmployeeRequest({ ...record, next_steps: steps });
   });
 
   // body: { tool_id, use_case_category, department?, data_classes?, business_justification?, replay? }
@@ -134,8 +146,12 @@ export function buildServer() {
     void runEmployeeBoardroom(record.request_id, ORG, REGISTRY, { replayScenarioId: replay }).catch(
       (err) => {
         updateEmployeeRequest(record.request_id, {
-          status: 'denied',
+          negotiation_phase: 'complete',
+          agent_outcome: 'DENIED',
           outcome: 'DENIED',
+          employee_resolution: 'accepted',
+          human_decision: 'not_required',
+          policy_activation: 'none',
           next_steps: [`Negotiation failed: ${(err as Error).message}`],
         });
       },
@@ -165,8 +181,8 @@ export function buildServer() {
       reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
-    if (record.status !== 'negotiating' && record.status !== 'submitted') {
-      send('result', record);
+    if (deriveDisplayStatus(record) !== 'submitted' && deriveDisplayStatus(record) !== 'negotiating') {
+      send('result', serializeEmployeeRequest(record));
       reply.raw.end();
       return;
     }
@@ -176,44 +192,25 @@ export function buildServer() {
       const replay = (req.query as { replay?: string }).replay;
       await runSession(session, ORG, {
         replayScenarioId: replay,
+        requestId: id,
         onTurn: (env) => send('turn', env),
       });
 
-      const outcome = session.outcome ?? 'DENIED';
-      const updated = updateEmployeeRequest(id, {
-        session_id: session.session_id,
-        status:
-          outcome === 'APPROVED'
-            ? 'approved'
-            : outcome === 'DENIED'
-              ? 'denied'
-              : outcome === 'PENDING_EXTERNAL'
-                ? 'pending_external'
-                : outcome === 'PENDING_HUMAN'
-                  ? 'pending_human'
-                  : 'negotiating',
-        outcome,
-        deny_code: session.deny_code,
-        routing_decision: session.routing_decision,
-        policy_id: session.policy?.policy_id,
-        policy_version_hash: session.policy_version_hash,
-        next_steps: nextStepsForRecord(
-          {
-            ...record,
-            status:
-              outcome === 'APPROVED'
-                ? 'approved'
-                : outcome === 'DENIED'
-                  ? 'denied'
-                  : outcome === 'PENDING_EXTERNAL'
-                    ? 'pending_external'
-                    : 'pending_human',
-            deny_code: session.deny_code,
-          },
-          REGISTRY,
-        ),
-      });
-      send('result', updated);
+      const updated = finalizeRequestFromSession(
+        record,
+        session.session_id,
+        ORG,
+        REGISTRY,
+        session.transcript,
+        session.outcome,
+        {
+          deny_code: session.deny_code,
+          routing_decision: session.routing_decision,
+          policy_id: session.policy?.policy_id,
+          policy_version_hash: session.policy_version_hash,
+        },
+      );
+      send('result', updated ? serializeEmployeeRequest(updated) : record);
     } catch (err) {
       send('error', { message: (err as Error).message });
     } finally {
@@ -223,7 +220,7 @@ export function buildServer() {
 
   app.get('/v1/employee/tools', async (req) => {
     const actorId = (req.query as { actor_id?: string }).actor_id ?? DEMO_EMPLOYEE.user_id;
-    const approved = listEmployeeRequests(actorId).filter((r) => r.status === 'approved' && r.policy_id);
+    const approved = listEmployeeRequests(actorId).filter((r) => isApprovedForGateway(r));
     return {
       tools: approved.map((r) => ({
         request_id: r.request_id,
@@ -306,6 +303,101 @@ export function buildServer() {
     return stored;
   });
 
+  // --- Boardroom session snapshot (trust / governance views) -----------------
+  app.get('/v1/boardroom/:id', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const session = getSession(id);
+    if (!session) return reply.code(404).send({ error: 'session not found' });
+    return {
+      session_id: session.session_id,
+      state: session.state,
+      outcome: session.outcome ?? null,
+      deny_code: session.deny_code ?? null,
+      routing_decision: session.routing_decision ?? null,
+      policy_id: session.policy?.policy_id ?? null,
+      policy_version_hash: session.policy_version_hash ?? null,
+      transcript: session.transcript,
+      policy: session.policy ?? null,
+    };
+  });
+
+  // --- Governance oversight (all employee requests + org context) ----------
+  app.get('/v1/governance/overview', async () => {
+    const requests = listEmployeeRequests().map(serializeEmployeeRequest);
+    const audit = readAudit(20);
+    return {
+      org: ORG,
+      stats: {
+        ...governanceOverviewStats(ORG),
+        audit_events: audit.length,
+      },
+      requests,
+      recent_audit: audit,
+    };
+  });
+
+  app.get('/v1/governance/queues', async (req) => {
+    const q = req.query as {
+      queue?: string;
+      role?: string;
+      limit?: string;
+      offset?: string;
+    };
+    return buildGovernanceQueue(ORG, {
+      queue: (q.queue as 'all' | 'signoff' | 'appeals' | 'external' | 'in_review' | 'negotiating') ?? 'all',
+      role: (q.role as 'all' | 'dpo' | 'procurement' | 'it') ?? 'all',
+      limit: Number(q.limit ?? 50),
+      offset: Number(q.offset ?? 0),
+    });
+  });
+
+  app.get('/v1/governance/requests/:id', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const detail = governanceRequestDetail(id, ORG);
+    if (!detail) return reply.code(404).send({ error: 'request not found' });
+
+    const session = detail.record.session_id ? getSession(detail.record.session_id) : undefined;
+    const audit = readAudit(100).filter((e) => e.policy_id === detail.record.policy_id);
+
+    return {
+      ...detail,
+      session: session
+        ? {
+            session_id: session.session_id,
+            state: session.state,
+            outcome: session.outcome ?? null,
+            transcript: session.transcript,
+          }
+        : null,
+      audit,
+    };
+  });
+
+  app.post('/v1/governance/requests/:id/reviews/:reviewId/decide', async (req, reply) => {
+    const { id, reviewId } = req.params as { id: string; reviewId: string };
+    const body = req.body as { decision?: 'approve' | 'reject'; rationale?: string };
+    const headers = req.headers;
+    const reviewerId =
+      (headers['x-reviewer-id'] as string | undefined) ?? 'katrin.mueller@nordpay.example';
+
+    if (!body.decision || !body.rationale) {
+      return reply.code(400).send({ error: 'decision and rationale required' });
+    }
+
+    const result = decideReviewForRequest(id, reviewId, body.decision, body.rationale, reviewerId, ORG);
+    if ('error' in result) return reply.code(result.code).send({ error: result.error });
+    return result;
+  });
+
+  app.post('/v1/governance/requests/:id/activate', async (req, reply) => {
+    const id = (req.params as { id: string }).id;
+    const reviewerId =
+      (req.headers['x-reviewer-id'] as string | undefined) ?? 'katrin.mueller@nordpay.example';
+    const result = activateRequestPolicy(id, reviewerId, ORG);
+    if ('error' in result) return reply.code(result.code).send({ error: result.error });
+    return result;
+  });
+
   // --- Governed inference through the gateway -------------------------------
   // body: { policy_id, prompt, request? }
   app.post('/v1/inference', async (req, reply) => {
@@ -317,6 +409,12 @@ export function buildServer() {
     };
     const stored = readPolicyById(body.policy_id);
     if (!stored) return reply.code(404).send({ error: 'policy not found' });
+    if (stored.activation_status !== 'active') {
+      return reply.code(403).send({
+        error: 'policy not activated',
+        deny_reason_code: 'POLICY_NOT_ACTIVATED',
+      });
+    }
 
     const request: RequestPacket =
       body.request ??
@@ -336,6 +434,7 @@ export function buildServer() {
         actor_id: body.actor_id,
       },
       { org: ORG, registry: REGISTRY },
+      { activation_status: stored.activation_status },
     );
     return result;
   });
@@ -349,8 +448,10 @@ export function buildServer() {
   return app;
 }
 
-// Boot when run directly.
-const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+// Boot when run directly (path.resolve handles spaces; file:// string compare does not).
+const isMain =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 if (isMain) {
   const port = Number(process.env.PORT ?? 8080);
   const app = buildServer();

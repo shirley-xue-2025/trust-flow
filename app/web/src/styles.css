@@ -1,4 +1,5 @@
-:root {
+/* Scoped to technical glassbox only — never import globally (see DemoApp.tsx). */
+.glassbox {
   --bg: #0e1117;
   --panel: #161b22;
   --panel2: #1c2230;
@@ -10,86 +11,346 @@
   --amber: #d29922;
   --red: #f85149;
   --purple: #bc8cff;
-}
-* { box-sizing: border-box; }
-body {
+
+  box-sizing: border-box;
+  min-height: 100vh;
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
-code, pre, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-a { color: var(--accent); }
 
-.app { max-width: 1200px; margin: 0 auto; padding: 16px; }
-header.top { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
-header.top h1 { font-size: 20px; margin: 0; }
-header.top .sub { color: var(--muted); font-size: 13px; flex: 1; }
-header.top .demo-employee-link { color: var(--accent); font-size: 13px; text-decoration: none; margin-left: auto; }
-header.top .demo-employee-link:hover { text-decoration: underline; }
-
-nav.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-nav.tabs button {
-  background: var(--panel); color: var(--text); border: 1px solid var(--border);
-  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px;
+.glassbox *,
+.glassbox *::before,
+.glassbox *::after {
+  box-sizing: border-box;
 }
-nav.tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-.panel h2 { margin: 0 0 12px; font-size: 16px; }
-.row { display: flex; gap: 16px; flex-wrap: wrap; }
-.col { flex: 1; min-width: 280px; }
-
-label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
-select, input, textarea, button.primary {
-  width: 100%; background: var(--panel2); color: var(--text);
-  border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; font-size: 14px;
+.glassbox code,
+.glassbox pre,
+.glassbox .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-textarea { min-height: 90px; resize: vertical; }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
-button.primary:disabled { opacity: 0.5; cursor: default; }
-button.ghost { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
 
-.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-.pill.approve { background: rgba(63,185,80,.15); color: var(--green); }
-.pill.conditional_approve { background: rgba(210,153,34,.15); color: var(--amber); }
-.pill.conditional_reject { background: rgba(248,81,73,.12); color: #ffa198; }
-.pill.reject { background: rgba(248,81,73,.18); color: var(--red); }
-.pill.pass { background: rgba(139,148,158,.15); color: var(--muted); }
-
-.outcome { font-size: 18px; font-weight: 700; }
-.outcome.APPROVED { color: var(--green); }
-.outcome.DENIED { color: var(--red); }
-.outcome.PENDING_EXTERNAL, .outcome.PENDING_HUMAN { color: var(--amber); }
-
-.agent-card {
-  border-left: 4px solid var(--border); background: var(--panel2);
-  border-radius: 8px; padding: 12px; margin-bottom: 10px;
+.glassbox a {
+  color: var(--accent);
 }
-.agent-card.approve { border-left-color: var(--green); }
-.agent-card.conditional_approve { border-left-color: var(--amber); }
-.agent-card.conditional_reject { border-left-color: #ffa198; }
-.agent-card.reject { border-left-color: var(--red); }
-.agent-card.pass { border-left-color: var(--muted); }
-.agent-card .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.agent-card .name { font-weight: 600; }
-.agent-card .nl { font-size: 14px; margin: 6px 0; }
-.agent-card .kv { font-size: 12px; color: var(--muted); }
-.agent-card .kv .hard { color: var(--red); }
 
-pre.json { background: #0b0e14; border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow: auto; font-size: 12.5px; max-height: 460px; }
-.hash { font-size: 12px; color: var(--purple); word-break: break-all; }
-.muted { color: var(--muted); }
-.added { background: rgba(63,185,80,.16); }
+.glassbox .app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
-table.audit { width: 100%; border-collapse: collapse; font-size: 12px; }
-table.audit th, table.audit td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
-table.audit td.mono { font-family: ui-monospace, monospace; }
-.tag-allowed { color: var(--green); }
-.tag-denied { color: var(--red); }
-.tag-redirected { color: var(--accent); }
+.glassbox header.top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
 
-.side { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.side .box { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
-.banner { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
-.banner.warn { background: rgba(210,153,34,.12); color: var(--amber); border: 1px solid rgba(210,153,34,.3); }
+.glassbox header.top h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.glassbox header.top .sub {
+  color: var(--muted);
+  font-size: 13px;
+  flex: 1;
+}
+
+.glassbox header.top .demo-employee-link {
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: none;
+  margin-left: auto;
+}
+
+.glassbox header.top .demo-employee-link:hover {
+  text-decoration: underline;
+}
+
+.glassbox header.top .glassbox-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.glassbox nav.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.glassbox nav.tabs button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.glassbox nav.tabs button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.glassbox .panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.glassbox .panel h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.glassbox .row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.glassbox .col {
+  flex: 1;
+  min-width: 280px;
+}
+
+.glassbox label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 4px;
+}
+
+.glassbox select,
+.glassbox input,
+.glassbox textarea,
+.glassbox button.primary {
+  width: 100%;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 14px;
+}
+
+.glassbox textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.glassbox button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.glassbox button.primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.glassbox button.ghost {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.glassbox .pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.glassbox .pill.approve {
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--green);
+}
+
+.glassbox .pill.conditional_approve {
+  background: rgba(210, 153, 34, 0.15);
+  color: var(--amber);
+}
+
+.glassbox .pill.conditional_reject {
+  background: rgba(248, 81, 73, 0.12);
+  color: #ffa198;
+}
+
+.glassbox .pill.reject {
+  background: rgba(248, 81, 73, 0.18);
+  color: var(--red);
+}
+
+.glassbox .pill.pass {
+  background: rgba(139, 148, 158, 0.15);
+  color: var(--muted);
+}
+
+.glassbox .outcome {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.glassbox .outcome.APPROVED {
+  color: var(--green);
+}
+
+.glassbox .outcome.DENIED {
+  color: var(--red);
+}
+
+.glassbox .outcome.PENDING_EXTERNAL,
+.glassbox .outcome.PENDING_HUMAN {
+  color: var(--amber);
+}
+
+.glassbox .agent-card {
+  border-left: 4px solid var(--border);
+  background: var(--panel2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.glassbox .agent-card.approve {
+  border-left-color: var(--green);
+}
+
+.glassbox .agent-card.conditional_approve {
+  border-left-color: var(--amber);
+}
+
+.glassbox .agent-card.conditional_reject {
+  border-left-color: #ffa198;
+}
+
+.glassbox .agent-card.reject {
+  border-left-color: var(--red);
+}
+
+.glassbox .agent-card.pass {
+  border-left-color: var(--muted);
+}
+
+.glassbox .agent-card .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.glassbox .agent-card .name {
+  font-weight: 600;
+}
+
+.glassbox .agent-card .nl {
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.glassbox .agent-card .kv {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.glassbox .agent-card .kv .hard {
+  color: var(--red);
+}
+
+.glassbox pre.json {
+  background: #0b0e14;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12.5px;
+  max-height: 460px;
+}
+
+.glassbox .hash {
+  font-size: 12px;
+  color: var(--purple);
+  word-break: break-all;
+}
+
+.glassbox .muted {
+  color: var(--muted);
+}
+
+.glassbox .added {
+  background: rgba(63, 185, 80, 0.16);
+}
+
+.glassbox table.audit {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.glassbox table.audit th,
+.glassbox table.audit td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.glassbox table.audit td.mono {
+  font-family: ui-monospace, monospace;
+}
+
+.glassbox .tag-allowed {
+  color: var(--green);
+}
+
+.glassbox .tag-denied {
+  color: var(--red);
+}
+
+.glassbox .tag-redirected {
+  color: var(--accent);
+}
+
+.glassbox .side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.glassbox .side .box {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.glassbox .banner {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.glassbox .banner.warn {
+  background: rgba(210, 153, 34, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}

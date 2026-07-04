@@ -67,6 +67,22 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
   });
 
+  it('draft policy activation_status → POLICY_NOT_ACTIVATED', () => {
+    const { result, request } = compileScenario('S01');
+    const r = runInference(
+      {
+        policy: result.policy,
+        policy_version_hash: result.policy_version_hash,
+        request,
+        prompt: 'Summarize this support thread.',
+      },
+      { org: ORG, registry: REGISTRY },
+      { activation_status: 'draft' },
+    );
+    expect(r.outcome).toBe('denied');
+    expect(r.deny_reason_code).toBe('POLICY_NOT_ACTIVATED');
+  });
+
   it('S02 policy still blocks inference with BETRIEBSVEREINBARUNG_PENDING', () => {
     const { result, request } = compileScenario('S02');
     const r = runInference(

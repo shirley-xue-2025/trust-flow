@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, appendFileSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { GatewayAuditEvent, PolicyArtifact } from '@trustflow/shared';
+import type { GatewayAuditEvent, PolicyArtifact, PolicyActivationStatus } from '@trustflow/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DATA_DIR = join(__dirname, '..', '..', '..', '..', 'data');
@@ -31,33 +31,75 @@ function ensureDir(dir: string): void {
 export interface StoredPolicy {
   policy: PolicyArtifact;
   policy_version_hash: string;
+  activation_status: PolicyActivationStatus;
+  request_id?: string;
+  activated_at?: string;
+  activated_by_reviewer_ids?: string[];
 }
 
-export function writePolicy(policy: PolicyArtifact, hash: string): void {
+export interface WritePolicyOptions {
+  activation_status?: PolicyActivationStatus;
+  request_id?: string;
+}
+
+function normalizeStoredPolicy(raw: StoredPolicy): StoredPolicy {
+  return {
+    ...raw,
+    activation_status: raw.activation_status ?? 'draft',
+  };
+}
+
+export function writePolicy(
+  policy: PolicyArtifact,
+  hash: string,
+  opts: WritePolicyOptions = {},
+): StoredPolicy {
   ensureDir(policyDir());
-  const record: StoredPolicy = { policy, policy_version_hash: hash };
+  const record: StoredPolicy = {
+    policy,
+    policy_version_hash: hash,
+    activation_status: opts.activation_status ?? 'draft',
+    request_id: opts.request_id ?? policy.request_id,
+  };
   writeFileSync(join(policyDir(), `${policy.policy_id}.json`), JSON.stringify(record, null, 2));
-  // Also index by hash for gateway load-by-hash.
   writeFileSync(join(policyDir(), `hash_${hash}.json`), JSON.stringify(record, null, 2));
+  return record;
+}
+
+export function activatePolicy(
+  policyId: string,
+  reviewerIds: string[],
+): StoredPolicy | null {
+  const stored = readPolicyById(policyId);
+  if (!stored) return null;
+  const record: StoredPolicy = {
+    ...stored,
+    activation_status: 'active',
+    activated_at: new Date().toISOString(),
+    activated_by_reviewer_ids: reviewerIds,
+  };
+  writeFileSync(join(policyDir(), `${policyId}.json`), JSON.stringify(record, null, 2));
+  writeFileSync(join(policyDir(), `hash_${record.policy_version_hash}.json`), JSON.stringify(record, null, 2));
+  return record;
 }
 
 export function readPolicyById(policyId: string): StoredPolicy | null {
   const p = join(policyDir(), `${policyId}.json`);
   if (!existsSync(p)) return null;
-  return JSON.parse(readFileSync(p, 'utf8')) as StoredPolicy;
+  return normalizeStoredPolicy(JSON.parse(readFileSync(p, 'utf8')) as StoredPolicy);
 }
 
 export function readPolicyByHash(hash: string): StoredPolicy | null {
   const p = join(policyDir(), `hash_${hash}.json`);
   if (!existsSync(p)) return null;
-  return JSON.parse(readFileSync(p, 'utf8')) as StoredPolicy;
+  return normalizeStoredPolicy(JSON.parse(readFileSync(p, 'utf8')) as StoredPolicy);
 }
 
 export function listPolicies(): StoredPolicy[] {
   if (!existsSync(policyDir())) return [];
   return readdirSync(policyDir())
     .filter((f) => f.endsWith('.json') && !f.startsWith('hash_'))
-    .map((f) => JSON.parse(readFileSync(join(policyDir(), f), 'utf8')) as StoredPolicy);
+    .map((f) => normalizeStoredPolicy(JSON.parse(readFileSync(join(policyDir(), f), 'utf8')) as StoredPolicy));
 }
 
 // --- Audit log (JSONL) ------------------------------------------------------

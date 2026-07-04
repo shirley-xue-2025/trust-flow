@@ -6,6 +6,7 @@ import Boardroom from './views/Boardroom.js';
 import PolicyPanel from './views/PolicyPanel.js';
 import Playground from './views/Playground.js';
 import AuditLog from './views/AuditLog.js';
+import './styles.css';
 
 type Tab = 'intro' | 'request' | 'boardroom' | 'policy' | 'playground' | 'audit';
 
@@ -32,15 +33,17 @@ export default function DemoApp() {
   const patch = (p: Partial<AppState>) => setState((s) => ({ ...s, ...p }));
 
   return (
-    <div className="app">
+    <div className="glassbox">
+      <div className="app">
       <header className="top">
         <h1>TrustFlow</h1>
         <span className="sub">
           Deterministic enforcement at the edge · generative negotiation for policy authoring
         </span>
         <Link to="/employee" className="demo-employee-link">
-          Employee portal →
+          ← Product
         </Link>
+        <span className="glassbox-label">Internal technical view</span>
       </header>
 
       <nav className="tabs">
@@ -91,6 +94,7 @@ export default function DemoApp() {
       {tab === 'playground' && <Playground policy={state.policy} request={state.request} />}
 
       {tab === 'audit' && <AuditLog />}
+      </div>
     </div>
   );
 }

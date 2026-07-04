@@ -32,7 +32,8 @@ export type DenyReasonCode =
   | 'PII_BLOCK'
   | 'BUDGET_EXCEEDED'
   | 'HIGH_RISK_USE_DENIED'
-  | 'PROHIBITED_PRACTICE';
+  | 'PROHIBITED_PRACTICE'
+  | 'POLICY_NOT_ACTIVATED';
 
 // ---------------------------------------------------------------------------
 // Policy artifact (policy-artifact.schema.json)
@@ -103,7 +104,10 @@ export type AuditEventType =
   | 'request_denied'
   | 'budget_cap_hit'
   | 'human_override'
-  | 'policy_compiled';
+  | 'policy_compiled'
+  | 'human_sign_off'
+  | 'appeal_decision'
+  | 'policy_activated';
 
 export type AuditOutcome = 'allowed' | 'denied' | 'redirected' | 'error';
 
@@ -295,10 +299,72 @@ export interface EmployeeProfile {
 export type EmployeeRequestStatus =
   | 'submitted'
   | 'negotiating'
+  | 'agent_recommended_approve'
+  | 'pending_signoff'
   | 'approved'
-  | 'denied'
+  | 'agent_recommended_deny'
+  | 'denied_pending_employee'
+  | 'appeal_pending'
+  | 'denied_closed'
   | 'pending_external'
-  | 'pending_human';
+  | 'pending_human'
+  /** @deprecated migrated to denied_closed or denied_pending_employee */
+  | 'denied';
+
+export type NegotiationPhase = 'submitted' | 'negotiating' | 'complete';
+
+export type HumanDecisionPhase =
+  | 'not_required'
+  | 'pending'
+  | 'complete'
+  | 'rejected';
+
+export type EmployeeResolution =
+  | 'not_applicable'
+  | 'pending'
+  | 'accepted'
+  | 'appealed'
+  | 'alternative_submitted';
+
+export type PolicyActivationPhase = 'none' | 'draft' | 'active';
+
+export type ReviewerRole = 'dpo' | 'procurement' | 'it';
+
+export type HumanReviewStatus = 'pending' | 'approved' | 'rejected';
+
+export interface HumanReviewRecord {
+  review_id: string;
+  request_id: string;
+  reviewer_role: ReviewerRole;
+  reviewer_id: string;
+  reviewer_display_name: string;
+  status: HumanReviewStatus;
+  rationale?: string;
+  rationale_hash?: string;
+  created_at: string;
+  decided_at?: string;
+  required: boolean;
+}
+
+export type AppealType = 'procedural' | 'factual' | 'alternative_scope' | 'wrong_tool';
+
+export type AppealStatus = 'pending' | 'granted' | 'denied';
+
+export interface AppealRecord {
+  appeal_id: string;
+  request_id: string;
+  actor_id: string;
+  appeal_type: AppealType;
+  statement: string;
+  status: AppealStatus;
+  chair_reviewer_id?: string;
+  decision_rationale?: string;
+  submitted_at: string;
+  decided_at?: string;
+  grant_routing?: 'human_reviews' | 'reopen_boardroom';
+}
+
+export type PolicyActivationStatus = 'draft' | 'active' | 'revoked';
 
 export interface EmployeeRequestRecord {
   request_id: string;
@@ -312,13 +378,24 @@ export interface EmployeeRequestRecord {
   business_justification?: string;
   packet: RequestPacket;
   session_id?: string;
+  /** Synced from derived display status for API compat */
   status: EmployeeRequestStatus;
+  /** Computed server-side on read */
+  display_status?: EmployeeRequestStatus;
+  negotiation_phase: NegotiationPhase;
+  agent_outcome?: SessionOutcome;
+  human_decision: HumanDecisionPhase;
+  employee_resolution: EmployeeResolution;
+  policy_activation: PolicyActivationPhase;
+  parent_request_id?: string;
+  child_request_ids?: string[];
   outcome?: SessionOutcome;
   deny_code?: string;
   routing_decision?: string;
   policy_id?: string;
   policy_version_hash?: string;
   transcript_length?: number;
+  advocate_thread_id?: string;
   submitted_at: string;
   updated_at: string;
   next_steps?: string[];

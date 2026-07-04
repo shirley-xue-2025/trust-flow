@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { getEmployeeRequest, runEmployeeInference } from '@/employee/api';
+import { DENY_LABELS } from '@/lib/agentLabels';
 
 interface ChatMessage {
   id: string;
@@ -68,7 +69,10 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
 
       const assistantContent =
         resp.outcome === 'denied'
-          ? `Request blocked at gateway${resp.deny_reason_code ? `: ${resp.deny_reason_code}` : ''}.`
+          ? resp.deny_reason_code
+            ? (DENY_LABELS[resp.deny_reason_code] ??
+              `Request blocked at gateway: ${resp.deny_reason_code}`)
+            : 'Request blocked at gateway.'
           : (resp.response_body ?? 'Response received.');
 
       setMessages((m) => [

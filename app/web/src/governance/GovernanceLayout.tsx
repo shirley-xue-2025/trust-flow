@@ -1,36 +1,32 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import type { EmployeeProfile } from '@trustflow/shared';
-import { LayoutDashboard, MessageSquarePlus, ClipboardList, Shield } from 'lucide-react';
+import { LayoutDashboard, Shield, ScrollText } from 'lucide-react';
 import { ProductRoleSwitcher } from '@/components/ProductRoleSwitcher';
-import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 const NAV = [
-  { to: '/employee', end: true, label: 'Dashboard', shortLabel: 'Home', icon: LayoutDashboard },
-  { to: '/employee/requests/new', label: 'New request', shortLabel: 'New', icon: MessageSquarePlus },
-  { to: '/employee/requests', end: true, label: 'My requests', shortLabel: 'Requests', icon: ClipboardList },
+  { to: '/governance', end: true, label: 'Overview', shortLabel: 'Overview', icon: LayoutDashboard },
+  { to: '/governance/audit', label: 'Audit log', shortLabel: 'Audit', icon: ScrollText },
 ];
 
-export default function EmployeeLayout({ profile }: { profile: EmployeeProfile }) {
+export default function GovernanceLayout() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-white">
               <Shield className="h-5 w-5" />
             </div>
             <div>
               <p className="text-sm font-semibold leading-none text-foreground">TrustFlow</p>
-              <p className="text-xs text-muted-foreground">Employee portal</p>
+              <p className="text-xs text-muted-foreground">Governance console</p>
             </div>
           </div>
           <ProductRoleSwitcher />
-          <div className="hidden text-right md:block">
-            <p className="text-sm font-medium">{profile.display_name}</p>
-            <p className="text-xs text-muted-foreground">
-              {profile.role.replace(/_/g, ' ')} · {profile.department.replace(/_/g, ' ')}
-            </p>
+          <div className="hidden text-right sm:block">
+            <p className="text-sm font-medium text-foreground">Katrin Müller</p>
+            <p className="text-xs text-muted-foreground">Data Protection Officer · NordPay AG</p>
           </div>
         </div>
       </header>
@@ -59,17 +55,17 @@ export default function EmployeeLayout({ profile }: { profile: EmployeeProfile }
           </nav>
           <Separator className="my-6" />
           <p className="px-3 text-xs text-muted-foreground">
-            Switch to <strong>Governance</strong> to see DPO / Legal oversight of the same requests.
+            Oversight for Legal, DPO, IT, and works council — see negotiation outcomes, compiled
+            policy, and gateway evidence.
           </p>
         </aside>
-
         <main className="min-w-0 flex-1">
-          <Outlet context={{ profile }} />
+          <Outlet />
         </main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t bg-background md:hidden">
-        {NAV.map(({ to, label, shortLabel, icon: Icon, end }) => (
+        {NAV.map(({ to, shortLabel, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
