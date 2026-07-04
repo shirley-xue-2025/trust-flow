@@ -358,6 +358,10 @@ export function buildServer() {
 
     const session = detail.record.session_id ? getSession(detail.record.session_id) : undefined;
     const audit = readAudit(100).filter((e) => e.policy_id === detail.record.policy_id);
+    const transcript =
+      session?.transcript ??
+      detail.record.transcript_snapshot ??
+      [];
 
     return {
       ...detail,
@@ -368,7 +372,14 @@ export function buildServer() {
             outcome: session.outcome ?? null,
             transcript: session.transcript,
           }
-        : null,
+        : transcript.length
+          ? {
+              session_id: detail.record.session_id ?? detail.record.request_id,
+              state: 'COMPILED',
+              outcome: detail.record.agent_outcome ?? null,
+              transcript,
+            }
+          : null,
       audit,
     };
   });

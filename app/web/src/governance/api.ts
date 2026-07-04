@@ -77,13 +77,14 @@ export async function decideHumanReview(
   requestId: string,
   reviewId: string,
   body: { decision: 'approve' | 'reject'; rationale: string },
+  reviewerRole?: string,
 ): Promise<unknown> {
   const res = await fetch(`${GOV}/requests/${requestId}/reviews/${reviewId}/decide`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Reviewer-Id': 'katrin.mueller@nordpay.example',
-      'X-Reviewer-Role': 'dpo',
+      'X-Reviewer-Role': reviewerRole ?? 'dpo',
     },
     body: JSON.stringify(body),
   });

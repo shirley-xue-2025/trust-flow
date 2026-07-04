@@ -396,6 +396,8 @@ export interface EmployeeRequestRecord {
   policy_version_hash?: string;
   transcript_length?: number;
   advocate_thread_id?: string;
+  /** Persisted boardroom transcript for demo reliability across server restarts */
+  transcript_snapshot?: BoardroomEnvelope[];
   submitted_at: string;
   updated_at: string;
   next_steps?: string[];

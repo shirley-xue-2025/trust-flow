@@ -43,8 +43,12 @@ export default function RequestDetailPage() {
             const session = await getBoardroomSession(r.session_id);
             if (!cancelled) setTranscript(session.transcript);
           } catch {
-            /* session may have expired after server restart */
+            if (!cancelled && r.transcript_snapshot?.length) {
+              setTranscript(r.transcript_snapshot);
+            }
           }
+        } else if (!cancelled && r.transcript_snapshot?.length) {
+          setTranscript(r.transcript_snapshot);
         }
 
         if (r.policy_id) {
@@ -96,6 +100,8 @@ export default function RequestDetailPage() {
 
   const inProgress = !isTerminalStatus(record.status);
   const score = computeComplianceScore(record, policy);
+  const defaultTab =
+    record.status === 'negotiating' || record.status === 'submitted' ? 'negotiation' : 'overview';
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -135,7 +141,7 @@ export default function RequestDetailPage() {
 
       <ComplianceScoreCard score={score} />
 
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue={defaultTab}>
         <TabsList className="flex h-auto flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="negotiation">
@@ -174,6 +180,12 @@ export default function RequestDetailPage() {
                   </ul>
                 ) : (
                   <p className="text-sm text-muted-foreground">Waiting for boardroom outcome…</p>
+                )}
+
+                {record.status === 'pending_signoff' && (
+                  <p className="text-sm text-amber-800">
+                    Waiting for DPO sign-off — you cannot use this tool until human reviewers approve.
+                  </p>
                 )}
 
                 {record.status === 'approved' && record.policy_id && (

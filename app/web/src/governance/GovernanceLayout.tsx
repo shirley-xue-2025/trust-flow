@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Shield, ScrollText } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, Shield, ScrollText } from 'lucide-react';
 import { ProductRoleSwitcher } from '@/components/ProductRoleSwitcher';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 const NAV = [
   { to: '/governance', end: true, label: 'Overview', shortLabel: 'Overview', icon: LayoutDashboard },
+  { to: '/governance/queues', label: 'Queues', shortLabel: 'Queues', icon: ClipboardList },
   { to: '/governance/audit', label: 'Audit log', shortLabel: 'Audit', icon: ScrollText },
 ];
 

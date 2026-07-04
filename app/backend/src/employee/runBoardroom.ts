@@ -54,7 +54,10 @@ export async function runEmployeeBoardroom(
     transcript,
   );
 
-  const updated = updateEmployeeRequest(requestId, patch);
+  const updated = updateEmployeeRequest(requestId, {
+    ...patch,
+    transcript_snapshot: transcript,
+  });
   if (!updated) return;
 
   if ((outcome === 'APPROVED' && patch.human_decision === 'pending') || outcome === 'PENDING_HUMAN') {
@@ -92,7 +95,10 @@ export function finalizeRequestFromSession(
     },
     transcript,
   );
-  const updated = updateEmployeeRequest(record.request_id, patch);
+  const updated = updateEmployeeRequest(record.request_id, {
+    ...patch,
+    transcript_snapshot: transcript,
+  });
   if (updated && resolvedOutcome === 'APPROVED' && patch.human_decision === 'pending') {
     spawnHumanReviews(record.request_id, updated.packet, transcript);
   }

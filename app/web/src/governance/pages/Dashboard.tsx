@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { EmployeeRequestRecord } from '@trustflow/shared';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getGovernanceOverview, type GovernanceOverview } from '@/governance/api';
 import { StatusBadge } from '@/employee/components/StatusBadge';
@@ -29,21 +30,40 @@ export default function GovernanceDashboard() {
     );
   }
 
+  const pendingSignoff = data.stats.pending_signoff ?? 0;
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Governance overview</h1>
-        <p className="text-muted-foreground">
-          {data.org.display_name ?? data.org.org_id} · {data.org.entity_country} entity · works
-          council {data.org.betriebsvereinbarung_status ?? 'pending'}
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Governance overview</h1>
+          <p className="text-muted-foreground">
+            {data.org.display_name ?? data.org.org_id} · {data.org.entity_country} entity · works
+            council {data.org.betriebsvereinbarung_status ?? 'pending'}
+          </p>
+        </div>
+        {pendingSignoff > 0 && (
+          <Button asChild>
+            <Link to="/governance/queues?queue=signoff&role=dpo">
+              {pendingSignoff} pending sign-off{pendingSignoff === 1 ? '' : 's'}
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="In review" value={data.stats.in_review} hint="Boardroom negotiating" />
-        <StatCard title="Approved" value={data.stats.approved} hint="Gateway-ready tools" />
-        <StatCard title="Blocked / external" value={data.stats.blocked} hint="BR, DPA, or denied" />
-        <StatCard title="Policies compiled" value={data.stats.policies_compiled} hint="Signed artifacts" />
+        <StatCard title="In review" value={data.stats.in_review} hint="Stakeholder negotiation" />
+        <StatCard
+          title="Pending sign-off"
+          value={pendingSignoff}
+          hint="Agent recommended — needs human"
+        />
+        <StatCard title="Approved" value={data.stats.approved} hint="Gateway-active policies" />
+        <StatCard
+          title="Policies active"
+          value={data.stats.policies_active ?? 0}
+          hint={`${data.stats.policies_compiled} compiled total`}
+        />
       </div>
 
       <Card>

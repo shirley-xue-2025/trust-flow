@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import GovernanceLayout from '@/governance/GovernanceLayout';
 import GovernanceDashboard from '@/governance/pages/Dashboard';
+import GovernanceQueuesPage from '@/governance/pages/QueuesPage';
 import GovernanceRequestOversight from '@/governance/pages/RequestOversight';
 import GovernanceAuditPage from '@/governance/pages/AuditPage';
 
@@ -9,6 +10,7 @@ export default function GovernanceApp() {
     <Routes>
       <Route element={<GovernanceLayout />}>
         <Route index element={<GovernanceDashboard />} />
+        <Route path="queues" element={<GovernanceQueuesPage />} />
         <Route path="requests/:id" element={<GovernanceRequestOversight />} />
         <Route path="audit" element={<GovernanceAuditPage />} />
       </Route>
