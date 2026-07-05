@@ -41,6 +41,7 @@
 |----------|-------------|--------|
 | S04 | `app/backend/test/golden/S04.json` | Multi-lane compromise → sovereign route |
 | S05 | `app/backend/test/golden/S05.json` | Procurement veto — unsigned DPA |
+| S05 baseline | `docs/hackathon/baseline/S05_comparison.json` | Single-agent vs boardroom — Track 3 measurable improvement |
 | S02 | roleplay + compiler | `BETRIEBSVEREINBARUNG_PENDING` external gate |
 
 **Journey map:** [`docs/research/stakeholders/journey_map.md`](../research/stakeholders/journey_map.md) — actors × corpus IDs (R0008 enforcement gap, R0011 VRM).
@@ -66,7 +67,7 @@
 | 98% speedup (strategy explorer) | **Illustrative projection** |
 | Weeks → seconds | Narrative from journey map, not A/B study |
 | PII detection | Regex demo — IBAN BLOCK, email MASK |
-| Single-agent baseline | Eval comparison S04/S05 — not published benchmark |
+| Single-agent baseline | **Measured** — S05 live capture 2026-07-05 ([`baseline/S05_comparison.json`](baseline/S05_comparison.json)) |
 
 ---
 

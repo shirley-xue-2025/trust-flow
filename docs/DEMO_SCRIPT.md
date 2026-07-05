@@ -100,7 +100,7 @@
 | **Spoken** | *"Disagreement doesn't vanish — procurement vetoes unsigned OpenAI DPA. New evidence reopens stakeholder review; humans still own the outcome. A single generic 'compliance agent' would miss the vendor gate."* |
 | **Track 3 — decomposition** | S05 golden: Procurement round 1 + 5 **reject** — lane-specific veto. |
 | **Track 3 — negotiation** | **Reject** stance holds until external gate clears; appeal = structured disagreement resolution. |
-| **Track 3 — baseline** | Multi-agent S05 → **DENIED** (correct); single-agent baseline → risk of false approve without DPA lane (see deck slide 5). |
+| **Track 3 — baseline** | **Measured:** S05 single-agent `conditional_approve` vs boardroom **DENIED** — [`baseline/S05_comparison.json`](hackathon/baseline/S05_comparison.json) |
 
 **Optional 10s:** **Propose alternative** → Copilot child request (`parent=demo-s05-denied`).
 

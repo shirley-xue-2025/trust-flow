@@ -22,7 +22,7 @@ Quick phrases for video, judges, and live Q&A. Full beats in [`../DEMO_SCRIPT.md
 
 ## Single-agent baseline (S05 DPA veto)
 
-> "A single 'super compliance agent' would likely approve ChatGPT Enterprise and miss procurement's unsigned DPA. Our Procurement lane vetoes in round one — and holds the veto in round five. That's disagreement resolution, not rubber-stamping."
+> "We captured this on 2026-07-05: one super-compliance `qwen-max` call on the same S05 packet gave **conditional_approve** and never mentioned the unsigned OpenAI DPA. Our Procurement lane **conditional_rejects in round one** — boardroom ends **DENIED / VENDOR_DPA_PENDING**. Artifact: `docs/hackathon/baseline/S05_comparison.json`."
 
 > "Multi-agent isn't slower for the employee — it's more correct. S05 ends DENIED until the vendor gate clears."
 

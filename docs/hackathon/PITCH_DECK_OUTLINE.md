@@ -69,15 +69,24 @@
 
 **Headline:** More agents ≠ slower — better gates.
 
-| Dimension | Single generic agent | TrustFlow multi-agent (eval fixtures) |
-|-----------|---------------------|--------------------------------------|
-| **Wall-clock (demo)** | ~1 API call | ~6 rounds, **seconds** with golden replay |
+**Evidence (captured 2026-07-05, live `qwen-max`):** [`baseline/S05_single_agent_vs_boardroom.md`](baseline/S05_single_agent_vs_boardroom.md)
+
+| Dimension | Single generic agent (1 call) | TrustFlow multi-agent (S05 golden) |
+|-----------|------------------------------|-------------------------------------|
+| **Wall-clock (demo)** | 1 API call (~11s live) | 6 rounds, **seconds** with golden replay |
+| **S05 — unsigned OpenAI DPA** | **`conditional_approve`** — audit fields only; **no vendor gate** | **`DENIED`** · `VENDOR_DPA_PENDING` |
+| **Procurement lane** | Absent (monolith prompt) | **R1 `conditional_reject`** — *"blocking until the DPA… is signed"* |
 | **S04 quality** | Risk: approves without sovereign route / audit fields | Compromise: `LOCAL_QWEN_72B`, fingerprint logs, financial retention |
-| **S05 quality** | Risk: approves ChatGPT without DPA | **DENIED** — procurement veto holds (unsigned OpenAI DPA) |
 | **BR / §87** | Often omitted in English tooling | Works Council Liaison lane + `BETRIEBSVEREINBARUNG_PENDING` |
 | **Enforcement** | Policy text only | Compiled hash enforced at gateway |
 
-**Footnote:** Time compression "weeks → seconds" = **illustrative** (strategy explorer 98% is projection, not measured SLA).
+**On-slide quotes (S05):**
+
+| Monolith | Boardroom |
+|----------|-----------|
+| *"Conditionally approve the use of ChatGPT Enterprise for summarization…"* | *"I am blocking this request until the DPA with the vendor is signed."* |
+
+**Footnote:** Time compression "weeks → seconds" = **illustrative** (strategy explorer 98% is projection, not measured SLA). S05 comparison is **measured** on 2026-07-05 — see JSON in `docs/hackathon/baseline/`.
 
 ---
 

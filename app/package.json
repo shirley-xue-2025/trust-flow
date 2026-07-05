@@ -18,6 +18,8 @@
     "negotiate:demo": "npm run build:shared && QWEN_PROFILE=demo npm run negotiate --workspace backend --",
     "capture:golden": "npm run build:shared && npm run capture:golden --workspace backend --",
     "capture:golden:demo": "npm run build:shared && QWEN_PROFILE=demo npm run capture:golden --workspace backend --",
+    "baseline": "npm run build:shared && npm run baseline --workspace backend --",
+    "baseline:demo": "npm run build:shared && QWEN_PROFILE=demo npm run baseline --workspace backend --",
     "dev:backend": "npm run dev --workspace backend",
     "dev:web": "npm run dev --workspace web",
     "dev": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace web\"",

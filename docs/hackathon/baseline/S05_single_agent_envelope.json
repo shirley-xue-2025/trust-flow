@@ -1,0 +1,35 @@
+{
+  "session_id": "baseline_S05",
+  "round": 0,
+  "agent": "corporate_compliance",
+  "stance": "conditional_approve",
+  "claims": [
+    {
+      "type": "regulatory",
+      "ref": "GDPR",
+      "text": "The use case is for summarization, which is considered low-risk. However, to ensure compliance with GDPR, we must maintain the policy of not logging raw prompts."
+    },
+    {
+      "type": "process",
+      "ref": "NordPay AG Policy",
+      "text": "The minimum retention period must be set to standard_6mo as per organizational policy."
+    }
+  ],
+  "demands": [
+    {
+      "field": "audit.raw_prompt_logging",
+      "value": false,
+      "hard": true
+    },
+    {
+      "field": "audit.retention_period",
+      "value": "standard_6mo",
+      "hard": true
+    }
+  ],
+  "concessions": [],
+  "evidence_ids": [
+    "R0008"
+  ],
+  "natural_language": "Conditionally approve the use of ChatGPT Enterprise for summarization, with the requirement that raw prompt logging remains disabled and the retention period is set to 6 months."
+}

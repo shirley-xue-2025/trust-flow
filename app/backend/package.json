@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "smoke": "tsx src/qwen/smoke.ts",
     "negotiate": "tsx src/negotiate.ts",
-    "capture:golden": "tsx src/negotiate.ts"
+    "capture:golden": "tsx src/negotiate.ts",
+    "baseline": "tsx src/baseline/run.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",
