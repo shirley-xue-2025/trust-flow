@@ -3,7 +3,7 @@
 **Purpose:** Shared view of who is working on what, current phase, and links to deliverables.  
 **Update rule:** When you start, finish, or hand off work — edit **Active workstreams** and append **Changelog** with your name and date.
 
-**Last updated:** 2026-07-05 · Shirley + Agent (Cursor)
+**Last updated:** 2026-07-05 (evening) · Shirley + Agent (Cursor)
 
 ---
 
@@ -15,7 +15,7 @@
 | **Next milestone** | Technical spec + build from **PRD v0.2** (HITL + negotiation transparency) |
 | **Hackathon** | Track 3: Agent Society — demo scope in [`docs/plans/hackathon_mvp_scope.md`](docs/plans/hackathon_mvp_scope.md) |
 
-**Cold start:** [`SESSION_LATEST.md`](SESSION_LATEST.md) · **Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · **Roadmap:** [`docs/WORK_PLAN.md`](docs/WORK_PLAN.md)
+**Cold start:** [`SESSION_LATEST.md`](SESSION_LATEST.md) · **Deploy / fork:** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) · **Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 ---
 
@@ -25,7 +25,8 @@
 |----|-------|-------|--------|----------------|
 | W01 | P0 decisions (deadline, stack, split) | **Shirley** (+ teammate for B04–B05) | 🔴 Blocked | [`docs/BLOCKED_ON_SHIRLEY.md`](docs/BLOCKED_ON_SHIRLEY.md) |
 | W02 | Persona review (DPO Katrin) | **Shirley** | 🟡 Review | [`docs/research/personas/dpo_fintech_de.md`](docs/research/personas/dpo_fintech_de.md) |
-| W03 | GitHub collaborator invite | **Shirley** | 🟡 Pending | Repo: [shirley-xue-2025/trust-flow](https://github.com/shirley-xue-2025/trust-flow) |
+| W03 | GitHub collaborator invite | **Shirley** | 🟢 Done | Mutual access on private repos (Shirley ↔ Max) |
+| W09 | ECS redeploy from canonical `main` | **Max** | 🟡 Waiting | Live box likely stale fork; redeploy when Shirley demo-frozen — [`DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) |
 | W04 | Phase 2 — Boardroom core | **Unassigned** | ⏸ Waiting on W01 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) |
 | W05 | Phase 3 — Gateway simulator | **Unassigned** | ⏸ Waiting on W04 | [`docs/schemas/gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
 | W06 | Phase 4 — Demo UI | **Agent** | 🟢 Done | Employee + governance portals; Playwright e2e; header role switcher |
@@ -65,7 +66,7 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 | B03 | Persona red lines | Shirley | same |
 | B04 | Stack (Python vs Node) | Shirley + teammate | same |
 | B05 | Work split (UI / boardroom / gateway) | Shirley + teammate | same |
-| B09 | GitHub collaborator invite | Shirley | same |
+| B09 | GitHub collaborator invite | — | ✅ Done (2026-07-05) |
 
 ---
 
@@ -73,6 +74,7 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
+| 2026-07-05 | Shirley + Agent | Documented fork vs canonical + deploy split (Max redeploys from `main`; fork 10 commits behind, nothing to merge) | `docs/DEPLOY_AND_REPO_COORDINATION.md` |
 | 2026-07-05 | Shirley + Agent | Design-review fixes; propose-alternative mobile/navigation; Playwright e2e (22 tests); governance header role switcher (DPO/Procurement/IT) | `session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md` |
 | 2026-07-04 | Shirley + Agent | HITL demo flow: state model, governance queues, advocate, appeals, seed data, demo script | `ac2583d`, `docs/DEMO_SCRIPT.md` |
 | 2026-07-04 | Shirley + Agent | Merged PR #3 (employee portal) + #4 (competitor research); synced main | `9305fc5` |

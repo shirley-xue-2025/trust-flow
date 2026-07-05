@@ -79,3 +79,15 @@ Architectural and product decisions of record. **Recommended defaults** marked â
 **Decision:** Copy drafted; no ad spend until B06/B07.
 
 **Date:** 2026-06-25
+
+---
+
+## D009 â€” Canonical repo + deploy ownership (ACCEPTED)
+
+**Decision:** `shirley-xue-2025/trust-flow` `main` is the only product source of truth. Max (`maxmedina05`) owns Alibaba ECS redeploy; Shirley owns code and demo verification. Max's fork is not merged into canonical (verified 2026-07-05: fork only *behind*, not ahead). Live ECS pulls from canonical on redeploy, not fork.
+
+**Why:** Fork diverged after early deploy; Shirley shipped HITL demo on canonical. Avoid dual-repo drift.
+
+**Doc:** [`DEPLOY_AND_REPO_COORDINATION.md`](DEPLOY_AND_REPO_COORDINATION.md)
+
+**Date:** 2026-07-05
