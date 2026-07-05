@@ -96,6 +96,23 @@ export function activatePolicy(
   return record;
 }
 
+/**
+ * Newest ACTIVE version of a policy id. A later draft compile (e.g. a glassbox
+ * replay) overwrites the `<policyId>.json` latest pointer, but the signed
+ * version survives as `hash_*.json` — the gateway must keep enforcing it.
+ */
+export function readActivePolicy(policyId: string): StoredPolicy | null {
+  const latest = readPolicyById(policyId);
+  if (latest?.activation_status === 'active') return latest;
+  if (!existsSync(policyDir())) return null;
+  const actives = readdirSync(policyDir())
+    .filter((f) => f.startsWith('hash_') && f.endsWith('.json'))
+    .map((f) => normalizeStoredPolicy(JSON.parse(readFileSync(join(policyDir(), f), 'utf8')) as StoredPolicy))
+    .filter((p) => p.policy.policy_id === policyId && p.activation_status === 'active')
+    .sort((a, b) => (b.activated_at ?? '').localeCompare(a.activated_at ?? ''));
+  return actives[0] ?? null;
+}
+
 export function readPolicyById(policyId: string): StoredPolicy | null {
   const p = join(policyDir(), `${policyId}.json`);
   if (!existsSync(p)) return null;

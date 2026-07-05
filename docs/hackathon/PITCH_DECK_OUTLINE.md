@@ -1,6 +1,6 @@
 # Pitch deck outline — Track 3 Agent Society
 
-**Format:** ~9 slides · export to PPT from this outline or build HTML later  
+**Format:** ~9 slides · **Built deck:** [`TrustFlow_deck.pptx`](TrustFlow_deck.pptx) (2026-07-06, from this outline + `screenshots/`)  
 **Diagram assets:** [`diagrams/architecture.png`](diagrams/architecture.png) · [`diagrams/round_schedule.png`](diagrams/round_schedule.png)
 
 ---
@@ -56,7 +56,7 @@
 
 **Headline:** Watch stakeholders negotiate in seconds.
 
-**Visual:** `<!-- TODO: screenshot employee_negotiation_s04.png -->` — transcript with stance chips
+**Visual:** [`screenshots/01_glassbox_boardroom_s04.png`](screenshots/01_glassbox_boardroom_s04.png) (glassbox theater) · alt: [`02_employee_negotiation_s04.png`](screenshots/02_employee_negotiation_s04.png) — transcript with stance chips
 
 **Callouts on slide:**
 - Round 2: Compliance **Conditional** — `LOCAL_QWEN_72B` for payment schemas

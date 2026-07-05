@@ -15,8 +15,10 @@
 
 | Field | Limit | Draft |
 |-------|-------|-------|
-| Tagline | 60 chars | Multi-agent policy boardroom + deterministic AI gateway |
+| Tagline | 60 chars | AI agents negotiate your AI policy. A gateway enforces it. |
 | Short description | 200 chars | TrustFlow compresses weeks of Legal/IT/Procurement/Works Council (Betriebsrat) negotiation into seconds of agent debate, compiles enforceable gateway rules, and keeps humans in control of activation. |
+
+*Tagline alternative (previous):* `Multi-agent policy boardroom + deterministic AI gateway`
 
 ---
 
@@ -30,7 +32,7 @@ Enterprises want employees on AI tools; IT, Legal, DPO, and Germany's **Betriebs
 
 ### Our solution
 
-**TrustFlow** is a three-layer system for Track 3 — Agent Society:
+**TrustFlow** is a four-stage pipeline for Track 3 — Agent Society:
 
 1. **Layer B — Agent Boardroom** (agents negotiate) — Five specialist agents (Workflow Runner, Procurement, Corporate Compliance, Works Council Liaison, IT Infrastructure) negotiate a structured Policy Proposal over six rounds using Qwen Cloud.
 2. **Policy Compiler** — Deterministic merge of agent concessions into schema-validated `rules.json` with a `policy_version_hash` (floor-check = validate against org non-negotiable red lines).
@@ -42,8 +44,16 @@ Enterprises want employees on AI tools; IT, Legal, DPO, and Germany's **Betriebs
 - **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing → human sign-off → gateway activity audit (tool used in IDE, not in-portal chat).
 - **Glassbox** (`/glassbox`) — transparent judge view of the negotiation engine: boardroom theater, live transcript on stage; click **Gateway enforce** to inspect the pipeline.
 - **S05 deny path:** Procurement vetoes unsigned OpenAI **DPA** (vendor data-processing agreement) → employee advocate + factual appeal.
+- **Measured baseline (live qwen-max):** the same S05 packet through one generic compliance agent → *conditional approve*, unsigned DPA never surfaced. Through the 5-agent boardroom → **DENIED · VENDOR_DPA_PENDING** (Procurement veto, round 1). Reproducible: `npm run baseline:demo -- S05` · committed artifacts in `docs/hackathon/baseline/`.
 - **Gateway PII:** Email masked; IBAN hard-blocked at edge (regex demo — honest scope).
 - **S02 external gate:** Works council agreement pending — product tracks status; legal process stays outside.
+
+### How we built it
+
+- **Qwen-Max via DashScope** (OpenAI-compatible endpoint, `dashscope-intl`) drives every agent turn; each turn returns a structured envelope (stance, demands, concessions) that is **zod-schema-validated** before it enters the transcript — a malformed turn never reaches the compiler.
+- **Deterministic compiler** merges validated concessions into `rules.json`, floor-checks against org red lines, and signs a `policy_version_hash`. The LLM proposes; it never enforces.
+- **Golden capture CLI** (`npm run capture:golden`) records live qwen-max negotiations as replayable transcripts — so the demo runs identically with or without an API key, and judges can diff live vs recorded.
+- **Quality gates:** 34 backend tests + 28 Playwright e2e across employee, governance, and glassbox surfaces.
 
 ### Hybrid deployment story
 
@@ -78,7 +88,7 @@ TrendAI secures like a firewall; Naaia documents like GRC. TrustFlow **negotiate
 
 - Multi-agent coordination with distinct roles and veto matrix
 - Structured disagreement resolution (S04 compromise, S05 veto, appeals, HITL)
-- Measurable demo baseline vs single-agent (eval fixtures S04/S05 — see deck slide 5)
+- **Measured** single-agent baseline: one generic qwen-max agent conditionally approves S05 and never surfaces the unsigned vendor DPA; the 5-agent boardroom denies it in round 1 — live-captured, committed at `docs/hackathon/baseline/`, reproducible via `npm run baseline:demo -- S05`
 
 ---
 
@@ -89,7 +99,7 @@ TrendAI secures like a firewall; Naaia documents like GRC. TrustFlow **negotiate
 | **GitHub repository** | `https://github.com/shirley-xue-2025/trust-flow` | Shirley — public before deadline |
 | **Live demo URL** | _TBD — Max ECS_ | **Max — DEPLOY** |
 | **Demo video** | _TBD — 5 min max_ | Shirley — record from `DEMO_SCRIPT.md` |
-| **Presentation deck** | `docs/hackathon/PITCH_DECK_OUTLINE.md` → PPT export | Shirley |
+| **Presentation deck** | `docs/hackathon/TrustFlow_deck.pptx` (source outline: `PITCH_DECK_OUTLINE.md`) | Shirley |
 
 ---
 

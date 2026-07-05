@@ -48,7 +48,7 @@
 |---|---|
 | **Path** | http://localhost:5173/strategy_explorer.html (or **Problem framing (pitch) ↗** in glassbox legend) |
 | **Show** | Inspector: strategy explorer iframe — approval deadlock chart, shadow-AI friction |
-| **Spoken** | *"Enterprise AI doesn't fail on models — it fails on approvals. In Germany, elected worker representatives — the Works Council, Betriebsrat — have a legal veto over workplace AI; what takes weeks elsewhere can take months there. We built for that hardest case. IT tickets and email chains stall rollouts; employees route around policy with shadow ChatGPT. TrustFlow compresses multi-stakeholder negotiation into a compiled gateway policy — not another Jira queue."* |
+| **Spoken** | *"Enterprise AI doesn't fail on models. It fails on approvals. In Germany, elected worker representatives — the Works Council, Betriebsrat — hold a legal veto over workplace AI. What takes weeks elsewhere takes months there. We built for that hardest case. Meanwhile, employees route around policy with shadow ChatGPT. TrustFlow turns multi-stakeholder negotiation into a compiled gateway policy — not another ticket queue."* |
 | **Track 3 — decomposition** | Problem sets up **five specialist lanes** (Runner, Procurement, Compliance, Works Council, IT) vs one generic approver. |
 | **Track 3 — negotiation** | — (setup beat) |
 | **Track 3 — baseline** | Strategy explorer **98%** tile = **illustrative projection** — say *"weeks to seconds in stakeholder review, not a measured production SLA."* |
@@ -62,8 +62,9 @@
 | | |
 |---|---|
 | **Path** | `/glassbox` — toolbar **Scenario** → **S04** (auto-loads on first visit) → **▶ Run** — watch transcript on stage |
-| **Show** | Live rounds 0–5 in the boardroom theater; roster stance chips update. Click **Employee request** or enforcement chips for the detail panel. |
-| **Spoken** | *"Watch five agents decompose one employee request into lanes — procurement checks vendor **DPA** (data-processing agreement), compliance sets audit red lines, works council clears **§87 BetrVG** works-council gate, IT assigns sovereign routing. This is Layer B (boardroom — agents negotiate) on Qwen Cloud; enforcement stays deterministic on Layer A (gateway) in the customer VPC."* |
+| **Show** | Rounds 0–5 in the boardroom theater; roster stance chips update. Click **Employee request** or enforcement chips for the detail panel. |
+| **LIVE beat (10s)** | With `DASHSCOPE_API_KEY` set, click **▶ Run boardroom** for a **live qwen-max negotiation** on camera. Wording differs run to run — that's the proof it's real. **Start the server with `npm run dev:demo`** (plain `npm run dev` uses the cheap `qwen-flash` dev profile) — verify `/v1/health` shows `"qwen_model":"qwen-max"` before recording. |
+| **Spoken** | *"Watch five agents split one request into lanes. Procurement checks the vendor **DPA** — the data-processing agreement. Compliance sets audit red lines. The Works Council clears Germany's co-determination gate. IT assigns sovereign routing. This negotiation runs live on qwen-max; our replays were recorded from runs exactly like this. Agents only propose — enforcement stays deterministic, in the customer's VPC."* |
 | **Track 3 — decomposition** | Round schedule: R0 Runner → R1 Procurement → R2 Compliance → R3 Works Council → R4 IT → R5 consensus. |
 | **Track 3 — negotiation** | Compliance **conditional_approve** vs IT **concessions** on `routing.sensitive` — compromise, not instant agreement. |
 | **Track 3 — baseline** | Golden replay completes in **seconds**; email approval chain = **weeks** (journey map — illustrative). |
@@ -110,6 +111,8 @@
 
 | | |
 |---|---|
+**Prerequisite:** Beat 2 sign-off must be done first — the playground enforces the **activated** policy. If you see `policy not activated`, complete DPO + IT sign-off on `demo-s04-pending-signoff`.
+
 | **Path A (email MASK)** | `/glassbox` → click **Gateway enforce** chip → detail panel **Email (masked)** → **Send through gateway** → raw vs **What the model saw (masked)** with `[EMAIL_MASKED]` |
 | **Path B (IBAN BLOCK)** | Same — **IBAN (may block)** sample → **Personal data blocked at gateway** |
 | **Path C (employee audit)** | `/employee/requests/demo-s04-pending-signoff?tab=activity` after sign-off — gateway activity list (no in-app chat) |
@@ -135,7 +138,7 @@
 |---|---|
 | **URLs** | `/governance/audit` · `/employee/requests/demo-s02-external` (quick) · `/glassbox` → **Audit trail** node |
 | **Show** | Audit events: `human_sign_off`, `appeal_decision`, gateway `disclosure_shown: true` (Art. 50) · S02 gate: **Works council agreement (Betriebsvereinbarung) not signed** |
-| **Spoken** | *"Every inference emits schema-valid audit — policy hash, routing, `disclosure_shown` for EU AI Act transparency. TrendAI secures like a firewall; Naaia documents like GRC — TrustFlow negotiates like a boardroom and enforces like a gateway, with Betriebsrat §87 co-determination neither competitor emphasizes. Hybrid deploy: Layer A gateway in your VPC, Layer B boardroom on Qwen Cloud."* |
+| **Spoken** | *"Every inference emits a schema-valid audit event — policy hash, routing, and `disclosure_shown` for EU AI Act transparency. TrendAI secures like a firewall. Naaia documents like GRC. TrustFlow negotiates like a boardroom and enforces like a gateway. And it models the German works-council gate neither competitor touches. Deployment is hybrid: gateway in your VPC, boardroom on Qwen Cloud."* |
 | **Track 3 — decomposition** | Audit ties agent output → compiler hash → gateway enforcement. |
 | **Track 3 — negotiation** | S02 = **PENDING_EXTERNAL** — disagreement escalates outside software (BR process). |
 | **Track 3 — baseline** | Evidence chain: 55 corpus items, 21 tagged `approval_process` (see `docs/hackathon/EVIDENCE_CHAIN.md`). |
@@ -165,6 +168,8 @@
 | Gateway node empty | Run boardroom first (**Agent boardroom** → **Result** shows APPROVED) |
 | BR pending at 80% after S04 approve | UI uses `policy_version_hash` — reseed if stale; S04 hash has BR signed |
 | Wrong tab label | Employee = **Agent negotiation**; Governance = **Agent negotiation trace** |
+| `policy not activated` in gateway playground | Complete beat 2 first (DPO + IT sign-off activates the policy) |
+| Duplicated transcript rounds on `/glassbox` | Happens after in-app navigation back to glassbox — hard refresh (Cmd+Shift+R) before recording the beat |
 
 ---
 
@@ -184,4 +189,4 @@
 - [x] **Disagreement resolution** — Beat 1 compromise (S04), Beat 3 veto + appeal (S05), Beat 5 external (S02)
 - [x] **Measurable baseline** — Beats 0, 1, 2, 3, 4 (time + quality; illustrative labels where noted)
 
-**Related:** [`docs/JUDGE_DEMO_RUNBOOK.md`](JUDGE_DEMO_RUNBOOK.md) · [`docs/hackathon/SPOKEN_LINES.md`](hackathon/SPOKEN_LINES.md) · [`docs/hackathon/PITCH_DECK_OUTLINE.md`](hackathon/PITCH_DECK_OUTLINE.md)
+**Related:** [`docs/JUDGE_DEMO_RUNBOOK.md`](JUDGE_DEMO_RUNBOOK.md) · [`docs/hackathon/SPOKEN_LINES.md`](hackathon/SPOKEN_LINES.md) · [`docs/hackathon/PITCH_DECK_OUTLINE.md`](hackathon/PITCH_DECK_OUTLINE.md) · **Deck:** [`docs/hackathon/TrustFlow_deck.pptx`](hackathon/TrustFlow_deck.pptx) · **Stills:** [`docs/hackathon/screenshots/`](hackathon/screenshots/) (refresh anytime: `cd app && node capture-stills.mjs` against the running dev server)

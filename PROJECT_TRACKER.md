@@ -76,6 +76,7 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
+| 2026-07-06 | Shirley + Agent | Pitch deck (pptx) + 10 judge stills (`capture-stills.mjs`); gateway enforces human-activated policy version (fix + test — playground no longer `policy not activated` after replay recompile); demo script v3 (live-qwen beat, prerequisites, recovery rows); Devpost draft measured-baseline copy | `docs/hackathon/TrustFlow_deck.pptx`, `docs/hackathon/screenshots/`, `app/backend/src/store/index.ts` |
 | 2026-07-06 | Shirley + Agent | Local Qwen env; live goldens S01–S05; S05 single-agent baseline; judge readability (glosses, why-Germany, UI) | `0f14150`, `492d0df`, `3ce0099` · `session_logs/SESSION_HANDOVER_2026-07-06_qwen_live_baseline_readability.md` |
 | 2026-07-05 | Shirley + Agent | Glassbox → boardroom-first theater (pipeline strip, live transcript, in-layout detail panel); product boardroom hero; hygiene (dead canvas CSS, trim processGraph) | `session_logs/SESSION_HANDOVER_2026-07-05_glassbox_theater.md` |
 | 2026-07-05 | Shirley + Agent | Win strategy (Ring 2); doc audit — `_REMOVE_BEFORE_PUBLIC/`; blockers → `memory/` | `memory/HACKATHON_WIN_STRATEGY.md`, `session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md` |

@@ -37,26 +37,26 @@ curl -X POST http://localhost:8080/v1/demo/reseed
 
 1. Open http://localhost:5173/strategy_explorer.html (or glassbox legend → **Problem framing (pitch) ↗**)
 2. Strategy explorer chart visible  
-   `<!-- TODO: screenshot strategy_explorer_chart.png -->`
+   `![Strategy explorer](hackathon/screenshots/10_strategy_explorer.png)`
 
 ### B — Live boardroom S04 (55s)
 
 1. Toolbar **Scenario** → **S04** (auto-selected on load) → **▶ Run**
 2. Watch **Agent boardroom** node summary (`N rounds · APPROVED`)
 3. Click **Agent boardroom** — inspector shows rounds 0–5 stream  
-   `<!-- TODO: screenshot glassbox_boardroom_sse.png -->`
+   `![Glassbox boardroom S04](hackathon/screenshots/01_glassbox_boardroom_s04.png)`
 4. Optional: **Policy compiler** / **Compiled policy** nodes — show `policy_version_hash`
 
 ### C — Human sign-off (65s) — **30s UX target**
 
 1. Tab: http://localhost:5173/employee/requests/demo-s04-pending-signoff
 2. Confirm badge **Pending sign-off** · **Agent negotiation** tab shows transcript  
-   `<!-- TODO: screenshot employee_negotiation_s04.png -->`
+   `![Employee negotiation S04](hackathon/screenshots/02_employee_negotiation_s04.png)`
 3. Tab: http://localhost:5173/governance/queues?queue=signoff&role=dpo
 4. Click **Alex Weber** row → request detail
 5. Header **Viewing as** → **DPO** → **Human sign-off** → rationale (≥20 chars) → **Sign off**
 6. Header → **IT Security** → **Sign off**  
-   `<!-- TODO: screenshot governance_signoff_dual.png -->`
+   `![Dual sign-off approved](hackathon/screenshots/04_governance_signoff_approved.png) (pending state: [03](hackathon/screenshots/03_governance_signoff_pending.png))`
 7. Employee tab refresh → **Approved** → **View gateway activity** (not in-app chat)
 
 ### D — S05 deny + appeal (55s)
@@ -94,7 +94,7 @@ curl -X POST http://localhost:8080/v1/demo/reseed
 
 1. http://localhost:5173/governance/audit — filter mentally for `human_sign_off`, gateway events
 2. Open `disclosure_shown: true` on any allowed inference event  
-   `<!-- TODO: screenshot audit_disclosure.png -->`
+   `![Governance audit](hackathon/screenshots/07_governance_audit.png)`
 3. http://localhost:5173/employee/requests/demo-s02-external — gate banner **Works council agreement (Betriebsvereinbarung) not signed**
 4. Optional: `/glassbox` → **Audit trail** node
 

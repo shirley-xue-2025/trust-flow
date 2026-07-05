@@ -25,7 +25,7 @@ import {
 } from './boardroom/session.js';
 import { hasGolden } from './boardroom/golden.js';
 import { runInference } from './gateway/enforce.js';
-import { readAudit, resolveStoredPolicy } from './store/index.js';
+import { readActivePolicy, readAudit, resolveStoredPolicy } from './store/index.js';
 import { hasApiKey, QWEN_MODEL } from './qwen/client.js';
 import {
   createEmployeeRequest,
@@ -524,13 +524,19 @@ export function buildServer() {
       actor_id?: string;
       request?: RequestPacket;
     };
-    const stored = resolveStoredPolicy(body.policy_id, body.policy_version_hash);
+    let stored = resolveStoredPolicy(body.policy_id, body.policy_version_hash);
     if (!stored) return reply.code(404).send({ error: 'policy not found' });
     if (stored.activation_status !== 'active') {
-      return reply.code(403).send({
-        error: 'policy not activated',
-        deny_reason_code: 'POLICY_NOT_ACTIVATED',
-      });
+      // The gateway enforces the version humans signed, not a newer draft
+      // compile (e.g. from a glassbox replay) that superseded the latest pointer.
+      const active = readActivePolicy(body.policy_id);
+      if (!active) {
+        return reply.code(403).send({
+          error: 'policy not activated',
+          deny_reason_code: 'POLICY_NOT_ACTIVATED',
+        });
+      }
+      stored = active;
     }
 
     const request: RequestPacket =
