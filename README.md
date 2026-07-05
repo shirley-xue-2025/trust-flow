@@ -128,14 +128,14 @@ passcode gate. Step-by-step guide:
 | [`app/`](app/) | Application monorepo (shared types, Fastify backend, React/Vite web) |
 | [`app/README.md`](app/README.md) | How to run, endpoints, live-Qwen setup |
 | [`app/deploy/`](app/deploy/) | Docker, nginx, Alibaba Cloud deploy guide |
-| [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | 5-minute winning demo script |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product & system architecture |
+| [`docs/hackathon/`](docs/hackathon/) | Submission pack — deck, screenshots, evidence chain |
+| [`docs/_REMOVE_BEFORE_PUBLIC/`](docs/_REMOVE_BEFORE_PUBLIC/) | Max deploy + recording ops — **delete before public** |
 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) | Agent negotiation protocol |
-| [`app/deploy/ALICLOUD_DEPLOY.md`](app/deploy/ALICLOUD_DEPLOY.md) | Alibaba Cloud deploy guide |
 | [`docs/schemas/`](docs/schemas/) | JSON schemas (proposal envelope, policy artifact) |
 | [`docs/fixtures/`](docs/fixtures/) | Org config seed + demo/eval data |
-| [`docs/research/`](docs/research/) | Market & regulatory research, personas |
-| [`PROJECT_TRACKER.md`](PROJECT_TRACKER.md) | Work ownership + changelog |
+| [`docs/research/`](docs/research/) | Regulatory & market research, personas |
+| [`prototypes/trustflow_strategy_explorer.html`](prototypes/trustflow_strategy_explorer.html) | Problem-framing pitch explorer |
 
 ---
 

@@ -2,9 +2,9 @@
 
 ## Read order (new session)
 
-1. `SESSION_LATEST.md` — what's in flight
-2. `PROJECT_TRACKER.md` — who owns what, links to deliverables
-3. `docs/research/RESEARCH_LEDGER.md` — open validation items
+1. `README.md` — quickstart + repo map
+2. `docs/ARCHITECTURE.md` — system design
+3. `docs/research/RESEARCH_LEDGER.md` — validated research
 4. `docs/DEFINITIONS.md` — before naming concepts in code or docs
 
 ## Build discipline
@@ -22,6 +22,6 @@
 | Definitions & schemas | `docs/DEFINITIONS.md`, `docs/schemas/` |
 | Static prototypes | `prototypes/` |
 | Application code | `app/` |
-| Session handovers | `SESSION_LATEST.md`, `session_logs/` |
+| Hackathon submission pack | `docs/hackathon/` |
 
 Full placement rules: `docs/PROJECT_STRUCTURE.md`.

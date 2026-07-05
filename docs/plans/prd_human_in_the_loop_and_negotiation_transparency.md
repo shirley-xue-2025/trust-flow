@@ -3,7 +3,7 @@
 **Status:** Draft v0.2 — decisions locked (2026-07-04)  
 **Author:** Product session (Shirley + agent)  
 **Next step:** Technical spec + build (separate session)  
-**Related:** `boardroom_protocol.md`, `DEFINITIONS.md`, `ARCHITECTURE.md`, competitor synthesis R6 (HITL)
+**Related:** `boardroom_protocol.md`, `DEFINITIONS.md`, `ARCHITECTURE.md`
 
 ---
 

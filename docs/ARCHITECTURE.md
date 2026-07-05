@@ -1,6 +1,6 @@
 # TrustFlow — product architecture
 
-**Status:** Pre-build specification (2026-06-25).  
+**Status:** Implemented (hackathon MVP, 2026-07-06).  
 **Audience:** Shirley, teammate, implementers.  
 **Principle:** Deterministic enforcement at the edge; generative negotiation only for policy *authoring*.
 
@@ -105,15 +105,14 @@ flowchart TB
 | `HIGH_RISK_USE_DENIED` | Compliance | Human oversight workflow |
 | `PROHIBITED_PRACTICE` | Compliance | Hard stop |
 
-### 3.4 Deployment options (decision pending — see BLOCKED_ON_SHIRLEY)
+### 3.4 Deployment
 
-| Model | Pros | Cons |
-|-------|------|------|
-| **Customer-hosted gateway** | Data stays in customer VPC; easier DPO story | Heavier install |
-| **TrustFlow SaaS processor** | Faster demo | DPA + subprocessor narrative harder |
-| **Hybrid** | Gateway on-prem, boardroom SaaS | Two components |
+**As built:** Hybrid — gateway + boardroom + UI in Docker Compose on Alibaba Cloud ECS. Local replay mode for judges (`npm run dev`, no API key).
 
-**Hackathon default (proposed):** single-tenant docker compose — gateway + boardroom + UI — runnable locally for judges.
+| Model | Hackathon choice |
+|-------|------------------|
+| **Customer-hosted gateway** | Demo narrative — data stays in customer VPC |
+| **Boardroom on Qwen Cloud** | Live `qwen-max` or golden replay |
 
 ---
 
@@ -259,8 +258,7 @@ click any stage chip for the full inspector (compiler, policy, gateway playgroun
 1. **HRIS connector** — auto-detect high-risk use cases  
 2. **SIEM export** — audit log streaming  
 3. **Microsoft Graph** — Copilot license + usage sync  
-4. **Fake-door LP** — R4 PMF funnel  
-5. **Langfuse eval harness** — boardroom regression tests on persona scenarios  
+4. **Langfuse eval harness** — boardroom regression tests on persona scenarios  
 
 ---
 
@@ -272,5 +270,4 @@ click any stage chip for the full inspector (compiler, policy, gateway playgroun
 | [`schemas/gateway-audit-event.schema.json`](schemas/gateway-audit-event.schema.json) | Audit event shape |
 | [`plans/boardroom_protocol.md`](plans/boardroom_protocol.md) | Agent message protocol |
 | [`plans/hackathon_mvp_scope.md`](plans/hackathon_mvp_scope.md) | What's in / out for demo |
-| [`WORK_PLAN.md`](WORK_PLAN.md) | Phased delivery |
-| [`BLOCKED_ON_SHIRLEY.md`](BLOCKED_ON_SHIRLEY.md) | Decisions only you can make |
+| [`hackathon/EVIDENCE_CHAIN.md`](hackathon/EVIDENCE_CHAIN.md) | Grounded claims for pitch |

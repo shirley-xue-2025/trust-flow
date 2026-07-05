@@ -48,15 +48,13 @@
 
 ---
 
-## Competitor positioning (R6)
+## Market positioning
 
-**Statement (use verbatim on slide 8):**
+**Statement (deck slide 8):**
 
 > **TrendAI** secures AI like a firewall. **Naaia** documents AI like a GRC system. **TrustFlow** negotiates AI like a boardroom and enforces AI like a gateway — so Legal, IT, Procurement, and Betriebsrat can say yes in hours, not months.
 
-**Source:** [`docs/research/06_competitor_inspiration_for_trustflow.md`](../research/06_competitor_inspiration_for_trustflow.md) §6
-
-**Quadrant:** High enforcement + high regulatory workflow = TrustFlow wedge (qualitative desk research).
+**Wedge:** High enforcement + high regulatory workflow — DE **§87 BetrVG** works-council gate neither category emphasizes.
 
 ---
 
@@ -77,7 +75,7 @@
 flowchart LR
     R3[R3 corpus 55 items] --> JM[Journey map pain]
     R1[R1 Art. 50 fields] --> AUDIT[gateway audit schema]
-    R6[R6 competitors] --> PITCH[positioning statement]
+    POS[Market positioning] --> PITCH[positioning statement]
     GOLDEN[S04/S05 golden] --> DEMO[live demo + video]
     JM --> DEMO
     AUDIT --> DEMO
@@ -86,4 +84,4 @@ flowchart LR
 
 ---
 
-**Related:** [`EVIDENCE_CHAIN` parent folder](./) · [`../DEMO_SCRIPT.md`](../DEMO_SCRIPT.md) · [`PITCH_DECK_OUTLINE.md`](PITCH_DECK_OUTLINE.md)
+**Related:** [`README.md`](README.md) · [`DEMO_VIDEO.md`](DEMO_VIDEO.md) · [`baseline/S05_single_agent_vs_boardroom.md`](baseline/S05_single_agent_vs_boardroom.md)

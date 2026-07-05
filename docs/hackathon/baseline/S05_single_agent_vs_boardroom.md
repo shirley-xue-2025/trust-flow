@@ -43,4 +43,4 @@ Without a key: read committed `S05_comparison.json` (evidence for judges / deck)
 
 > *"We ran the same S05 packet through one super-compliance prompt and through our five-agent boardroom. The monolith conditionally approved ChatGPT Enterprise and never blocked on the unsigned OpenAI DPA. Procurement vetoed in round one — boardroom ends DENIED. That's measurable improvement on the quality axis, not a slide assertion."*
 
-**Related:** [`../PITCH_DECK_OUTLINE.md`](../PITCH_DECK_OUTLINE.md) slide 5 · [`../EVIDENCE_CHAIN.md`](../EVIDENCE_CHAIN.md)
+**Related:** [`../EVIDENCE_CHAIN.md`](../EVIDENCE_CHAIN.md) · [`TrustFlow_deck.pptx`](../TrustFlow_deck.pptx)

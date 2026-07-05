@@ -11,8 +11,8 @@
 |------|--------|
 | **Canonical repo** | [`shirley-xue-2025/trust-flow`](https://github.com/shirley-xue-2025/trust-flow) → branch `main` |
 | **Local dev** | `cd app && npm run dev` (web :5173, backend :8080) |
-| **Demo script** | [`docs/DEMO_SCRIPT.md`](DEMO_SCRIPT.md) |
-| **Deploy runbook** | [`app/deploy/ALICLOUD_DEPLOY.md`](../app/deploy/ALICLOUD_DEPLOY.md) |
+| **Demo script** | [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) (this folder) |
+| **Deploy runbook** | [`app/deploy/ALICLOUD_DEPLOY.md`](../../app/deploy/ALICLOUD_DEPLOY.md) |
 
 **Do not treat the fork as canonical.** Max's fork exists for historical setup only.
 

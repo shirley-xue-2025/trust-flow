@@ -1,22 +1,19 @@
-# ⚠️ REMOVE BEFORE PUBLIC
+# Remove before public
 
-**Delete this entire folder** before changing the GitHub repo to **public**.
+**Max / Shirley only** — operational docs for recording, deploy, and Devpost. **Delete this entire folder** before making the repo public.
 
-These files are useful during the private hackathon sprint but are **not** intended for open-source release:
-
-| File | Reason |
-|------|--------|
-| `DEVPOST_DRAFT.md` | Pre-submit draft; finalize on Devpost directly |
-| `BUILD_AND_DEMO_PLAN.md` | Internal build timeline / teammate pacing |
-| `trustflow_context.md` | Early project context; superseded by `README.md` + `ARCHITECTURE.md` |
-| `fake_door_copy.md` | Post-hackathon PMF / fake-door ad copy |
-
-**Shirley-only blockers** live in Ring 2: `memory/BLOCKED_ON_SHIRLEY.md` (never in repo).
-
-**Full manifest:** `memory/REMOVE_BEFORE_PUBLIC/README.md` in the local workspace (not cloned with repo).
+| File | Who needs it |
+|------|--------------|
+| [`DEPLOY_AND_REPO_COORDINATION.md`](DEPLOY_AND_REPO_COORDINATION.md) | **Max** — ECS redeploy from `main` |
+| [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) | Shirley — video recording |
+| [`JUDGE_DEMO_RUNBOOK.md`](JUDGE_DEMO_RUNBOOK.md) | Shirley — rehearsal checklist |
+| [`SPOKEN_LINES.md`](SPOKEN_LINES.md) | Shirley — on-camera lines |
+| [`PITCH_DECK_OUTLINE.md`](PITCH_DECK_OUTLINE.md) | Shirley — deck source (pptx in `docs/hackathon/`) |
+| [`DEVPOST_DRAFT.md`](DEVPOST_DRAFT.md) | Shirley — paste into Devpost |
+| [`coordination/`](coordination/) | Session tracker + handover (internal) |
 
 ```bash
 rm -rf docs/_REMOVE_BEFORE_PUBLIC
 ```
 
-Then fix links in `README.md` and `SESSION_LATEST.md` if they still point here.
+Public submission pack stays in [`docs/hackathon/`](../hackathon/).

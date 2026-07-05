@@ -93,4 +93,4 @@ For TrustFlow product design: any enterprise AI gateway with **per-user audit lo
 - Mapping from tool category → required log fields — partial in policy schema `audit.required_fields`
 - Deployment model (customer-hosted vs SaaS) — see BLOCKED B02
 
-Track in `docs/research/RESEARCH_LEDGER.md` and `docs/BLOCKED_ON_SHIRLEY.md`.
+Track in `docs/research/RESEARCH_LEDGER.md`.
