@@ -25,7 +25,7 @@ import {
 } from './boardroom/session.js';
 import { hasGolden } from './boardroom/golden.js';
 import { runInference } from './gateway/enforce.js';
-import { readAudit, readPolicyById } from './store/index.js';
+import { readAudit, resolveStoredPolicy } from './store/index.js';
 import { hasApiKey } from './qwen/client.js';
 import {
   createEmployeeRequest,
@@ -91,8 +91,8 @@ export function buildServer() {
     const id = (req.params as { id: string }).id;
     const record = getEmployeeRequest(id);
     if (!record) return reply.code(404).send({ error: 'request not found' });
-    const steps = record.next_steps ?? nextStepsForRecord(record, REGISTRY);
-    return serializeEmployeeRequest({ ...record, next_steps: steps });
+    const synced = serializeEmployeeRequest(record);
+    return { ...synced, next_steps: nextStepsForRecord(synced, REGISTRY) };
   });
 
   // body: { tool_id, use_case_category, department?, data_classes?, business_justification?, replay? }
@@ -366,7 +366,8 @@ export function buildServer() {
   // --- Policy by id ----------------------------------------------------------
   app.get('/v1/policy/:id', async (req, reply) => {
     const id = (req.params as { id: string }).id;
-    const stored = readPolicyById(id);
+    const hash = (req.query as { hash?: string }).hash;
+    const stored = resolveStoredPolicy(id, hash);
     if (!stored) return reply.code(404).send({ error: 'policy not found' });
     return stored;
   });
@@ -517,11 +518,12 @@ export function buildServer() {
   app.post('/v1/inference', async (req, reply) => {
     const body = req.body as {
       policy_id: string;
+      policy_version_hash?: string;
       prompt: string;
       actor_id?: string;
       request?: RequestPacket;
     };
-    const stored = readPolicyById(body.policy_id);
+    const stored = resolveStoredPolicy(body.policy_id, body.policy_version_hash);
     if (!stored) return reply.code(404).send({ error: 'policy not found' });
     if (stored.activation_status !== 'active') {
       return reply.code(403).send({

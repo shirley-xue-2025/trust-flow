@@ -33,7 +33,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
     {
       step: 1,
       title: 'Watch agents negotiate',
-      description: 'Five Qwen agents debate policy — full trace, no black box.',
+      description: 'Five Qwen agents in the boardroom — full trace on your request, or live replay in glassbox.',
       icon: Users,
       to: '/employee/requests/demo-s04-pending-signoff',
     },
@@ -46,10 +46,10 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
     },
     {
       step: 3,
-      title: 'Governed gateway',
-      description: 'After sign-off, prompts pass through Layer A — PII masked, audit logged.',
+      title: 'Gateway audit',
+      description: 'After sign-off, see PII masked + disclosure_shown in gateway activity. Live tests in glassbox.',
       icon: ShieldCheck,
-      to: '/glassbox',
+      to: '/employee/requests/demo-s04-pending-signoff?tab=activity',
     },
   ];
 
@@ -136,11 +136,16 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
               <Bot className="h-5 w-5 text-primary" />
               You have approved tools
             </CardTitle>
-            <CardDescription>Use them through TrustFlow — PII masked, routing enforced, audit logged.</CardDescription>
+            <CardDescription>
+              Use approved tools in your IDE — TrustFlow records gateway enforcement and audit here,
+              not an in-app chat.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="secondary">
-              <Link to="/employee/tools">Open tool workspace →</Link>
+              <Link to="/employee/requests/demo-s04-pending-signoff?tab=activity">
+                View gateway activity →
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -160,6 +165,9 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
               <Link to={`/employee/requests/${d.id}`}>{d.label}</Link>
             </Button>
           ))}
+          <Button variant="secondary" size="sm" asChild>
+            <Link to="/glassbox">Glassbox — live boardroom replay →</Link>
+          </Button>
         </CardContent>
       </Card>
 

@@ -67,6 +67,26 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
   });
 
+  it('S04 email prompt → masked + allowed (not PII_BLOCK)', () => {
+    const { result, request } = compileScenario('S04');
+    const r = runInference(
+      {
+        policy: result.policy,
+        policy_version_hash: result.policy_version_hash,
+        request: request as RequestPacket,
+        prompt: 'Email the receipt to katrin.brenner@nordpay.example.',
+      },
+      { org: ORG, registry: REGISTRY },
+      { activation_status: 'active' },
+    );
+    expect(r.outcome).not.toBe('denied');
+    expect(r.deny_reason_code).not.toBe('PII_BLOCK');
+    expect(r.redacted_prompt).toContain('EMAIL_MASKED');
+    expect(r.audit_event.pii_actions?.some((p) => p.entity_type === 'email' && p.action === 'masked')).toBe(
+      true,
+    );
+  });
+
   it('draft policy activation_status → POLICY_NOT_ACTIVATED', () => {
     const { result, request } = compileScenario('S01');
     const r = runInference(

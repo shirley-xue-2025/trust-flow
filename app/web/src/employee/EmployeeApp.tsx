@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import type { EmployeeProfile } from '@trustflow/shared';
 import { Loader2 } from 'lucide-react';
 import EmployeeLayout from '@/employee/EmployeeLayout';
@@ -8,8 +8,14 @@ import EmployeeDashboard from '@/employee/pages/Dashboard';
 import NewRequestPage from '@/employee/pages/NewRequest';
 import RequestsListPage from '@/employee/pages/RequestsList';
 import RequestDetailPage from '@/employee/pages/RequestDetail';
-import ToolsIndexPage from '@/employee/pages/ToolsIndex';
-import ToolChatPage from '@/employee/pages/ToolChat';
+
+function ToolsRedirect() {
+  const { requestId } = useParams<{ requestId: string }>();
+  const dest = requestId
+    ? `/employee/requests/${requestId}?tab=activity`
+    : '/employee/requests/demo-s04-pending-signoff?tab=activity';
+  return <Navigate to={dest} replace />;
+}
 
 function EmployeeRoutes({ profile }: { profile: EmployeeProfile }) {
   return (
@@ -19,8 +25,8 @@ function EmployeeRoutes({ profile }: { profile: EmployeeProfile }) {
         <Route path="requests/new" element={<NewRequestPage profile={profile} />} />
         <Route path="requests" element={<RequestsListPage profile={profile} />} />
         <Route path="requests/:id" element={<RequestDetailPage />} />
-        <Route path="tools" element={<ToolsIndexPage profile={profile} />} />
-        <Route path="tools/:requestId" element={<ToolChatPage profile={profile} />} />
+        <Route path="tools" element={<ToolsRedirect />} />
+        <Route path="tools/:requestId" element={<ToolsRedirect />} />
       </Route>
     </Routes>
   );

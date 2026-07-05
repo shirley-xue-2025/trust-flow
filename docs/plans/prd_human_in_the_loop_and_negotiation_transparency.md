@@ -21,7 +21,17 @@ This PRD defines two connected capabilities:
 
 **Glassbox** remains the place for full technical depth (live SSE, compiler diff, scenario replay). **Employee + Governance portals** become the trust product.
 
----
+### As implemented (2026-07-05)
+
+| PRD intent | Shipped behavior |
+|------------|------------------|
+| Negotiation visible on employee request | Tab **Agent negotiation** (default when transcript exists) |
+| Human sign-off before gateway | Governance DPO + IT sign-off; `policy_activation: active` |
+| Employee audit without in-app chat | Tab **Gateway activity** — no `/employee/tools` chat UI |
+| Glassbox technical depth | `/glassbox` single-page **node canvas** + inspector (replaces tabbed demo) |
+| PII honesty | Email **MASK**, IBAN **BLOCK** in glassbox **Gateway enforce** + seeded audit on activation |
+| Policy version integrity | `policy_version_hash` on lookup/activation (S04 vs S02 collision fixed) |
+
 
 ## 2. Problem statement
 
@@ -162,9 +172,9 @@ Human sign-off transitions `pending_signoff` → `approved` + `policy_activation
 | ID | Requirement | Priority |
 |----|-------------|----------|
 | A1 | **Seed demo requests** with golden session transcripts (e.g. Claude Code → S04, ChatGPT → S02/S05) and `session_id` persisted | P0 |
-| A2 | When `status === negotiating`, **default tab = Negotiation**; show live SSE progress on employee request detail | P0 |
+| A2 | When `status === negotiating`, **default tab = Agent negotiation**; show live SSE progress on employee request detail | P0 — shipped |
 | A3 | **Stakeholder summary card** on overview: per-agent stance chips (Supports / Conditional / Opposes) — no hackathon “Agent Society” label | P0 |
-| A4 | Governance request view: same transcript + summary; **Boardroom** tab default when in review | P1 |
+| A4 | Governance request view: same transcript + summary; **Agent negotiation trace** tab default when in review | P1 — shipped |
 | A5 | Copy pass: “Stakeholder review” / “Policy negotiation” in employee UI; reserve “boardroom” for governance | P1 |
 | A6 | Dashboard stat hints link to **active negotiation** or **pending sign-off** count | P2 |
 
@@ -234,12 +244,12 @@ Human sign-off transitions `pending_signoff` → `approved` + `policy_activation
 
 ---
 
-### Epic F — Glassbox (unchanged scope, explicit boundary)
+### Epic F — Glassbox (technical judge view)
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| F1 | Glassbox continues to show **live** boardroom SSE, compiler, scenarios S01–S05 | — |
-| F2 | Add **footnote** in glassbox: “Production requires human sign-off — see Governance queue” | P1 |
+| F1 | `/glassbox` single-page **node canvas** — live SSE, compiler, scenarios S01–S05 in inspector | — shipped |
+| F2 | Footnote in glassbox Result inspector: “Production requires human sign-off — see Governance queue” | P1 — shipped |
 | F3 | No employee appeal/sign-off flows in glassbox | — |
 
 ---
@@ -249,14 +259,14 @@ Human sign-off transitions `pending_signoff` → `approved` + `policy_activation
 | Surface | New / changed |
 |---------|----------------|
 | Employee dashboard | Pending sign-off badge; link to requests in review |
-| Employee request detail | Stakeholder summary; default negotiation tab; Advocate chat; resolution CTAs |
+| Employee request detail | Stakeholder summary; default **Agent negotiation** tab; **Gateway activity** (no in-app chat); Advocate; resolution CTAs |
 | Employee new request | `parent_request_id` banner when linked to denied parent |
 | Governance overview | Queue counts |
 | Governance console | Oversight — **role-filtered queues** (DPO / Procurement / IT) |
 | Governance role switcher | **New** — same pattern as Employee/Governance product switcher |
 | Governance appeal queue | **New** |
 | Governance request detail | Sign-off / appeal actions when permitted |
-| Glassbox | Annotation only |
+| Glassbox | Single-page node canvas + inspector (`/glassbox`) |
 
 ---
 
@@ -266,10 +276,10 @@ Updated 5-minute story:
 
 | Min | Beat |
 |-----|------|
-| 0:00 | Problem framing (strategy explorer / glassbox) |
+| 0:00 | Problem framing (`/strategy_explorer.html` — separate from pipeline canvas) |
 | 0:45 | Alex submits request — **stakeholder review** visible live |
 | 1:30 | Recommendation: approve — **“Pending DPO sign-off”** (not instant access) |
-| 2:00 | Katrin signs off — policy activates — Alex uses tool |
+| 2:00 | Katrin signs off — policy activates — **Gateway activity** on request (tool in IDE) |
 | 2:45 | Second request denied — **live Advocate** explains; employee files **factual appeal** |
 | 3:15 | DPO grants appeal → **boardroom re-opens**; parallel human reviews → activation |
 | 3:45 | Optional beat: **procedural appeal** on S02 — no re-boardroom, stale BR registry fixed |

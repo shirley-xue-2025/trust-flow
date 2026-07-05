@@ -5,7 +5,7 @@
 **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed`  
 **Live URL (when deployed):** _TBD — Max ECS redeploy from canonical `main`_
 
-**Video arc:** Problem → Glassbox SSE S04 → HITL sign-off → S05 deny/appeal → Gateway PII → Audit + S02 BR → close
+**Video arc:** Problem → Glassbox canvas S04 SSE → HITL sign-off → S05 deny/appeal → Gateway PII → Audit + S02 BR → close
 
 ---
 
@@ -13,10 +13,10 @@
 
 | Role | URL | Persona |
 |------|-----|---------|
-| Narrator / judge view | `/glassbox` | Technical — live boardroom SSE |
+| Narrator / judge view | `/glassbox` | Technical — single-page node canvas + inspector |
 | Employee | `/employee` | Alex Weber |
 | DPO / IT | `/governance` | Katrin Müller — use header **Viewing as** role tabs |
-| Strategy problem frame | `/glassbox` tab **0 · Problem** (embeds strategy explorer) | Pitch only |
+| Strategy problem frame | `/strategy_explorer.html` (link from glassbox legend — not a pipeline node) | Pitch only |
 
 ---
 
@@ -25,17 +25,20 @@
 | Context | Exact string in UI |
 |---------|-------------------|
 | Employee status | `Stakeholder review`, `Pending sign-off`, `Approved` |
-| Employee tab | `Negotiation` (not "Boardroom") |
-| Governance tab | `Boardroom` |
+| Employee request tabs | `Overview`, `Agent negotiation`, `Policy`, `Gateway activity` |
+| Governance request tab | `Agent negotiation trace` |
 | Governance sign-off card | `Human sign-off` → button `Sign off` |
 | Governance roles (header) | `All roles`, `DPO`, `Procurement`, `IT Security` |
 | Sign-off roles in list | `DPO / Legal`, `IT / CISO` |
 | Employee advocate | `Your Advocate` |
 | Employee appeal | `Appeal` → type `Factual — new evidence changes substance` |
 | Governance appeal action | `Grant appeal` |
-| Deny message (S05) | `Personal data blocked at gateway` only for PII — S05 uses procurement veto copy |
+| Deny message (S05) | Procurement veto copy — not PII block |
 | Gateway deny (IBAN) | `Personal data blocked at gateway` (`PII_BLOCK`) |
-| Glassbox tabs | `0 · Problem` … `2 · Boardroom` … `4 · Playground` … `5 · Audit Log` |
+| Post-approval CTA | `View gateway activity` + link to glassbox Playground — **no in-app tool chat** |
+| Architecture strip | `Agents propose → Compiler signs → Humans approve → Gateway enforces` |
+| Glassbox canvas nodes | `Employee request` → `Org gates read` → `Agent boardroom` → `Policy compiler` → `Compiled policy` → `Gateway enforce` → `Audit trail` → `Result` |
+| Glassbox legend | Blue = Connected systems inform · Green = AI reasons & proposes · Purple = Mechanics validate & execute |
 
 ---
 
@@ -43,8 +46,8 @@
 
 | | |
 |---|---|
-| **Tab** | http://localhost:5173/glassbox → **0 · Problem** |
-| **Show** | Strategy explorer iframe — approval deadlock chart, shadow-AI friction |
+| **Path** | http://localhost:5173/strategy_explorer.html (or **Problem framing (pitch) ↗** in glassbox legend) |
+| **Show** | Inspector: strategy explorer iframe — approval deadlock chart, shadow-AI friction |
 | **Spoken** | *"Enterprise AI doesn't fail on models — it fails on approvals. IT tickets and email chains take weeks; employees route around policy with shadow ChatGPT. We're not building another Jira queue or ServiceNow form — TrustFlow compresses multi-stakeholder negotiation into a compiled gateway policy."* |
 | **Track 3 — decomposition** | Problem sets up **five specialist lanes** (Runner, Procurement, Compliance, Works Council, IT) vs one generic approver. |
 | **Track 3 — negotiation** | — (setup beat) |
@@ -58,14 +61,14 @@
 
 | | |
 |---|---|
-| **Tab** | `/glassbox` → **1 · Request** → pick **S04** replay → auto-jump **2 · Boardroom** |
-| **Show** | SSE rounds 0–5; stance chips (`Supports`, `Conditional`, …); Compliance demands `LOCAL_QWEN_72B` |
+| **Path** | `/glassbox` — toolbar **Scenario** → **S04** (auto-loads on first visit) → **▶ Run** → watch **Agent boardroom** node summary update |
+| **Show** | Click **Agent boardroom** — inspector shows SSE rounds 0–5; stance chips; Compliance demands `LOCAL_QWEN_72B`. Node summaries live on canvas. |
 | **Spoken** | *"Watch five agents decompose one employee request into lanes — procurement checks DPA, compliance sets audit red lines, works council clears §87 Betriebsrat, IT assigns sovereign routing. This is Qwen Cloud boardroom on Layer B; enforcement stays deterministic on Layer A in the customer VPC."* |
 | **Track 3 — decomposition** | Round schedule: R0 Runner → R1 Procurement → R2 Compliance → R3 Works Council → R4 IT → R5 consensus. |
 | **Track 3 — negotiation** | Compliance **conditional_approve** vs IT **concessions** on `routing.sensitive` — compromise, not instant agreement. |
 | **Track 3 — baseline** | Golden replay completes in **seconds**; email approval chain = **weeks** (journey map — illustrative). |
 
-**Fallback:** If `DASHSCOPE_API_KEY` missing → `?replay=S04` uses canned golden transcript (no live LLM).
+**Fallback:** If `DASHSCOPE_API_KEY` missing → Scenario **S04** uses canned golden transcript (no live LLM).
 
 **Recovery:** Empty boardroom → reseed; persisted `transcript_snapshot` on employee request survives restart.
 
@@ -76,13 +79,15 @@
 | | |
 |---|---|
 | **URLs** | `/employee/requests/demo-s04-pending-signoff` → `/governance/queues?queue=signoff&role=dpo` |
-| **Clicks** | 1. Employee → **Negotiation** tab — full transcript, status **Pending sign-off** — no **Use Claude Code** yet 2. Governance → open **Alex Weber** / Claude Code row 3. Header **DPO** → **Human sign-off** → rationale ≥20 chars → **Sign off** 4. Header **IT Security** → **Sign off** 5. Employee refresh → **Approved** → **Use Claude Code** |
+| **Clicks** | 1. Employee → **Agent negotiation** tab — full transcript, status **Pending sign-off** — no gateway activity yet 2. Governance → open **Alex Weber** / Claude Code row 3. Header **DPO** → **Human sign-off** → rationale ≥20 chars → **Sign off** 4. Header **IT Security** → **Sign off** 5. Employee refresh → **Approved** → **View gateway activity** (IDE copy: use Claude Code outside this portal) |
 | **Spoken** | *"Agents recommended approval in seconds; humans still own activation — one-click sign-off on the policy diff, not a ticket workflow. DPO and IT parallel review before the gateway goes live."* |
 | **Track 3 — decomposition** | Agents author; **DPO + IT** roles activate (Layer C HITL). |
 | **Track 3 — negotiation** | Human can **Reject** — demo approve path only. |
 | **Track 3 — baseline** | **30-second sign-off UX target** (two clicks + rationale) vs multi-week approval meetings. |
 
 **UI strings:** `Waiting for human sign-off`, `Stakeholders recommended approval. DPO and IT must sign off before you can use this tool.`
+
+**Post-sign-off:** Compliance **100%** when S04 policy hash is used (BR signed in packet; no `BETRIEBSVEREINBARUNG_PENDING` on that hash). Gateway activity tab shows seeded email MASK event.
 
 ---
 
@@ -105,8 +110,9 @@
 
 | | |
 |---|---|
-| **Path A (email MASK)** | `/glassbox` tab **4 · Playground** after S04 compile — sample **Email (PII)** → **Send through gateway** → side-by-side: raw prompt vs **What the model saw (masked)** with `[EMAIL_MASKED]` |
-| **Path B (IBAN BLOCK)** | `/employee/tools/demo-s04-pending-signoff` after sign-off — paste `DE89370400440532013000` → **Personal data blocked at gateway** |
+| **Path A (email MASK)** | `/glassbox` → **Gateway enforce** node (after S04 compile) → inspector **Email (masked)** → **Send through gateway** → raw vs **What the model saw (masked)** with `[EMAIL_MASKED]` |
+| **Path B (IBAN BLOCK)** | Same node → **IBAN (may block)** sample → **Personal data blocked at gateway** |
+| **Path C (employee audit)** | `/employee/requests/demo-s04-pending-signoff?tab=activity` after sign-off — gateway activity list (no in-app chat) |
 | **Spoken** | *"Layer A is regex policy — email is masked and the request can continue; IBAN is hard-blocked at the edge. We do not round-trip restore PII; the audit log records fingerprints and `pii_actions`, not raw prompts. Deterministic code — not LLM guesswork."* |
 | **Track 3 — decomposition** | Gateway = separate deterministic layer from boardroom agents. |
 | **Track 3 — negotiation** | — |
@@ -127,7 +133,7 @@
 
 | | |
 |---|---|
-| **URLs** | `/governance/audit` · `/employee/requests/demo-s02-external` (quick) |
+| **URLs** | `/governance/audit` · `/employee/requests/demo-s02-external` (quick) · `/glassbox` → **Audit trail** node |
 | **Show** | Audit events: `human_sign_off`, `appeal_decision`, gateway `disclosure_shown: true` (Art. 50) · S02 gate: **Works council agreement (Betriebsvereinbarung) not signed** |
 | **Spoken** | *"Every inference emits schema-valid audit — policy hash, routing, `disclosure_shown` for EU AI Act transparency. TrendAI secures like a firewall; Naaia documents like GRC — TrustFlow negotiates like a boardroom and enforces like a gateway, with Betriebsrat §87 co-determination neither competitor emphasizes. Hybrid deploy: Layer A gateway in your VPC, Layer B boardroom on Qwen Cloud."* |
 | **Track 3 — decomposition** | Audit ties agent output → compiler hash → gateway enforcement. |
@@ -152,12 +158,13 @@
 | Issue | Fix |
 |-------|-----|
 | Empty employee requests | `curl -X POST http://localhost:8080/v1/demo/reseed` |
-| Boardroom SSE fails | Glassbox **Request** tab → replay **S04** / **S05** (golden JSON) |
+| Boardroom SSE fails | Glassbox toolbar **Scenario** → **S04** / **S05** replay |
 | No `DASHSCOPE_API_KEY` | Golden replay only — still demo-complete |
 | Stuck pending sign-off | Reseed; sign DPO then IT (both required for S04) |
-| "Use tool" missing | Both human reviews approved → status **Approved** |
-| Playground empty | Run boardroom compile first (tab 2 → 3) |
-| Wrong negotiation tab label | Employee = **Negotiation**; Governance = **Boardroom** |
+| No gateway activity | Both human reviews approved → status **Approved** → **Gateway activity** tab |
+| Gateway node empty | Run boardroom first (**Agent boardroom** → **Result** shows APPROVED) |
+| BR pending at 80% after S04 approve | UI uses `policy_version_hash` — reseed if stale; S04 hash has BR signed |
+| Wrong tab label | Employee = **Agent negotiation**; Governance = **Agent negotiation trace** |
 
 ---
 
@@ -165,7 +172,7 @@
 
 | ID | Scenario | End state | Primary beat |
 |----|----------|-----------|--------------|
-| `demo-s04-pending-signoff` | S04 | Pending sign-off → approve path | Beats 2, 4B |
+| `demo-s04-pending-signoff` | S04 | Pending sign-off → approve path | Beats 2, 4 |
 | `demo-s05-denied` | S05 | Denied — appeal demo | Beat 3 |
 | `demo-s02-external` | S02 | Pending external (BR) | Beat 5 |
 

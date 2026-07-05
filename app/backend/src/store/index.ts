@@ -66,11 +66,24 @@ export function writePolicy(
   return record;
 }
 
+/** Prefer hash-specific artifact when demos share a policy_id (e.g. S04 vs S02). */
+export function resolveStoredPolicy(
+  policyId: string,
+  policyVersionHash?: string | null,
+): StoredPolicy | null {
+  if (policyVersionHash) {
+    const byHash = readPolicyByHash(policyVersionHash);
+    if (byHash && byHash.policy.policy_id === policyId) return byHash;
+  }
+  return readPolicyById(policyId);
+}
+
 export function activatePolicy(
   policyId: string,
   reviewerIds: string[],
+  policyVersionHash?: string | null,
 ): StoredPolicy | null {
-  const stored = readPolicyById(policyId);
+  const stored = resolveStoredPolicy(policyId, policyVersionHash);
   if (!stored) return null;
   const record: StoredPolicy = {
     ...stored,

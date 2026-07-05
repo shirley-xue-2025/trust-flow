@@ -11,11 +11,12 @@ import type {
   ReviewerRole,
 } from '@trustflow/shared';
 import { emitAuditEvent } from '../gateway/audit.js';
-import { activationState, deriveDisplayStatus, externalGatesClear } from '../employee/requestState.js';
+import { activationState, deriveDisplayStatus, externalGatesClear, syncRecord } from '../employee/requestState.js';
 import {
   getEmployeeRequest,
   isApprovedForGateway,
   listEmployeeRequests,
+  nextStepsForRecord,
   serializeEmployeeRequest,
   updateEmployeeRequest,
 } from '../employee/requests.js';
@@ -27,8 +28,10 @@ import {
   spawnHumanReviews,
 } from '../store/humanReviews.js';
 import { getPendingAppealForRequest, listAppeals, decideAppeal, getAppeal } from '../store/appeals.js';
-import { activatePolicy, listPolicies, readPolicyById } from '../store/index.js';
+import { activatePolicy, listPolicies, resolveStoredPolicy } from '../store/index.js';
 import { runEmployeeBoardroom } from '../employee/runBoardroom.js';
+import { runInference } from '../gateway/enforce.js';
+import { REGISTRY } from '../fixtures/index.js';
 import type { ToolRegistry } from '@trustflow/shared';
 
 export type GovernanceQueue =
@@ -169,6 +172,62 @@ export function governanceOverviewStats(org: OrgConfig) {
   };
 }
 
+function finalizeRequestActivation(
+  requestId: string,
+  record: EmployeeRequestRecord,
+  reviewerIds: string[],
+  reviewerIdForAudit: string,
+  org: OrgConfig,
+): EmployeeRequestRecord {
+  if (!record.policy_id) return serializeEmployeeRequest(record);
+
+  activatePolicy(record.policy_id, reviewerIds, record.policy_version_hash);
+
+  const stored = resolveStoredPolicy(record.policy_id, record.policy_version_hash);
+  if (stored?.policy) {
+    runInference(
+      {
+        policy: stored.policy,
+        policy_version_hash: stored.policy_version_hash,
+        request: record.packet,
+        prompt: 'Email the receipt to katrin.brenner@nordpay.example for review.',
+        actor_id: record.actor_id,
+      },
+      { org, registry: REGISTRY },
+      { activation_status: 'active' },
+    );
+  }
+
+  const activated = syncRecord({
+    ...getEmployeeRequest(requestId)!,
+    human_decision: 'complete',
+    policy_activation: 'active',
+  });
+  updateEmployeeRequest(requestId, {
+    human_decision: 'complete',
+    policy_activation: 'active',
+    status: activated.status,
+    display_status: activated.display_status,
+    next_steps: nextStepsForRecord(activated, REGISTRY),
+  });
+
+  emitAuditEvent({
+    event_id: randomUUID(),
+    event_type: 'policy_activated',
+    policy_id: record.policy_id,
+    policy_version_hash: record.policy_version_hash ?? 'none',
+    actor_id: record.actor_id,
+    tool_id: record.tool_id,
+    model_provider: 'none',
+    model_id: 'none',
+    routing_decision: 'BLOCKED',
+    outcome: 'allowed',
+    human_reviewer_id: reviewerIdForAudit,
+  });
+
+  return serializeEmployeeRequest(getEmployeeRequest(requestId)!);
+}
+
 export function decideReviewForRequest(
   requestId: string,
   reviewId: string,
@@ -208,7 +267,6 @@ export function decideReviewForRequest(
   } else {
     const activation = activationState(record, human_reviews, org);
     if (activation.can_activate && record.policy_id) {
-      activatePolicy(record.policy_id, human_reviews.filter((r) => r.status === 'approved').map((r) => r.reviewer_id));
       patch = {
         human_decision: 'complete',
         policy_activation: 'active',
@@ -220,6 +278,16 @@ export function decideReviewForRequest(
 
   const updated = updateEmployeeRequest(requestId, patch);
   if (!updated) return { error: 'update failed', code: 500 };
+
+  if (patch.policy_activation === 'active' && record.policy_id) {
+    finalizeRequestActivation(
+      requestId,
+      getEmployeeRequest(requestId)!,
+      human_reviews.filter((r) => r.status === 'approved').map((r) => r.reviewer_id),
+      reviewerId,
+      org,
+    );
+  }
 
   const audit = emitAuditEvent({
     event_type: 'human_sign_off',
@@ -255,7 +323,20 @@ export function activateRequestPolicy(
 ): { record: EmployeeRequestRecord } | { error: string; code: number } {
   const record = getEmployeeRequest(requestId);
   if (!record) return { error: 'request not found', code: 404 };
-  if (isApprovedForGateway(record)) return { record };
+
+  if (isApprovedForGateway(record)) {
+    const activated = syncRecord(record);
+    const steps = nextStepsForRecord(activated, REGISTRY);
+    if (JSON.stringify(record.next_steps) !== JSON.stringify(steps)) {
+      updateEmployeeRequest(requestId, {
+        next_steps: steps,
+        status: activated.status,
+        display_status: activated.display_status,
+      });
+      return { record: serializeEmployeeRequest(getEmployeeRequest(requestId)!) };
+    }
+    return { record: serializeEmployeeRequest(record) };
+  }
 
   const reviews = listHumanReviews(requestId);
   const activation = activationState(record, reviews, org);
@@ -263,27 +344,15 @@ export function activateRequestPolicy(
     return { error: 'activation blocked', code: 409 };
   }
 
-  activatePolicy(
-    record.policy_id,
+  const finalRecord = finalizeRequestActivation(
+    requestId,
+    record,
     reviews.filter((r) => r.status === 'approved').map((r) => r.reviewer_id),
+    reviewerId,
+    org,
   );
-  updateEmployeeRequest(requestId, { human_decision: 'complete', policy_activation: 'active' });
 
-  emitAuditEvent({
-    event_id: randomUUID(),
-    event_type: 'policy_activated',
-    policy_id: record.policy_id,
-    policy_version_hash: record.policy_version_hash ?? 'none',
-    actor_id: record.actor_id,
-    tool_id: record.tool_id,
-    model_provider: 'none',
-    model_id: 'none',
-    routing_decision: 'BLOCKED',
-    outcome: 'allowed',
-    human_reviewer_id: reviewerId,
-  });
-
-  return { record: serializeEmployeeRequest(getEmployeeRequest(requestId)!) };
+  return { record: finalRecord };
 }
 
 export function governanceRequestDetail(requestId: string, org: OrgConfig) {
@@ -291,7 +360,9 @@ export function governanceRequestDetail(requestId: string, org: OrgConfig) {
   if (!record) return null;
   const human_reviews = listHumanReviews(requestId);
   const appeal = getPendingAppealForRequest(requestId);
-  const policy = record.policy_id ? readPolicyById(record.policy_id) : null;
+  const policy = record.policy_id
+    ? resolveStoredPolicy(record.policy_id, record.policy_version_hash)
+    : null;
   return {
     record: serializeEmployeeRequest(record),
     human_reviews,

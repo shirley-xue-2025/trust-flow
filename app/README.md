@@ -21,7 +21,10 @@ app/
 ├── shared/        TS types mirrored from the 2 JSON schemas + canonical hash
 ├── backend/       Fastify REST+SSE, boardroom, compiler, gateway, file stores
 │   └── test/      vitest + hand-authored golden transcripts (S01–S05)
-└── web/           React + Vite UI (5 views + strategy-explorer intro)
+└── web/           React + Vite UI
+    ├── employee/  Product portals (employee + governance)
+    ├── glassbox/  Judge / engineer canvas (node graph)
+    └── views/     Shared inspector panels (Playground, PolicyPanel, AuditLog, …)
 ```
 
 ## Run it (no API key needed)
@@ -29,34 +32,50 @@ app/
 ```bash
 cd app
 npm install
-npm run test          # 20 tests, S01–S05 green, NO network / NO key
+npm run test          # 32 tests, S01–S05 green, NO network / NO key
+npm run test:e2e      # 28 Playwright tests
 npm run dev           # backend :8080 + web :5173 (Vite proxies /v1 → backend)
 ```
 
-Open http://localhost:5173 → **Employee portal** (default) or `/demo` for the judge walkthrough.
+Open http://localhost:5173/employee for the **product** (default route).
 
-### Employee portal (`/`)
+### Employee portal (`/employee`)
 
 Role-based flow for employees:
 
-1. **Dashboard** — approved tools, in-review count, recent requests
+1. **Dashboard** — demo tour, approved tools card, recent requests
 2. **New request** — submit tool access with business justification
 3. **My requests** — track status (negotiating → approved / denied / pending external)
-4. **Tool workspace** — chat through the governed gateway after approval
+4. **Request detail** — tabs: Overview, **Agent negotiation**, Policy, **Gateway activity**
 
-Uses **shadcn/ui + Tailwind**. Backend: `POST/GET /v1/employee/requests`, `GET /v1/employee/tools`.
+After human sign-off, employees use approved tools **in their IDE** — TrustFlow records
+gateway enforcement on the request; there is **no in-app tool chat**.
 
-Quick test: New request → **S04 — Approved, local route** (replay, no API key) → open tool workspace.
+Uses **shadcn/ui + Tailwind**. Backend: `POST/GET /v1/employee/requests`.
 
-### Demo console (`/demo`)
+Quick test: Dashboard → **Claude Code — pending sign-off** → **Agent negotiation** tab.
 
-Tab "1 · Request" → pick a replay scenario (S01–S05).
-The boardroom streams over SSE, the compiler produces the hashed policy, and the
-Playground sends prompts through the gateway (try the IBAN sample → `PII_BLOCK`).
+### Governance portal (`/governance`)
 
-**Replay mode** (`?replay=S0X`) is the keyless, deterministic path and the demo
-fallback. It sources hand-authored golden transcripts instead of calling Qwen,
-then runs them through the *same* compiler + gateway.
+Queues (sign-off, appeals, external, negotiating), request oversight, org-wide audit.
+Header **Viewing as** switches DPO / Procurement / IT personas.
+
+### Glassbox (`/glassbox`)
+
+Single-page **node canvas** for judges and engineers (not the employee product):
+
+- Left→right pipeline: Problem frame → Employee request → Org gates → Agent boardroom →
+  Policy compiler → Compiled policy → Gateway enforce → Audit trail → Result
+- Triad legend: blue (data reads) · green (AI) · purple (deterministic mechanics)
+- Toolbar: Scenario (S01–S05), **Run**, **Fit**, zoom
+- Click any node → right **inspector** with full inputs/outputs
+- Auto-loads **S04** on first visit
+
+`/demo` redirects to `/glassbox`.
+
+**Replay mode** (`?replay=S0X` on boardroom session) is the keyless, deterministic path.
+It sources hand-authored golden transcripts instead of calling Qwen, then runs them
+through the *same* compiler + gateway.
 
 ## Live Qwen (optional — needs the voucher key)
 
@@ -77,8 +96,8 @@ dependency), so no secrets go on the command line. Just run the one-shot smoke t
 npm run smoke   # one live qwen-max round-trip → valid envelope
 ```
 
-With the key present, the "Submit to boardroom (live)" button in the Request view
-runs a real 5-agent negotiation. Without it, use replay scenarios.
+With the key present, glassbox **Use custom request** + **Run** starts a real
+5-agent negotiation. Without it, use replay scenarios.
 
 ## Endpoints
 
@@ -86,10 +105,13 @@ runs a real 5-agent negotiation. Without it, use replay scenarios.
 |---|---|---|
 | POST | `/v1/boardroom/session?replay=S0X` | start a negotiation |
 | GET  | `/v1/boardroom/:id/stream` | SSE — one event per agent turn, then `result` |
-| GET  | `/v1/policy/:id` | compiled policy artifact + hash |
+| GET  | `/v1/policy/:id` | compiled policy artifact + hash (`?hash=` for version) |
 | POST | `/v1/inference` | governed inference through the gateway |
 | GET  | `/v1/audit` | tail of the JSONL audit log |
+| POST | `/v1/demo/reseed` | reset demo employee requests |
 | GET  | `/v1/org`, `/v1/tools`, `/v1/scenarios` | seed fixtures |
+| POST/GET | `/v1/employee/requests` | employee request CRUD |
+| GET  | `/v1/governance/...` | queues, sign-off, appeals, audit |
 
 ## Locked scenario outcomes (asserted by tests)
 
@@ -100,4 +122,3 @@ runs a real 5-agent negotiation. Without it, use replay scenarios.
 | S03 | DENIED | `HIGH_RISK_USE_DENIED` (Annex III) |
 | S04 | APPROVED | routing `LOCAL_QWEN_72B` |
 | S05 | DENIED | `VENDOR_DPA_PENDING` |
-```

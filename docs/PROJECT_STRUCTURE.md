@@ -24,6 +24,7 @@ trust-flow/                    ← this git repo (shared)
 ├── prototypes/
 ├── session_logs/
 └── app/                       ← application code (Node/TS monorepo)
+    └── web/src/glassbox/      ← judge canvas (not employee product)
 ```
 
 On Shirley's machine, the repo sits inside a **local-only** parent folder (`Trust Flow/`) that holds private `memory/` — that parent is **not** version-controlled and is **not** cloned by teammates.

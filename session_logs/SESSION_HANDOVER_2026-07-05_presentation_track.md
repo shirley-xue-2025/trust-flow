@@ -9,7 +9,7 @@
 | B3 | Pitch deck outline (9 slides) | [`docs/hackathon/PITCH_DECK_OUTLINE.md`](../docs/hackathon/PITCH_DECK_OUTLINE.md) |
 | B4 | Architecture PNG export | [`docs/hackathon/diagrams/architecture.png`](../docs/hackathon/diagrams/architecture.png) |
 | B4b | Round schedule PNG (optional) | [`docs/hackathon/diagrams/round_schedule.png`](../docs/hackathon/diagrams/round_schedule.png) |
-| B5 | Devpost DRAFT | [`docs/hackathon/DEVPOST_DRAFT.md`](../docs/hackathon/DEVPOST_DRAFT.md) |
+| B5 | Devpost DRAFT | [`docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md`](../docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md) |
 | B6 | Spoken lines cheat sheet | [`docs/hackathon/SPOKEN_LINES.md`](../docs/hackathon/SPOKEN_LINES.md) |
 | B7 | Evidence chain one-pager | [`docs/hackathon/EVIDENCE_CHAIN.md`](../docs/hackathon/EVIDENCE_CHAIN.md) |
 
@@ -30,7 +30,7 @@
 
 ## UI label contract (Track A)
 
-Documented in `DEMO_SCRIPT.md` — Employee **Negotiation** vs Governance **Boardroom**; exact sign-off strings.
+Documented in `DEMO_SCRIPT.md` — Employee **Agent negotiation** / **Gateway activity**; Governance **Agent negotiation trace**; glassbox **node canvas** (not tabs); no in-app tool chat.
 
 ## Not done (out of scope)
 

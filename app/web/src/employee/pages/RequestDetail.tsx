@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import type { BoardroomEnvelope, EmployeeRequestRecord } from '@trustflow/shared';
-import { AlertCircle, ArrowLeft, Bot, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ExternalLink, Loader2, ScrollText } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +25,8 @@ import type { GatewayAuditEvent, PolicyArtifact } from '@trustflow/shared';
 
 export default function RequestDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const tabFromQuery = searchParams.get('tab');
   const [record, setRecord] = useState<EmployeeRequestRecord | null>(null);
   const [transcript, setTranscript] = useState<BoardroomEnvelope[]>([]);
   const [policy, setPolicy] = useState<PolicyArtifact | null>(null);
@@ -65,7 +67,7 @@ export default function RequestDetailPage() {
 
         if (r.policy_id) {
           try {
-            const p = await getPolicy(r.policy_id);
+            const p = await getPolicy(r.policy_id, r.policy_version_hash);
             if (!cancelled) setPolicy(p.policy);
           } catch {
             /* optional */
@@ -98,8 +100,12 @@ export default function RequestDetailPage() {
 
   useEffect(() => {
     if (!hydrated || !record || activeTab !== null) return;
+    if (tabFromQuery === 'activity' || tabFromQuery === 'gateway') {
+      setActiveTab('activity');
+      return;
+    }
     setActiveTab(defaultRequestDetailTab(record, transcript.length));
-  }, [hydrated, record, transcript.length, activeTab]);
+  }, [hydrated, record, transcript.length, activeTab, tabFromQuery]);
 
   if (error) {
     return (
@@ -193,12 +199,20 @@ export default function RequestDetailPage() {
 
       <Tabs value={activeTab ?? 'overview'} onValueChange={setActiveTab}>
         <TabsList className="flex h-auto flex-wrap">
+          {transcript.length > 0 && (
+            <TabsTrigger
+              value="negotiation"
+              className="border border-green-200/80 bg-green-50/50 font-semibold data-[state=active]:border-green-600 data-[state=active]:bg-green-50"
+            >
+              Agent negotiation ({transcript.length})
+            </TabsTrigger>
+          )}
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="negotiation">
-            Agent negotiation {transcript.length > 0 ? `(${transcript.length})` : ''}
-          </TabsTrigger>
+          {transcript.length === 0 && (
+            <TabsTrigger value="negotiation">Agent negotiation</TabsTrigger>
+          )}
           <TabsTrigger value="policy">Policy</TabsTrigger>
-          <TabsTrigger value="activity">My usage</TabsTrigger>
+          <TabsTrigger value="activity">Gateway activity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 space-y-6">
@@ -241,11 +255,16 @@ export default function RequestDetailPage() {
                 {record.status === 'approved' && record.policy_id && (
                   <>
                     <Separator className="my-4" />
-                    <Button asChild className="w-full">
-                      <Link to={`/employee/tools/${record.request_id}`}>
-                        <Bot className="h-4 w-4" />
-                        Use {record.tool_display_name}
-                      </Link>
+                    <p className="text-sm text-muted-foreground">
+                      TrustFlow governs access — use {record.tool_display_name} in your IDE. Gateway
+                      enforcement and audit are recorded here, not a chat inside this portal.
+                    </p>
+                    <Button variant="outline" className="mt-3 w-full" onClick={() => setActiveTab('activity')}>
+                      <ScrollText className="h-4 w-4" />
+                      View gateway activity
+                    </Button>
+                    <Button variant="ghost" size="sm" className="mt-2 w-full" asChild>
+                      <Link to="/glassbox">Try PII masking in glassbox Playground →</Link>
                     </Button>
                   </>
                 )}
@@ -263,7 +282,8 @@ export default function RequestDetailPage() {
 
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Agent negotiation trace — see why agents agreed or disagreed before any human sign-off.
+            Full agent boardroom trace — five specialists debate your request before any human
+            sign-off or gateway enforcement.
           </p>
           <BoardroomTranscript turns={transcript} />
         </TabsContent>
@@ -277,10 +297,14 @@ export default function RequestDetailPage() {
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">
+          <p className="mb-4 text-sm text-muted-foreground">
+            What the enforcement layer recorded for this policy — PII actions, routing, and Art. 50
+            fields. Live prompt tests live in the glassbox Playground.
+          </p>
           <AuditTrustList
             events={audit}
-            title="Your gateway activity"
-            emptyMessage="Usage is logged here after you use an approved tool."
+            title="Gateway activity"
+            emptyMessage="Gateway events appear here after policy activation and governed inference."
           />
         </TabsContent>
       </Tabs>

@@ -37,7 +37,8 @@ Enterprises want employees on AI tools; IT, Legal, DPO, and Germany's Betriebsra
 
 ### Demo highlights
 
-- **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing for payment schemas → human sign-off → governed chat.
+- **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing → human sign-off → gateway activity audit (tool used in IDE, not in-portal chat).
+- **Glassbox:** Single-page node canvas — click **Agent boardroom** / **Gateway enforce** to inspect live pipeline.
 - **S05 deny path:** Procurement vetoes unsigned OpenAI DPA → employee advocate + factual appeal.
 - **Gateway PII:** Email masked; IBAN hard-blocked at edge (regex demo — honest scope).
 - **S02 external gate:** Works council agreement pending — product tracks, legal process stays outside.

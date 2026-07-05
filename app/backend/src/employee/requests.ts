@@ -174,10 +174,11 @@ export function nextStepsForRecord(
     steps.push('This case is closed.');
   }
   if (status === 'approved') {
-    steps.push('Your request is approved — use the tool through the governed gateway.');
+    steps.push('Approved — use the tool in your IDE; gateway activity is recorded on this request.');
     if (record.routing_decision === 'LOCAL_QWEN_72B') {
       steps.push('Sensitive prompts route to the EU-local model automatically.');
     }
+    steps.push('Open the Gateway activity tab to review PII actions and routing decisions.');
   }
   return steps;
 }

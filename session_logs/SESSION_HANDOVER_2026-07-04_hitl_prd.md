@@ -18,7 +18,7 @@
 - Routes: `/employee/*`, `/governance/*`, `/glassbox/*` (demo demoted).
 - Governance console: dashboard, request oversight, audit.
 - Shared trust components: `BoardroomTranscript`, `ComplianceScoreCard`, `PolicyTrustCard`, `AuditTrustList`.
-- Employee `RequestDetail`: tabs (Overview, Negotiation, Policy, My usage).
+- Employee `RequestDetail`: tabs (Overview, **Agent negotiation**, Policy, **Gateway activity**) — no in-app tool chat.
 - Backend: `GET /v1/governance/overview`, `GET /v1/governance/requests/:id`, `GET /v1/boardroom/:id`.
 - Backend boot fix: `isMain` check for paths with spaces (`Trust Flow`).
 

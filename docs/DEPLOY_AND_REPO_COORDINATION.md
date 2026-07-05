@@ -112,6 +112,6 @@ curl -X POST -u <BASIC_AUTH_USER>:<BASIC_AUTH_PASSWORD> http://localhost/v1/demo
 
 ## Related docs
 
-- [`docs/plans/BUILD_AND_DEMO_PLAN.md`](plans/BUILD_AND_DEMO_PLAN.md) — original build + deploy plan (Max as infra owner)
+- [`app/deploy/ALICLOUD_DEPLOY.md`](../app/deploy/ALICLOUD_DEPLOY.md) — ECS deploy runbook
 - [`docs/DECISION_LOG.md`](DECISION_LOG.md) — D004 (docker on ECS), D009 (repo coordination)
 - [`PROJECT_TRACKER.md`](../PROJECT_TRACKER.md) — workstream W09 deploy

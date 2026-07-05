@@ -128,8 +128,12 @@ export async function getBoardroomSession(sessionId: string): Promise<BoardroomS
   return res.json();
 }
 
-export async function getPolicy(policyId: string): Promise<{ policy: PolicyArtifact; policy_version_hash: string }> {
-  const res = await fetch(`${BASE}/policy/${policyId}`);
+export async function getPolicy(
+  policyId: string,
+  policyVersionHash?: string,
+): Promise<{ policy: PolicyArtifact; policy_version_hash: string }> {
+  const qs = policyVersionHash ? `?hash=${encodeURIComponent(policyVersionHash)}` : '';
+  const res = await fetch(`${BASE}/policy/${policyId}${qs}`);
   if (!res.ok) throw new Error('policy not found');
   return res.json();
 }

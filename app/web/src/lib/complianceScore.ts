@@ -23,6 +23,7 @@ export function computeComplianceScore(
     policy?.gates?.betriebsvereinbarung_status ??
     record.packet.betriebsvereinbarung_status ??
     'pending';
+  const brBlockedByPolicy = policy?.deny_overrides?.includes('BETRIEBSVEREINBARUNG_PENDING');
   const dpaStatus =
     policy?.gates?.vendor_dpa_status ?? record.packet.vendor_dpa_status ?? 'pending';
 
@@ -50,12 +51,14 @@ export function computeComplianceScore(
       label: 'Betriebsvereinbarung',
       status:
         brStatus === 'signed' || brStatus === 'not_required'
-          ? 'done'
+          ? brBlockedByPolicy
+            ? 'pending'
+            : 'done'
           : brStatus === 'pending'
             ? 'pending'
             : 'blocked',
       detail:
-        brStatus === 'pending'
+        brBlockedByPolicy || brStatus === 'pending'
           ? 'Works council annex required before rollout'
           : brStatus === 'signed'
             ? 'Works council agreement in place'

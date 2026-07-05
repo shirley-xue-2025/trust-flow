@@ -160,9 +160,10 @@ curl -s -u judge:PASS http://localhost/v1/health                                
 ```
 
 Then open **`http://<your-ECS-public-ip>/`** in a browser, enter the passcode, and:
-- **Request** tab → click an **S0x replay** → watch the boardroom stream (SSE through nginx) and the policy compile.
-- **Playground** → an IBAN prompt is blocked; a clean prompt is allowed.
-- If you set the key: run a **live** negotiation.
+- **`/glassbox`** → toolbar **Scenario S04** → **Run** → watch **Agent boardroom** node stream (SSE through nginx)
+- Click **Gateway enforce** → email MASK / IBAN BLOCK samples
+- **`/employee`** → sign-off demo on `demo-s04-pending-signoff`
+- If you set the key: run a **live** negotiation from glassbox **Use custom request**
 
 If SSE doesn't stream, see Troubleshooting — but the nginx config already disables
 proxy buffering, so it should "just work".

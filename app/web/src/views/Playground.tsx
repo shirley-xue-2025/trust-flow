@@ -12,9 +12,11 @@ const SAMPLES = [
 export default function Playground({
   policy,
   request,
+  onInference,
 }: {
   policy?: PolicyArtifact;
   request?: RequestPacket;
+  onInference?: (resp: InferenceResponse | null) => void;
 }) {
   const [prompt, setPrompt] = useState(SAMPLES[0].text);
   const [resp, setResp] = useState<InferenceResponse | null>(null);
@@ -32,8 +34,11 @@ export default function Playground({
   const send = async () => {
     setError(null);
     setResp(null);
+    onInference?.(null);
     try {
-      setResp(await runInference({ policy_id: policy.policy_id, prompt, request }));
+      const next = await runInference({ policy_id: policy.policy_id, prompt, request });
+      setResp(next);
+      onInference?.(next);
     } catch (e) {
       setError((e as Error).message);
     }

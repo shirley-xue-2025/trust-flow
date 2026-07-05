@@ -106,7 +106,7 @@
 
 | # | Task | Owner | Blocked? |
 |---|------|-------|----------|
-| 5.1 | LP copy (`research/pmf/fake_door_copy.md`) | Agent drafted | |
+| 5.1 | LP copy | Agent drafted | `docs/_REMOVE_BEFORE_PUBLIC/fake_door_copy.md` |
 | 5.2 | Framer/Webflow build | Shirley/teammate | Yes — brand |
 | 5.3 | Tally form + UTM | Shirley | Yes |
 | 5.4 | LinkedIn ads €? | Shirley | Yes — budget |
@@ -149,7 +149,7 @@ Week 3           Phase 4 polish + video
 Week 4+          Phase 5 fake door (optional)
 ```
 
-**Blocked:** actual hackathon deadline — see `BLOCKED_ON_SHIRLEY.md`.
+**Blocked:** actual hackathon deadline — Shirley: `memory/BLOCKED_ON_SHIRLEY.md` (Ring 2)
 
 ---
 

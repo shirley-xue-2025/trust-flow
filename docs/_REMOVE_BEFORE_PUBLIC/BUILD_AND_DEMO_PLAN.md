@@ -63,16 +63,11 @@ app/
 │   │   ├── store/               # JSON file read/write (policy store, audit log, sessions)
 │   │   └── server.ts            # Fastify: REST + SSE; loads the 3 seed fixtures
 │   └── test/                    # vitest: compiler, floor, schema validation, S01–S05
-└── web/                         # React + Vite + TS
-    ├── src/
-    │   ├── views/
-    │   │   ├── RequestForm.tsx       # employee submits {tool, use_case, dept}
-    │   │   ├── Boardroom.tsx         # SSE transcript, agent cards, emerging policy
-    │   │   ├── PolicyPanel.tsx       # rules.json + version hash + diff highlight
-    │   │   ├── Playground.tsx        # send a prompt → masked/allowed/denied + audit line
-    │   │   └── AuditLog.tsx          # tail of the JSONL audit events
-    │   └── api.ts                    # fetch + EventSource client
-    └── index.html
+└── web/                       # React + Vite + TS
+    ├── employee/              # Product portals
+    ├── glassbox/              # Judge canvas (GlassBoxCanvas, processGraph, NodeInspector)
+    ├── views/                 # Inspector panels (Playground, PolicyPanel, Boardroom, …)
+    └── api.ts                 # fetch + EventSource client
 ```
 
 **Why a monorepo isn't overkill:** the only overhead is one `package.json` with workspaces. The payoff is that `shared/types.ts` and the hash function are imported identically by gateway, compiler, and UI, so the policy artifact can never drift between "what the agents produced," "what the gateway enforces," and "what the UI shows."
@@ -172,13 +167,13 @@ Deploy **once early** (~July 1, right after the gateway works at CLI level) to s
 
 | Time | Beat | What's on screen |
 |---|---|---|
-| 0:00–0:45 | **Problem** | Strategy-explorer chart: approval deadlock + Shadow AI. Weeks of Legal/IT/Betriebsrat email. |
-| 0:45–1:00 | **Employee request** | RequestForm: payments engineer asks to use Claude Code on payment API schemas. |
-| 1:00–2:30 | **Boardroom (money shot)** | SSE transcript animates: Runner advocates → Procurement flags DPA → Compliance demands fingerprint-only logs + EU → Works Council raises Betriebsvereinbarung → IT concedes route to `LOCAL_QWEN_72B`. Visible disagreement then consensus (Decision #5). |
-| 2:30–3:00 | **Compile** | PolicyPanel: `rules.json` assembles, `risk_tier`, routing, audit fields, **version hash** appear. "An LLM proposed this; a deterministic compiler validated and signed it — the model never touches enforcement." |
-| 3:00–4:00 | **Governed inference** | Playground: clean prompt → allowed via cloud; **IBAN prompt → masked/blocked at the edge**; payment-schema prompt → routed LOCAL. Side-by-side raw vs masked. |
-| 4:00–4:30 | **Audit** | AuditLog: `gateway-audit-event` lines with deny reason codes — "Art. 26-ready trail." |
-| 4:30–5:00 | **ROI + CTA** | weeks→seconds; fake-door/contact. |
+| 0:00–0:45 | **Problem** | Strategy explorer (`/strategy_explorer.html`) — approval deadlock + Shadow AI |
+| 0:45–1:00 | **Employee request** | Glassbox **Employee request** / **Org gates** nodes — S04 packet |
+| 1:00–2:30 | **Boardroom (money shot)** | Glassbox **Agent boardroom** node — SSE transcript in inspector; canvas summaries update live |
+| 2:30–3:00 | **Compile** | **Policy compiler** + **Compiled policy** nodes — hash, `rules.json` diff |
+| 3:00–4:00 | **Governed inference** | **Gateway enforce** node — email MASK + IBAN BLOCK; optional employee **Gateway activity** tab |
+| 4:00–4:30 | **Audit** | **Audit trail** node + `/governance/audit` — `disclosure_shown`, fingerprints |
+| 4:30–5:00 | **ROI + CTA** | **Result** node — grounding badge; weeks→seconds; fake-door/contact |
 
 ## 3.3 Submission checklist (Devpost, by July 9)
 - [ ] **Public GitHub repo** + README quickstart (judges can `docker compose up`).

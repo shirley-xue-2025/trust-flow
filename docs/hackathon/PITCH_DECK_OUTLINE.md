@@ -9,7 +9,7 @@
 
 **Headline:** Enterprise AI fails on approvals, not models.
 
-**Visual:** Strategy explorer screenshot — friction trap chart (`prototypes/trustflow_strategy_explorer.html` or glassbox tab 0 iframe)
+**Visual:** Strategy explorer screenshot (`prototypes/trustflow_strategy_explorer.html` — separate from glassbox pipeline)
 
 **Bullets:**
 - Weeks of Legal / IT / Procurement / Betriebsrat email before one tool goes live
@@ -98,7 +98,7 @@
 
 **Headline:** Deterministic edge — no LLM in enforcement path.
 
-**Visual:** Glassbox Playground side-by-side — email MASK vs IBAN BLOCK
+**Visual:** Glassbox **Gateway enforce** node inspector — email MASK vs IBAN BLOCK side-by-side
 
 **Bullets:**
 - `disclosure_shown` on audit events (EU AI Act Art. 50 transparency)

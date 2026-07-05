@@ -68,14 +68,16 @@ npm run test     # golden-transcript suite (scenarios S01–S05), no network / n
 npm run dev      # backend :8080 + web :5173
 ```
 
-Open <http://localhost:5173> → **1 · Request** → pick a replay scenario (S01–S05).
-The boardroom streams live over SSE, the compiler produces the hashed policy, and the
-Playground sends prompts through the gateway (try the IBAN sample → `PII_BLOCK`).
+Open <http://localhost:5173/employee> for the **product** (employee + governance portals).
+
+Open <http://localhost:5173/glassbox> for the **technical judge view** — a single-page
+node canvas (Problem → Request → Boardroom → Compiler → Gateway → Audit → Result).
+Scenario **S04** auto-loads; click **Gateway enforce** to try email MASK / IBAN BLOCK.
 
 **Live Qwen negotiation** (optional, needs the hackathon voucher key): put
 `DASHSCOPE_API_KEY=sk-...` in a git-ignored `app/.env`, then `npm run smoke` for a
-one-shot live round-trip, or use the "Submit to boardroom (live)" button. Full
-instructions: [`app/README.md`](app/README.md).
+one-shot live round-trip, or use **Use custom request** in the glassbox inspector.
+Full instructions: [`app/README.md`](app/README.md).
 
 ### Demo scenarios (asserted by the test suite)
 
@@ -105,9 +107,10 @@ passcode gate. Step-by-step guide:
 | [`app/`](app/) | Application monorepo (shared types, Fastify backend, React/Vite web) |
 | [`app/README.md`](app/README.md) | How to run, endpoints, live-Qwen setup |
 | [`app/deploy/`](app/deploy/) | Docker, nginx, Alibaba Cloud deploy guide |
+| [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | 5-minute winning demo script |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product & system architecture |
-| [`docs/plans/BUILD_AND_DEMO_PLAN.md`](docs/plans/BUILD_AND_DEMO_PLAN.md) | Implementation, deploy & demo plan |
 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) | Agent negotiation protocol |
+| [`app/deploy/ALICLOUD_DEPLOY.md`](app/deploy/ALICLOUD_DEPLOY.md) | Alibaba Cloud deploy guide |
 | [`docs/schemas/`](docs/schemas/) | JSON schemas (proposal envelope, policy artifact) |
 | [`docs/fixtures/`](docs/fixtures/) | Org config seed + demo/eval data |
 | [`docs/research/`](docs/research/) | Market & regulatory research, personas |

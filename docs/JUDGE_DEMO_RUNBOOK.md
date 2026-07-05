@@ -35,28 +35,29 @@ curl -X POST http://localhost:8080/v1/demo/reseed
 
 ### A — Problem frame (40s)
 
-1. Open http://localhost:5173/glassbox
-2. Tab **0 · Problem** — strategy explorer chart visible  
+1. Open http://localhost:5173/strategy_explorer.html (or glassbox legend → **Problem framing (pitch) ↗**)
+2. Strategy explorer chart visible  
    `<!-- TODO: screenshot strategy_explorer_chart.png -->`
 
 ### B — Live boardroom S04 (55s)
 
-1. Tab **1 · Request** → select scenario **S04** (or replay)
-2. Tab **2 · Boardroom** — watch rounds 0–5 stream  
+1. Toolbar **Scenario** → **S04** (auto-selected on load) → **▶ Run**
+2. Watch **Agent boardroom** node summary (`N rounds · APPROVED`)
+3. Click **Agent boardroom** — inspector shows rounds 0–5 stream  
    `<!-- TODO: screenshot glassbox_boardroom_sse.png -->`
-3. Optional: tab **3 · Policy** — show `policy_version_hash`
+4. Optional: **Policy compiler** / **Compiled policy** nodes — show `policy_version_hash`
 
 ### C — Human sign-off (65s) — **30s UX target**
 
 1. Tab: http://localhost:5173/employee/requests/demo-s04-pending-signoff
-2. Confirm badge **Pending sign-off** · tab **Negotiation** shows transcript  
+2. Confirm badge **Pending sign-off** · **Agent negotiation** tab shows transcript  
    `<!-- TODO: screenshot employee_negotiation_s04.png -->`
 3. Tab: http://localhost:5173/governance/queues?queue=signoff&role=dpo
 4. Click **Alex Weber** row → request detail
 5. Header **Viewing as** → **DPO** → **Human sign-off** → rationale (≥20 chars) → **Sign off**
 6. Header → **IT Security** → **Sign off**  
    `<!-- TODO: screenshot governance_signoff_dual.png -->`
-7. Employee tab refresh → **Approved** → **Use Claude Code**
+7. Employee tab refresh → **Approved** → **View gateway activity** (not in-app chat)
 
 ### D — S05 deny + appeal (55s)
 
@@ -71,15 +72,18 @@ curl -X POST http://localhost:8080/v1/demo/reseed
 
 **Email MASK (glassbox):**
 
-1. `/glassbox` → compile S04 if needed → tab **4 · Playground**
-2. Button **Email (PII)** → **Send through gateway**
+1. `/glassbox` → **Gateway enforce** node (S04 compiled)
+2. Button **Email (masked)** → **Send through gateway**
 3. Show **What the model saw (masked)** with `[EMAIL_MASKED]`
 
-**IBAN BLOCK (employee chat, after C.7):**
+**IBAN BLOCK (glassbox):**
 
-1. `/employee/tools/demo-s04-pending-signoff`
-2. Send: `Refund to IBAN DE89370400440532013000`
-3. Expect amber system message: **Personal data blocked at gateway**
+1. Same inspector → **IBAN (may block)** → **Send through gateway**
+2. Expect **Personal data blocked at gateway**
+
+**Employee audit (optional):**
+
+1. `/employee/requests/demo-s04-pending-signoff?tab=activity` — gateway activity list after sign-off
 
 | Test string | Expected |
 |-------------|----------|
@@ -92,6 +96,7 @@ curl -X POST http://localhost:8080/v1/demo/reseed
 2. Open `disclosure_shown: true` on any allowed inference event  
    `<!-- TODO: screenshot audit_disclosure.png -->`
 3. http://localhost:5173/employee/requests/demo-s02-external — gate banner **Works council agreement (Betriebsvereinbarung) not signed**
+4. Optional: `/glassbox` → **Audit trail** node
 
 ---
 
@@ -127,9 +132,10 @@ Shirley signals **demo-frozen** → Max pulls canonical `main` → `docker compo
 | Symptom | Action |
 |---------|--------|
 | Empty queues | `POST /v1/demo/reseed` |
-| SSE hang | Use replay S04 in glassbox Request tab |
+| SSE hang | Glassbox **Scenario** → **S04** replay |
 | Sign off disabled | Rationale &lt; 20 characters |
-| No "Use tool" | Both DPO + IT signed off |
-| IBAN not blocked | Confirm request is **Approved** with active policy |
+| No gateway activity | Both DPO + IT signed off → **Gateway activity** tab |
+| IBAN not blocked | Use glassbox **Gateway enforce** with IBAN sample |
+| BR stuck at 80% on S04 | Policy resolved by hash — reseed if confused with S02 |
 
 **Full script:** [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) · **Spoken lines:** [`hackathon/SPOKEN_LINES.md`](hackathon/SPOKEN_LINES.md)

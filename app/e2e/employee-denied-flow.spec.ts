@@ -57,7 +57,7 @@ test.describe('Denied request — page links', () => {
     await page.getByRole('tab', { name: /Agent negotiation/i }).click();
     await expect(page.getByText(/Round 1/i)).toBeVisible();
     await page.getByRole('tab', { name: 'Policy' }).click();
-    await page.getByRole('tab', { name: 'My usage' }).click();
+    await page.getByRole('tab', { name: 'Gateway activity' }).click();
   });
 
   test('advocate chat accepts a why question', async ({ page }) => {

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge } from '@/employee/components/StatusBadge';
 import { BoardroomTranscript } from '@/components/trust/BoardroomTranscript';
+import { StakeholderSummaryCard } from '@/components/trust/StakeholderSummaryCard';
 import { ComplianceScoreCard } from '@/components/trust/ComplianceScoreCard';
 import { PolicyTrustCard } from '@/components/trust/PolicyTrustCard';
 import { AuditTrustList } from '@/components/trust/AuditTrustList';
@@ -85,18 +86,30 @@ export default function GovernanceRequestOversight() {
         <AppealReviewPanel appeal={detail.appeal} onUpdated={reload} />
       )}
 
+      <StakeholderSummaryCard turns={transcript} />
+
       <ComplianceScoreCard score={score} />
 
       <Tabs defaultValue={defaultTab}>
         <TabsList>
-          <TabsTrigger value="negotiation">Agent negotiation trace</TabsTrigger>
+          {transcript.length > 0 && (
+            <TabsTrigger
+              value="negotiation"
+              className="border border-green-200/80 bg-green-50/50 font-semibold data-[state=active]:border-green-600 data-[state=active]:bg-green-50"
+            >
+              Agent negotiation ({transcript.length})
+            </TabsTrigger>
+          )}
+          {transcript.length === 0 && (
+            <TabsTrigger value="negotiation">Agent negotiation trace</TabsTrigger>
+          )}
           <TabsTrigger value="policy">Policy</TabsTrigger>
           <TabsTrigger value="audit">Gateway audit</TabsTrigger>
         </TabsList>
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Full agent negotiation trace — Compliance, Procurement, IT, Works Council, and Runner
-            before any policy was compiled.
+            Full agent boardroom trace — five specialists debate before any policy was compiled
+            or human sign-off.
           </p>
           <BoardroomTranscript turns={transcript} />
         </TabsContent>

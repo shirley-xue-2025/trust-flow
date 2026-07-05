@@ -39,16 +39,18 @@ Minimum judge story:
 
 ## Suggested demo script (5 min)
 
+**Canonical script:** [`docs/DEMO_SCRIPT.md`](../DEMO_SCRIPT.md)
+
 | Min | Beat |
 |-----|------|
-| 0:00 | Problem — approval deadlock (strategy explorer chart) |
-| 0:45 | Employee submits request in UI |
-| 1:00 | Boardroom rounds 0–5 (accelerated or pre-recorded fallback) |
-| 2:30 | Policy JSON + hash sync to gateway |
-| 3:00 | Live inference: clean prompt → allowed; IBAN prompt → masked/blocked |
-| 4:00 | Audit log + deny reason codes |
-| 4:30 | ROI slide — weeks → seconds (existing prototype numbers) |
-| 5:00 | CTA — fake door / contact |
+| 0:00 | Problem — `/strategy_explorer.html` (pitch; not on glassbox canvas) |
+| 0:45 | Glassbox **Employee request** / **Org gates** — S04 packet |
+| 1:00 | **Agent boardroom** node — SSE rounds 0–5 in inspector |
+| 2:30 | **Policy compiler** + **Compiled policy** — hash |
+| 3:00 | **Gateway enforce** — email MASK; IBAN BLOCK |
+| 4:00 | **Audit trail** + `/governance/audit` |
+| 4:30 | **Result** node + employee **Gateway activity** after sign-off |
+| 5:00 | CTA |
 
 ---
 

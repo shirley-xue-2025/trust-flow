@@ -4,30 +4,39 @@
 
 ---
 
-## Current state — 2026-07-05 (evening)
+## Current state — 2026-07-05 (late evening)
 
-**Phase:** **Demo-ready + Track 3 product visibility** — negotiation default tab, Agent Society labels, demo tour, architecture strip, PII honesty, Art. 50 audit fields. Track B presentation artifacts also on disk.
+**Phase:** **Demo-ready** — product portals + glassbox canvas node graph + gateway-activity employee UX (no in-app tool chat). Track B presentation artifacts on disk.
 
-**👉 Product visibility handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md)
+**👉 Demo script (v2):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
 
-**👉 Demo script (v2 winning cut):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
-
-**👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`docs/hackathon/SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`docs/hackathon/EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md) · [`docs/hackathon/DEVPOST_DRAFT.md`](docs/hackathon/DEVPOST_DRAFT.md) _(DRAFT)_
+**👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md)  
+**👉 Devpost DRAFT (delete before public):** [`docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md`](docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md)  
+**👉 Win strategy (Ring 2, local):** `memory/HACKATHON_WIN_STRATEGY.md` · doc audit [`session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md`](session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md)
 
 **👉 Diagrams:** [`docs/hackathon/diagrams/architecture.png`](docs/hackathon/diagrams/architecture.png) · [`round_schedule.png`](docs/hackathon/diagrams/round_schedule.png)
 
 **👉 Deploy / fork:** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) — Max redeploys ECS when demo-frozen.
 
-**👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md) · [`session_logs/SESSION_HANDOVER_2026-07-05_presentation_track.md`](session_logs/SESSION_HANDOVER_2026-07-05_presentation_track.md) · [`SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md`](session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md)
+**👉 Recent handovers:** [`session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md`](session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md) · [`product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md) · [`presentation_track.md`](session_logs/SESSION_HANDOVER_2026-07-05_presentation_track.md)
 
-**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **E2E:** `cd app && npm run test:e2e` (28 tests)
+**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **Tests:** `npm run test` (32) + `npm run test:e2e` (28)
+
+### Surfaces (quick map)
+
+| URL | What |
+|-----|------|
+| `/employee` | Product — dashboard, requests, **Agent negotiation**, **Gateway activity** |
+| `/governance` | DPO/IT queues, sign-off, appeals, audit |
+| `/glassbox` | Judge view — **node canvas** (Problem → … → Result) + inspector |
+| `/demo` | Redirects to `/glassbox` |
 
 ---
 
 ## Cold-start paths
 
 - **PRD (HITL):** `docs/plans/prd_human_in_the_loop_and_negotiation_transparency.md`
-- **Architecture:** `docs/ARCHITECTURE.md`
+- **Architecture:** `docs/ARCHITECTURE.md` (§6 UI surfaces)
 - **Boardroom protocol:** `docs/plans/boardroom_protocol.md`
 - **Demo story:** `docs/research/roleplay/scenario_001_payments_claude.md`
 - **Run locally:** `cd app && npm run dev` (web :5173, backend :8080)

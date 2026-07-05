@@ -64,6 +64,6 @@ test.describe('Employee dashboard demo links', () => {
     await expect(page.getByRole('heading', { name: /Hackathon demo tour/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /Watch agents negotiate/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /Human sign-off/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Governed gateway/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Gateway audit/i })).toBeVisible();
   });
 });

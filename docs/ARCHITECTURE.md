@@ -212,17 +212,21 @@ MVP: SQLite or JSON files. Production path: Postgres + immutable log object stor
 
 ---
 
-## 6. UI surfaces (hackathon)
+## 6. UI surfaces (as implemented, 2026-07-05)
 
-| Surface | User | MVP depth |
-|---------|------|-----------|
-| **Employee request form** | Employee | Tool pick + use case description |
-| **Boardroom live view** | Judge / admin | Agent messages + emerging policy JSON |
-| **Policy diff** | DPO | Before/after rules highlight |
-| **Gateway trace** | IT | Sample inference with audit event |
-| **Strategy explorer** | Pitch | Existing `prototypes/trustflow_strategy_explorer.html` |
+| Surface | Route | User | What it shows |
+|---------|-------|------|----------------|
+| **Employee portal** | `/employee` | Employee | Dashboard, new request, request detail (Agent negotiation, Gateway activity) |
+| **Governance console** | `/governance` | DPO / IT / Procurement | Queues, human sign-off, appeals, org-wide audit |
+| **Glassbox canvas** | `/glassbox` | Judge / engineer | Single-page node graph + inspector — full pipeline trace |
+| **Strategy explorer** | `/strategy_explorer.html` (pitch link from glassbox legend) | Pitch | `prototypes/trustflow_strategy_explorer.html` |
 
-Single-page demo app acceptable; link out to strategy explorer for narrative.
+**Product vs glassbox:** Employees see stakeholder review and gateway audit on their request;
+they do **not** chat with tools inside TrustFlow (use IDE + governed gateway). Glassbox is
+the deep technical view — color-coded nodes (data / AI / mechanics), click-to-inspect, live
+summaries driven by the real pipeline run.
+
+**Architecture strip** (employee + governance): `Agents propose → Compiler signs → Humans approve → Gateway enforces`
 
 ---
 

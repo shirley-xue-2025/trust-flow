@@ -21,7 +21,7 @@
 | Research notes & evidence | `docs/research/` |
 | Definitions & schemas | `docs/DEFINITIONS.md`, `docs/schemas/` |
 | Static prototypes | `prototypes/` |
-| Application code (future) | `src/` |
+| Application code | `app/` |
 | Session handovers | `SESSION_LATEST.md`, `session_logs/` |
 
 Full placement rules: `docs/PROJECT_STRUCTURE.md`.
