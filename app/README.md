@@ -23,7 +23,7 @@ app/
 │   └── test/      vitest + hand-authored golden transcripts (S01–S05)
 └── web/           React + Vite UI
     ├── employee/  Product portals (employee + governance)
-    ├── glassbox/  Judge / engineer canvas (node graph)
+    ├── glassbox/  Judge / engineer boardroom theater
     └── views/     Shared inspector panels (Playground, PolicyPanel, AuditLog, …)
 ```
 
@@ -62,14 +62,14 @@ Header **Viewing as** switches DPO / Procurement / IT personas.
 
 ### Glassbox (`/glassbox`)
 
-Single-page **node canvas** for judges and engineers (not the employee product):
+**Boardroom-first theater** for judges and engineers (not the employee product):
 
-- Left→right pipeline: Problem frame → Employee request → Org gates → Agent boardroom →
-  Policy compiler → Compiled policy → Gateway enforce → Audit trail → Result
+- **Pipeline strip:** Inputs → Agent boardroom → Compiler → Humans → Gateway
+- **Stage:** Five-agent roster + live negotiation transcript (SSE)
+- **Enforcement bar:** Muted chips for compiler, policy, gateway, audit, result — click for detail panel
+- Toolbar: Scenario (S01–S05), **Run** — auto-loads **S04** on first visit
+- Detail panel (in-layout, right): full inspector for request form, org gates, compiler, policy, gateway playground, audit
 - Triad legend: blue (data reads) · green (AI) · purple (deterministic mechanics)
-- Toolbar: Scenario (S01–S05), **Run**, **Fit**, zoom
-- Click any node → right **inspector** with full inputs/outputs
-- Auto-loads **S04** on first visit
 
 `/demo` redirects to `/glassbox`.
 

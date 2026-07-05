@@ -1,31 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { EvalScenario, GatewayAuditEvent, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import { getAudit, getScenarios, type InferenceResponse } from '../api.js';
 import { useBoardroomRun } from '../hooks/useBoardroomRun.js';
-import { BoardroomNodeFace } from './BoardroomNodeFace.js';
+import { BoardroomTheater } from './BoardroomTheater.js';
+import { EnforcementBar, InputContextBar, type EnforcementId } from './EnforcementBar.js';
 import NodeInspector from './NodeInspector.js';
-import {
-  BOARDROOM_NODE_ID,
-  BOARDROOM_STAGE_RECT,
-  CANVAS_TIERS,
-  GLASSBOX_EDGES,
-  GLASSBOX_NODES,
-  LEG_META,
-  computeEdgePath,
-  graphBounds,
-  isHeroEdge,
-  nodeById,
-  nodeSummary,
-  type NodeLeg,
-} from './processGraph.js';
+import { PipelineStrip } from './PipelineStrip.js';
 
-export interface GlassboxState {
-  request?: RequestPacket;
-  replay?: string;
-  policy?: PolicyArtifact;
-  policyHash?: string;
-}
+const PANEL_TITLES: Record<string, string> = {
+  request: 'Employee request',
+  'org-gates': 'Org gates read',
+  compiler: 'Policy compiler',
+  policy: 'Compiled policy',
+  gateway: 'Gateway enforce',
+  audit: 'Audit trail',
+  result: 'Result',
+};
 
 export default function GlassBoxCanvas() {
   const [request, setRequest] = useState<RequestPacket | undefined>();
@@ -33,18 +24,15 @@ export default function GlassBoxCanvas() {
   const [policy, setPolicy] = useState<PolicyArtifact | undefined>();
   const [policyHash, setPolicyHash] = useState<string | undefined>();
   const [scenarios, setScenarios] = useState<EvalScenario[]>([]);
-  const [selectedId, setSelectedId] = useState(BOARDROOM_NODE_ID);
+  const [inspectorId, setInspectorId] = useState<string | null>(null);
   const [inference, setInference] = useState<InferenceResponse | null>(null);
   const [auditEvents, setAuditEvents] = useState<GatewayAuditEvent[]>([]);
-  const [scale, setScale] = useState(0.85);
   const [autoRun, setAutoRun] = useState(true);
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const didCenterRef = useRef(false);
 
   const onCompiled = useCallback((p: PolicyArtifact, hash: string) => {
     setPolicy(p);
     setPolicyHash(hash);
-    setSelectedId(BOARDROOM_NODE_ID);
+    setInspectorId(null);
   }, []);
 
   const { turns, result, running, error, run, reset } = useBoardroomRun(
@@ -85,14 +73,13 @@ export default function GlassBoxCanvas() {
     setPolicyHash(undefined);
     setInference(null);
     setAutoRun(true);
-    setSelectedId(BOARDROOM_NODE_ID);
-    didCenterRef.current = false;
+    setInspectorId(null);
   };
 
   const handleRun = () => {
     setAutoRun(false);
     run();
-    setSelectedId(BOARDROOM_NODE_ID);
+    setInspectorId(null);
   };
 
   const summaryCtx = useMemo(
@@ -110,55 +97,25 @@ export default function GlassBoxCanvas() {
     [request, replay, turns, running, result, policy, policyHash, inference, auditEvents],
   );
 
-  const bounds = graphBounds(GLASSBOX_NODES);
-  const enforcementLive = Boolean(result);
-
-  const fit = useCallback(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const pad = 16;
-    const sx = (el.clientWidth - pad * 2) / bounds.width;
-    const sy = (el.clientHeight - pad * 2) / bounds.height;
-    setScale(Math.min(1, Math.max(0.5, Math.min(sx, sy))));
-  }, [bounds.width, bounds.height]);
-
-  const centerOnBoardroom = useCallback((nextScale: number) => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const boardroom = nodeById(BOARDROOM_NODE_ID);
-    const cx = (boardroom.x + boardroom.width / 2) * nextScale;
-    const cy = (boardroom.y + boardroom.height / 2) * nextScale;
-    el.scrollLeft = Math.max(0, cx - el.clientWidth / 2);
-    el.scrollTop = Math.max(0, cy - el.clientHeight / 2);
-  }, []);
-
-  useEffect(() => {
-    fit();
-    window.addEventListener('resize', fit);
-    return () => window.removeEventListener('resize', fit);
-  }, [fit]);
-
-  useEffect(() => {
-    if (didCenterRef.current) return;
-    centerOnBoardroom(scale);
-    didCenterRef.current = true;
-  }, [scale, centerOnBoardroom]);
-
-  const boardroomFocused = selectedId === BOARDROOM_NODE_ID;
+  const panelTitle = inspectorId ? (PANEL_TITLES[inspectorId] ?? inspectorId) : '';
+  const panelTech =
+    inspectorId === 'gateway' ||
+    inspectorId === 'audit' ||
+    inspectorId === 'compiler' ||
+    inspectorId === 'policy';
 
   return (
-    <div className={`glassbox-canvas-app${boardroomFocused ? ' glassbox-canvas-app--boardroom' : ''}`}>
-      <header className="canvas-toolbar">
-        <Link to="/employee" className="canvas-back">
+    <div className={`glassbox-shell${inspectorId ? ' glassbox-shell--panel-open' : ''}`}>
+      <header className="glassbox-toolbar">
+        <Link to="/employee" className="glassbox-toolbar__back">
           ← Product
         </Link>
-        <div className="canvas-title-block">
+        <div className="glassbox-toolbar__title">
           <h1>TrustFlow glassbox</h1>
-          <span>Agent boardroom is the product — inputs feed it; enforcement follows</span>
+          <p>Agent boardroom is the product — inputs feed it; enforcement follows</p>
         </div>
-
-        <div className="canvas-controls">
-          <label className="canvas-control">
+        <div className="glassbox-toolbar__controls">
+          <label className="glassbox-toolbar__scenario">
             Scenario
             <select
               value={replay ?? ''}
@@ -176,181 +133,108 @@ export default function GlassBoxCanvas() {
               ))}
             </select>
           </label>
-          <button type="button" className="canvas-run" onClick={handleRun} disabled={!request || running}>
+          <button
+            type="button"
+            className="glassbox-toolbar__run"
+            onClick={handleRun}
+            disabled={!request || running}
+          >
             ▶ Run boardroom
           </button>
-          <button type="button" className="canvas-fit" onClick={fit}>
-            Fit
-          </button>
-          <div className="canvas-zoom">
-            <button type="button" aria-label="Zoom out" onClick={() => setScale((s) => Math.max(0.45, s - 0.08))}>
-              −
-            </button>
-            <span>{Math.round(scale * 100)}%</span>
-            <button type="button" aria-label="Zoom in" onClick={() => setScale((s) => Math.min(1.15, s + 0.08))}>
-              +
-            </button>
-          </div>
+          {error ? (
+            <p className="glassbox-toolbar__error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </div>
       </header>
 
-      <div className="canvas-legend">
-        {(['data', 'ai', 'mechanics'] as NodeLeg[]).map((leg) => (
-          <span key={leg} className="legend-item" style={{ color: LEG_META[leg].color }}>
-            <span className="legend-dot">{LEG_META[leg].dot}</span>
-            {LEG_META[leg].label}
-          </span>
-        ))}
-        <span className="legend-hint">
-          <a href="/strategy_explorer.html" target="_blank" rel="noreferrer" className="canvas-pitch-link">
-            Problem framing (pitch) ↗
-          </a>
-        </span>
-      </div>
+      <PipelineStrip highlight="boardroom" />
 
-      <div className="canvas-layout">
-        <div className="canvas-viewport" ref={viewportRef}>
-          <div
-            className="canvas-stage"
-            style={{
-              width: bounds.width,
-              height: bounds.height,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left',
-            }}
-          >
-            {CANVAS_TIERS.map((tier) => (
-              <div
-                key={tier.id}
-                className={`canvas-tier-label canvas-tier-label--${tier.id}`}
-                style={{ top: tier.y }}
-              >
-                <span className="canvas-tier-label__name">{tier.label}</span>
-                <span className="canvas-tier-label__hint">{tier.hint}</span>
-              </div>
-            ))}
+      <div className="glassbox-main">
+        <div className="glassbox-body">
+          <InputContextBar
+            request={request}
+            activeRequest={inspectorId === 'request'}
+            activeGates={inspectorId === 'org-gates'}
+            onSelectRequest={() => setInspectorId((id) => (id === 'request' ? null : 'request'))}
+            onSelectGates={() => setInspectorId((id) => (id === 'org-gates' ? null : 'org-gates'))}
+          />
 
-            <div
-              className={[
-                'canvas-boardroom-stage',
-                running ? 'canvas-boardroom-stage--running' : '',
-                turns.length > 0 ? 'canvas-boardroom-stage--active' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              style={{
-                left: BOARDROOM_STAGE_RECT.x,
-                top: BOARDROOM_STAGE_RECT.y,
-                width: BOARDROOM_STAGE_RECT.width,
-                height: BOARDROOM_STAGE_RECT.height,
-              }}
-              aria-hidden
-            />
+          <BoardroomTheater turns={turns} running={running} result={result} replay={replay} />
 
-            <svg className="canvas-edges" width={bounds.width} height={bounds.height}>
-              {GLASSBOX_EDGES.map((e) => {
-                const from = nodeById(e.from);
-                const to = nodeById(e.to);
-                return (
-                  <path
-                    key={`${e.from}-${e.to}`}
-                    d={computeEdgePath(from, to)}
-                    className={isHeroEdge(e) ? 'canvas-edge canvas-edge--hero' : 'canvas-edge'}
-                  />
-                );
-              })}
-            </svg>
-
-            {GLASSBOX_NODES.map((node) => {
-              const leg = node.leg;
-              const selected = selectedId === node.id;
-              const isBoardroom = node.id === BOARDROOM_NODE_ID;
-              const isRail = node.tier === 'enforcement';
-              const summary = nodeSummary(node.id, summaryCtx);
-
-              if (isBoardroom) {
-                return (
-                  <button
-                    key={node.id}
-                    type="button"
-                    className={[
-                      'canvas-node',
-                      'canvas-node--stage',
-                      `canvas-node--${leg}`,
-                      'canvas-node--featured',
-                      running ? 'canvas-node--running' : '',
-                      selected ? 'canvas-node--selected' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    style={{ left: node.x, top: node.y, width: node.width, height: node.height }}
-                    onClick={() => setSelectedId(node.id)}
-                  >
-                    <BoardroomNodeFace turns={turns} running={running} result={result} replay={replay} />
-                  </button>
-                );
-              }
-
-              return (
-                <button
-                  key={node.id}
-                  type="button"
-                  className={[
-                    'canvas-node',
-                    `canvas-node--${leg}`,
-                    isRail ? 'canvas-node--rail' : '',
-                    isRail && enforcementLive ? 'canvas-node--rail-live' : '',
-                    selected ? 'canvas-node--selected' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  style={{ left: node.x, top: node.y, width: node.width, height: node.height }}
-                  onClick={() => setSelectedId(node.id)}
-                >
-                  <span className="canvas-node-kind" style={{ color: LEG_META[leg].color }}>
-                    {LEG_META[leg].dot}{' '}
-                    {leg === 'result' ? 'Output' : leg === 'data' ? 'Read' : 'Code'}
-                  </span>
-                  <span className="canvas-node-title">{node.title}</span>
-                  <span className="canvas-node-summary">{summary}</span>
-                </button>
-              );
-            })}
-          </div>
+          <EnforcementBar
+            ctx={summaryCtx}
+            selected={inspectorId}
+            onSelect={(id: EnforcementId) => setInspectorId((cur) => (cur === id ? null : id))}
+          />
         </div>
 
-        <aside className={`canvas-inspector${boardroomFocused ? ' canvas-inspector--boardroom' : ''}`}>
-          <div className="canvas-inspector-head">
-            <span className="canvas-inspector-label">Inspector</span>
-            <strong>{GLASSBOX_NODES.find((n) => n.id === selectedId)?.title}</strong>
-            {boardroomFocused && (
-              <span className="canvas-inspector-sub">Live multi-agent negotiation — the product highlight</span>
-            )}
-          </div>
-          <div className="glassbox">
-            <NodeInspector
-              nodeId={selectedId}
-              request={request}
-              replay={replay}
-              turns={turns}
-              result={result}
-              running={running}
-              boardroomError={error}
-              policy={policy}
-              policyHash={policyHash}
-              inference={inference}
-              auditEvents={auditEvents}
-              onRequestChange={handleRequestChange}
-              onRunBoardroom={handleRun}
-              onInference={(resp) => {
-                setInference(resp);
-                refreshAudit();
-                if (resp) setSelectedId('gateway');
-              }}
-              scenarios={scenarios}
-            />
-          </div>
-        </aside>
+        {inspectorId && (
+          <aside className="glassbox-panel" aria-labelledby="glassbox-panel-title">
+            <header className="glassbox-panel__head">
+              <div className="glassbox-panel__head-text">
+                <span className="glassbox-panel__label">Detail</span>
+                <strong id="glassbox-panel-title">{panelTitle}</strong>
+              </div>
+              <button
+                type="button"
+                className="glassbox-panel__close"
+                aria-label="Close detail panel"
+                onClick={() => setInspectorId(null)}
+              >
+                ✕
+              </button>
+            </header>
+            <div className={`glassbox-panel__body${panelTech ? ' glassbox-panel__body--tech' : ''}`}>
+              {panelTech ? (
+                <div className="glassbox">
+                  <NodeInspector
+                    nodeId={inspectorId}
+                    embedded
+                    request={request}
+                    replay={replay}
+                    turns={turns}
+                    result={result}
+                    running={running}
+                    policy={policy}
+                    policyHash={policyHash}
+                    inference={inference}
+                    auditEvents={auditEvents}
+                    onRequestChange={handleRequestChange}
+                    onInference={(resp) => {
+                      setInference(resp);
+                      refreshAudit();
+                      if (resp) setInspectorId('gateway');
+                    }}
+                    scenarios={scenarios}
+                  />
+                </div>
+              ) : (
+                <NodeInspector
+                  nodeId={inspectorId}
+                  embedded
+                  request={request}
+                  replay={replay}
+                  turns={turns}
+                  result={result}
+                  running={running}
+                  policy={policy}
+                  policyHash={policyHash}
+                  inference={inference}
+                  auditEvents={auditEvents}
+                  onRequestChange={handleRequestChange}
+                  onInference={(resp) => {
+                    setInference(resp);
+                    refreshAudit();
+                    if (resp) setInspectorId('gateway');
+                  }}
+                  scenarios={scenarios}
+                />
+              )}
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );

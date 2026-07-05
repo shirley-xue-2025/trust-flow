@@ -13,7 +13,7 @@
 
 | Role | URL | Persona |
 |------|-----|---------|
-| Narrator / judge view | `/glassbox` | Technical — single-page node canvas + inspector |
+| Narrator / judge view | `/glassbox` | Technical — boardroom theater + detail panel |
 | Employee | `/employee` | Alex Weber |
 | DPO / IT | `/governance` | Katrin Müller — use header **Viewing as** role tabs |
 | Strategy problem frame | `/strategy_explorer.html` (link from glassbox legend — not a pipeline node) | Pitch only |
@@ -37,7 +37,7 @@
 | Gateway deny (IBAN) | `Personal data blocked at gateway` (`PII_BLOCK`) |
 | Post-approval CTA | `View gateway activity` + link to glassbox Playground — **no in-app tool chat** |
 | Architecture strip | `Agents propose → Compiler signs → Humans approve → Gateway enforces` |
-| Glassbox canvas nodes | `Employee request` → `Org gates read` → `Agent boardroom` → `Policy compiler` → `Compiled policy` → `Gateway enforce` → `Audit trail` → `Result` |
+| Glassbox pipeline stages | `Employee request` · `Org gates read` · **Agent boardroom (stage)** · `Policy compiler` · `Compiled policy` · `Gateway enforce` · `Audit trail` · `Result` |
 | Glassbox legend | Blue = Connected systems inform · Green = AI reasons & proposes · Purple = Mechanics validate & execute |
 
 ---
@@ -61,8 +61,8 @@
 
 | | |
 |---|---|
-| **Path** | `/glassbox` — toolbar **Scenario** → **S04** (auto-loads on first visit) → **▶ Run** → watch **Agent boardroom** node summary update |
-| **Show** | Click **Agent boardroom** — inspector shows SSE rounds 0–5; stance chips; Compliance demands `LOCAL_QWEN_72B`. Node summaries live on canvas. |
+| **Path** | `/glassbox` — toolbar **Scenario** → **S04** (auto-loads on first visit) → **▶ Run** — watch transcript on stage |
+| **Show** | Live rounds 0–5 in the boardroom theater; roster stance chips update. Click **Employee request** or enforcement chips for the detail panel. |
 | **Spoken** | *"Watch five agents decompose one employee request into lanes — procurement checks DPA, compliance sets audit red lines, works council clears §87 Betriebsrat, IT assigns sovereign routing. This is Qwen Cloud boardroom on Layer B; enforcement stays deterministic on Layer A in the customer VPC."* |
 | **Track 3 — decomposition** | Round schedule: R0 Runner → R1 Procurement → R2 Compliance → R3 Works Council → R4 IT → R5 consensus. |
 | **Track 3 — negotiation** | Compliance **conditional_approve** vs IT **concessions** on `routing.sensitive` — compromise, not instant agreement. |
@@ -110,8 +110,8 @@
 
 | | |
 |---|---|
-| **Path A (email MASK)** | `/glassbox` → **Gateway enforce** node (after S04 compile) → inspector **Email (masked)** → **Send through gateway** → raw vs **What the model saw (masked)** with `[EMAIL_MASKED]` |
-| **Path B (IBAN BLOCK)** | Same node → **IBAN (may block)** sample → **Personal data blocked at gateway** |
+| **Path A (email MASK)** | `/glassbox` → click **Gateway enforce** chip → detail panel **Email (masked)** → **Send through gateway** → raw vs **What the model saw (masked)** with `[EMAIL_MASKED]` |
+| **Path B (IBAN BLOCK)** | Same — **IBAN (may block)** sample → **Personal data blocked at gateway** |
 | **Path C (employee audit)** | `/employee/requests/demo-s04-pending-signoff?tab=activity` after sign-off — gateway activity list (no in-app chat) |
 | **Spoken** | *"Layer A is regex policy — email is masked and the request can continue; IBAN is hard-blocked at the edge. We do not round-trip restore PII; the audit log records fingerprints and `pii_actions`, not raw prompts. Deterministic code — not LLM guesswork."* |
 | **Track 3 — decomposition** | Gateway = separate deterministic layer from boardroom agents. |

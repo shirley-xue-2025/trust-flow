@@ -70,8 +70,8 @@ npm run dev      # backend :8080 + web :5173
 
 Open <http://localhost:5173/employee> for the **product** (employee + governance portals).
 
-Open <http://localhost:5173/glassbox> for the **technical judge view** — a single-page
-node canvas (Problem → Request → Boardroom → Compiler → Gateway → Audit → Result).
+Open <http://localhost:5173/glassbox> for the **technical judge view** — boardroom theater
+with pipeline strip, live negotiation transcript, and click-to-inspect detail panel.
 Scenario **S04** auto-loads; click **Gateway enforce** to try email MASK / IBAN BLOCK.
 
 **Live Qwen negotiation** (optional, needs the hackathon voucher key): put

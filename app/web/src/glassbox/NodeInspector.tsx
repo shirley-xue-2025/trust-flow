@@ -4,7 +4,6 @@ import type { BoardroomResult, InferenceResponse } from '../api.js';
 import PolicyPanel from '../views/PolicyPanel.js';
 import Playground from '../views/Playground.js';
 import AuditLog from '../views/AuditLog.js';
-import { BoardroomTranscript } from '../components/trust/BoardroomTranscript.js';
 import { resultGrounding } from './processGraph.js';
 
 const AGENT_NAME: Record<string, string> = {
@@ -17,34 +16,32 @@ const AGENT_NAME: Record<string, string> = {
 
 export default function NodeInspector({
   nodeId,
+  embedded = false,
   request,
   replay,
   turns,
   result,
   running,
-  boardroomError,
   policy,
   policyHash,
   inference,
   auditEvents,
   onRequestChange,
-  onRunBoardroom,
   onInference,
   scenarios,
 }: {
   nodeId: string;
+  embedded?: boolean;
   request?: RequestPacket;
   replay?: string;
   turns: BoardroomEnvelope[];
   result: BoardroomResult | null;
   running: boolean;
-  boardroomError: string | null;
   policy?: PolicyArtifact;
   policyHash?: string;
   inference: InferenceResponse | null;
   auditEvents: GatewayAuditEvent[];
   onRequestChange: (request: RequestPacket, replay?: string) => void;
-  onRunBoardroom: () => void;
   onInference: (resp: InferenceResponse | null) => void;
   scenarios: EvalScenario[];
 }) {
@@ -52,7 +49,7 @@ export default function NodeInspector({
     case 'request':
       return (
         <div className="inspector-body">
-          <h3>Employee request</h3>
+          {!embedded && <h3>Employee request</h3>}
           <p className="inspector-lead">Configure inputs or pick a locked replay scenario (no API key).</p>
           <RequestInspectorForm request={request} scenarios={scenarios} onSubmit={onRequestChange} />
         </div>
@@ -61,7 +58,7 @@ export default function NodeInspector({
     case 'org-gates':
       return (
         <div className="inspector-body">
-          <h3>Org gates read</h3>
+          {!embedded && <h3>Org gates read</h3>}
           <p className="inspector-lead">Connected reads — no judgment, just grounding for the boardroom.</p>
           {request ? (
             <dl className="inspector-kv">
@@ -83,34 +80,12 @@ export default function NodeInspector({
       );
 
     case 'boardroom':
-      return (
-        <div className="inspector-body inspector-body--wide inspector-body--boardroom">
-          <div className="inspector-boardroom-hero">
-            <h3>Agent boardroom</h3>
-            <p className="inspector-lead">
-              Five Qwen agents negotiate in structured rounds — this is Track 3 Agent Society.{' '}
-              {replay ? <span className="pill pass">replay {replay}</span> : <span className="pill conditional_approve">live SSE</span>}
-            </p>
-            {result && !running && (
-              <div className={`inspector-outcome inspector-outcome--${result.outcome}`}>
-                Outcome: <strong>{result.outcome}</strong>
-                {result.routing_decision && <span> · route {result.routing_decision}</span>}
-              </div>
-            )}
-          </div>
-          {boardroomError && <div className="banner warn">Live path error: {boardroomError}. Try a replay scenario.</div>}
-          {running && turns.length === 0 && <p className="muted">Negotiating… watch turns stream below.</p>}
-          <BoardroomTranscript turns={turns} compact />
-          <button type="button" className="ghost" onClick={onRunBoardroom} disabled={!request || running}>
-            Re-run boardroom
-          </button>
-        </div>
-      );
+      return null;
 
     case 'compiler':
       return (
         <div className="inspector-body">
-          <h3>Policy compiler</h3>
+          {!embedded && <h3>Policy compiler</h3>}
           <p className="inspector-lead">
             LLM <em>proposed</em> demands; deterministic compiler validated, floor-checked, and signed.
             The model never touches enforcement.
@@ -166,7 +141,7 @@ export default function NodeInspector({
       });
       return (
         <div className="inspector-body">
-          <h3>Output · Result</h3>
+          {!embedded && <h3>Output · Result</h3>}
           <p className="inspector-result-headline">{g.detail}</p>
           <dl className="inspector-kv">
             <dt>Decision</dt>
@@ -270,7 +245,7 @@ function RequestInspectorForm({
           <button
             key={s.scenario_id}
             type="button"
-            className="ghost scenario-btn"
+            className="scenario-btn"
             onClick={() => onSubmit(s.request, s.scenario_id)}
           >
             <span>{s.scenario_id}</span> · {s.name}
