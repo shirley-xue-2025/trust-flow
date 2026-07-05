@@ -169,7 +169,6 @@
 | BR pending at 80% after S04 approve | UI uses `policy_version_hash` — reseed if stale; S04 hash has BR signed |
 | Wrong tab label | Employee = **Agent negotiation**; Governance = **Agent negotiation trace** |
 | `policy not activated` in gateway playground | Complete beat 2 first (DPO + IT sign-off activates the policy) |
-| Duplicated transcript rounds on `/glassbox` | Happens after in-app navigation back to glassbox — hard refresh (Cmd+Shift+R) before recording the beat |
 
 ---
 

@@ -15,54 +15,74 @@
 
 | Field | Limit | Draft |
 |-------|-------|-------|
-| Tagline | 60 chars | AI agents negotiate your AI policy. A gateway enforces it. |
+| Tagline | 60 chars | Five AI agents negotiate your AI policy. Code enforces it. |
 | Short description | 200 chars | TrustFlow compresses weeks of Legal/IT/Procurement/Works Council (Betriebsrat) negotiation into seconds of agent debate, compiles enforceable gateway rules, and keeps humans in control of activation. |
 
-*Tagline alternative (previous):* `Multi-agent policy boardroom + deterministic AI gateway`
+*Tagline alternatives:* `AI agents negotiate your AI policy. A gateway enforces it.` (58) · `Multi-agent policy boardroom + deterministic AI gateway` (56)
 
 ---
 
-## About the project
+## About the project — paste into "Project Story" (Devpost template headings)
 
-### The problem
+## Inspiration
 
-Enterprises want employees on AI tools; IT, Legal, DPO, and Germany's **Betriebsrat** (Works Council — elected worker representatives with legal veto over workplace tools under §87 German labor law) block or slow rollouts. Employees use shadow ChatGPT while approval email chains run for weeks. Policies exist as PDFs without deterministic enforcement at the inference edge.
+Enterprises want employees on AI tools, but the approval path is broken. IT, Legal, DPO, and — in Germany — the **Betriebsrat** (Works Council: elected worker representatives with a legal veto over workplace tools under §87 German labor law) trade email attachments for weeks while employees quietly paste company data into private ChatGPT. We collected a 55-item practitioner-evidence corpus; the single largest pain cluster (21/55) was the approval process itself, not the models.
 
-> **Why Germany:** Approval that takes weeks in the US can take months in Germany because of works-council co-determination. We built for the hardest market; everywhere else is a subset.
+The trigger insight: approval that takes weeks in the US can take **months** in Germany because of works-council co-determination. So we built for the hardest market — everywhere else is a subset.
 
-### Our solution
+## What it does
 
-**TrustFlow** is a four-stage pipeline for Track 3 — Agent Society:
+**TrustFlow** turns multi-stakeholder AI-tool approval into a four-stage pipeline:
 
-1. **Layer B — Agent Boardroom** (agents negotiate) — Five specialist agents (Workflow Runner, Procurement, Corporate Compliance, Works Council Liaison, IT Infrastructure) negotiate a structured Policy Proposal over six rounds using Qwen Cloud.
-2. **Policy Compiler** — Deterministic merge of agent concessions into schema-validated `rules.json` with a `policy_version_hash` (floor-check = validate against org non-negotiable red lines).
-3. **Layer A — Edge Gateway** (deterministic enforcement) — Pre-flight checks (tool approval, **Betriebsvereinbarung** works-council agreement status, PII scan, routing, budget) with deny reason codes and **Art. 50** (EU AI Act transparency) audit events.
-4. **Layer C — Human-in-the-loop (HITL)** — DPO and IT parallel sign-off before the gateway activates.
+1. **Agent Boardroom (Layer B — agents negotiate)** — Five specialist agents (Workflow Runner, Procurement, Corporate Compliance, Works Council Liaison, IT Infrastructure) negotiate a structured Policy Proposal over six rounds on Qwen Cloud.
+2. **Policy Compiler** — Deterministic merge of agent concessions into schema-validated `rules.json` with a signed `policy_version_hash`, floor-checked against the org's non-negotiable red lines.
+3. **Human sign-off (Layer C — HITL)** — DPO and IT review in parallel; nothing activates without them.
+4. **Edge Gateway (Layer A — deterministic enforcement)** — Pre-flight checks (tool approval, **Betriebsvereinbarung** works-council-agreement status, PII scan, routing, budget) with deny reason codes and **Art. 50** (EU AI Act transparency) audit events.
 
-### Demo highlights
+Demo highlights:
 
-- **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing → human sign-off → gateway activity audit (tool used in IDE, not in-portal chat).
-- **Glassbox** (`/glassbox`) — transparent judge view of the negotiation engine: boardroom theater, live transcript on stage; click **Gateway enforce** to inspect the pipeline.
-- **S05 deny path:** Procurement vetoes unsigned OpenAI **DPA** (vendor data-processing agreement) → employee advocate + factual appeal.
-- **Measured baseline (live qwen-max):** the same S05 packet through one generic compliance agent → *conditional approve*, unsigned DPA never surfaced. Through the 5-agent boardroom → **DENIED · VENDOR_DPA_PENDING** (Procurement veto, round 1). Reproducible: `npm run baseline:demo -- S05` · committed artifacts in `docs/hackathon/baseline/`.
-- **Gateway PII:** Email masked; IBAN hard-blocked at edge (regex demo — honest scope).
-- **S02 external gate:** Works council agreement pending — product tracks status; legal process stays outside.
+- **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing → human sign-off → gateway activity audit.
+- **S05 deny path:** Procurement vetoes an unsigned OpenAI **DPA** (vendor data-processing agreement) → employee advocate + factual appeal.
+- **Glassbox** (`/glassbox`) — transparent judge view: boardroom theater with live transcript; click **Gateway enforce** to test PII masking/blocking yourself.
+- **Gateway PII:** email masked, IBAN hard-blocked at the edge (regex demo — honest scope).
+- **S02 external gate:** works-council agreement pending — the product tracks the gate; the legal process stays outside the software.
 
-### How we built it
+## How we built it
 
 - **Qwen-Max via DashScope** (OpenAI-compatible endpoint, `dashscope-intl`) drives every agent turn; each turn returns a structured envelope (stance, demands, concessions) that is **zod-schema-validated** before it enters the transcript — a malformed turn never reaches the compiler.
-- **Deterministic compiler** merges validated concessions into `rules.json`, floor-checks against org red lines, and signs a `policy_version_hash`. The LLM proposes; it never enforces.
-- **Golden capture CLI** (`npm run capture:golden`) records live qwen-max negotiations as replayable transcripts — so the demo runs identically with or without an API key, and judges can diff live vs recorded.
-- **Quality gates:** 34 backend tests + 28 Playwright e2e across employee, governance, and glassbox surfaces.
+- **Deterministic compiler** merges validated concessions into `rules.json` and signs a `policy_version_hash`. The LLM proposes; it never enforces.
+- **Golden capture CLI** (`npm run capture:golden`) records live qwen-max negotiations as replayable transcripts — the demo runs identically with or without an API key, and judges can diff live vs recorded.
+- **Hybrid deployment:** the gateway (Layer A) runs in the customer VPC — data stays in the sovereign boundary; the boardroom (Layer B) runs on Qwen Cloud.
+- **Quality gates:** 36 backend tests + 28 Playwright e2e across employee, governance, and glassbox surfaces.
 
-### Hybrid deployment story
+## Challenges we ran into
 
-- **Layer A (gateway):** Customer VPC — data stays in sovereign boundary.
-- **Layer B (boardroom):** Qwen Cloud — hackathon-aligned agent negotiation.
+- **Making agent output enforceable.** Free-text LLM debate is useless to a gateway. We forced every turn into a schema-validated envelope and moved all merging/signing into deterministic code — the hard line "agents propose, code enforces" is the architecture's answer to LLM unreliability.
+- **Demo determinism vs. live LLMs.** Live negotiations word themselves differently every run. The golden-capture pipeline records real qwen-max runs and replays them deterministically, so the same system demos reliably offline and runs live with a key.
+- **Policy versioning semantics.** A late bug taught us the gateway must enforce the *human-activated* policy version even after a newer draft is compiled — activation state has to survive recompiles. We fixed it with an active-version fallback and a regression test.
+- **Modeling co-determination honestly.** The works-council agreement is a legal process, not an API. TrustFlow tracks and enforces its *status* as a gate (`BETRIEBSVEREINBARUNG_PENDING`) and leaves the negotiation itself where it belongs — outside the software.
 
-### Differentiation
+## Accomplishments that we're proud of
 
-TrendAI secures like a firewall; Naaia documents like GRC. TrustFlow **negotiates** stakeholder policy and **enforces** it deterministically — with DE **§87 BetrVG** works-council gates neither competitor emphasizes.
+- **A measured multi-agent win, not a claimed one:** the same S05 packet through one generic qwen-max agent → *conditional approve* (unsigned DPA never surfaced); through the five-agent boardroom → **DENIED · VENDOR_DPA_PENDING** in round 1. Live-captured, committed at `docs/hackathon/baseline/`, reproducible with `npm run baseline:demo -- S05`.
+- A **complete HITL loop** — parallel DPO + IT sign-off, employee advocate, appeals that re-open the boardroom.
+- **Works-council co-determination as a first-class agent lane** — a stakeholder no English-language tooling models.
+- End-to-end honesty: every "illustrative" number labeled, PII scope stated, replay vs live visible in the UI.
+
+## What we learned
+
+- Specialist decomposition beats a monolith **on quality, not just speed** — the baseline showed the monolith misses lane-specific gates entirely.
+- Regulation is a design constraint, not paperwork: modeling §87 BetrVG changed the round schedule, the deny codes, and the audit schema.
+- Put the deterministic boundary as early as possible: schema-validate at the agent turn, sign at the compiler, and the rest of the system can trust its inputs.
+
+## What's next for TrustFlow
+
+- Pilot with a German mid-market fintech (design-partner conversations start from the DPO persona in our research corpus).
+- Upgrade PII from regex demo to NER-grade detection in the gateway.
+- Broader scenario coverage (HR, marketing content tools) and Betriebsvereinbarung workflow integrations.
+- Harden the boardroom protocol: agent-count and round-count are config, so orgs can add lanes (e.g., InfoSec, external counsel).
+
+*(Competitive framing if asked: TrendAI secures like a firewall; Naaia documents like GRC. TrustFlow negotiates stakeholder policy and enforces it deterministically — with the §87 BetrVG works-council gate neither competitor emphasizes.)*
 
 ---
 

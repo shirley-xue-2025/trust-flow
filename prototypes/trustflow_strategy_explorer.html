@@ -113,10 +113,10 @@
     <!-- Hero Section -->
     <header class="pt-32 pb-20 px-6 max-w-5xl mx-auto text-center">
         <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Safe AI Adoption, <span class="text-teal-700 underline decoration-teal-200">On Autopilot</span>.
+            Safe AI Adoption, <span class="text-teal-700 underline decoration-teal-200">Without the Deadlock</span>.
         </h1>
         <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Eliminate the corporate approval bottleneck. TrustFlow leverages autonomous agent negotiation to bridge the gap between business velocity and legal safety.
+            Eliminate the corporate approval bottleneck. TrustFlow uses five-agent negotiation to bridge the gap between business velocity and legal safety.
         </p>
         <div class="flex justify-center space-x-4">
             <a href="#agents" class="bg-teal-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-teal-800 transition shadow-lg">Explore the Agents</a>
@@ -167,7 +167,7 @@
                 <span class="text-teal-700 font-bold text-sm tracking-widest uppercase">The Agent Society</span>
                 <h2 class="text-4xl font-bold mt-2">The Virtual Boardroom</h2>
                 <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
-                    Instead of a static "No", TrustFlow uses three specialized agents to negotiate safe parameters in milliseconds.
+                    Instead of a static "No", TrustFlow uses five specialized agents to negotiate safe parameters in seconds — humans sign off before anything activates.
                 </p>
             </div>
 
@@ -194,6 +194,22 @@
                     <h3 class="text-xl font-bold mb-2">IT & Infra Agent</h3>
                     <p class="text-sm text-gray-500 mb-4 italic">"I optimize cost and sovereignty."</p>
                     <p class="text-gray-600 text-sm">Monitors budget burn and routes traffic between cloud and local Qwen nodes.</p>
+                </div>
+
+                <!-- Agent 4: Procurement -->
+                <div onclick="showAgentDetail('procurement')" class="agent-node glass-card p-8 rounded-2xl border-t-4 border-emerald-500">
+                    <div class="text-3xl mb-4">🧾</div>
+                    <h3 class="text-xl font-bold mb-2">Procurement &amp; Vendor Risk</h3>
+                    <p class="text-sm text-gray-500 mb-4 italic">"I block until the vendor DPA is signed."</p>
+                    <p class="text-gray-600 text-sm">Holds vendor contracts and data-processing agreements — the lane a generic agent misses.</p>
+                </div>
+
+                <!-- Agent 5: Works Council -->
+                <div onclick="showAgentDetail('council')" class="agent-node glass-card p-8 rounded-2xl border-t-4 border-rose-500">
+                    <div class="text-3xl mb-4">🤝</div>
+                    <h3 class="text-xl font-bold mb-2">Works Council Liaison</h3>
+                    <p class="text-sm text-gray-500 mb-4 italic">"I hold Germany's §87 co-determination gate."</p>
+                    <p class="text-gray-600 text-sm">Tracks the works-council agreement (Betriebsvereinbarung) — the stakeholder no English tooling models.</p>
                 </div>
             </div>
 
@@ -358,6 +374,28 @@
     <script>
         // Data Store
         const agentData = {
+            procurement: {
+                title: "Procurement & Vendor Risk Agent",
+                role: "The Contract Gatekeeper",
+                status: "Permanent / Vetoing",
+                jtbd: "When a team requests a new AI vendor, I must verify the data-processing agreement and commercial terms are signed before any traffic flows, so the company never processes data on an unsigned contract.",
+                focus: [
+                    "Vendor DPA signature status as a hard gate",
+                    "Round-1 veto on unsigned contracts (see S05)",
+                    "Commercial terms and budget ownership"
+                ]
+            },
+            council: {
+                title: "Works Council Liaison Agent",
+                role: "The Co-Determination Voice",
+                status: "Permanent / Gatekeeping",
+                jtbd: "When AI tools could affect how employees work or are monitored, I must confirm the works-council agreement (Betriebsvereinbarung, §87 BetrVG) covers the use case before rollout, so worker co-determination rights are respected by design.",
+                focus: [
+                    "Betriebsvereinbarung signature status as a gate",
+                    "§87 BetrVG co-determination scope checks",
+                    "PENDING_EXTERNAL escalation when unsigned (see S02)"
+                ]
+            },
             runner: {
                 title: "Workflow Runner Agent",
                 role: "The Business Champion",
