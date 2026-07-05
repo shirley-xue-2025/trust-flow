@@ -58,7 +58,7 @@ This is the differentiator, and the whole design hangs off one boundary:
 ## Quickstart (no API key needed)
 
 The application code lives in [`app/`](app/). Replay mode runs the full pipeline —
-boardroom → compiler → gateway — against hand-authored golden transcripts, with **no
+boardroom → compiler → gateway — against golden transcripts recorded from live qwen-max, with **no
 network and no key**, so judges can see everything working immediately.
 
 ```bash

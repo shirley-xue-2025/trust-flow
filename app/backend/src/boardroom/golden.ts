@@ -2,9 +2,9 @@
  * Golden-transcript loader for REPLAY MODE.
  *
  * Replay is a first-class path (the Step 6 demo fallback): the boardroom can
- * source validated envelopes from a hand-authored golden transcript instead of
- * calling qwen-max. This is what makes the whole test suite run with NO network
- * and NO API key, and what makes the live demo recoverable in <2 min.
+ * source validated envelopes from a golden transcript instead of calling Qwen
+ * live. Transcripts are captured from real qwen-max runs via
+ * `npm run capture:golden -- S04` and replayed deterministically in tests and demo.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

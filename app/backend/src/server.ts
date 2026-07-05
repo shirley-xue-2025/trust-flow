@@ -26,7 +26,7 @@ import {
 import { hasGolden } from './boardroom/golden.js';
 import { runInference } from './gateway/enforce.js';
 import { readAudit, resolveStoredPolicy } from './store/index.js';
-import { hasApiKey } from './qwen/client.js';
+import { hasApiKey, QWEN_MODEL } from './qwen/client.js';
 import {
   createEmployeeRequest,
   getEmployeeRequest,
@@ -71,6 +71,7 @@ export function buildServer() {
   app.get('/v1/health', async () => ({
     ok: true,
     live_qwen: hasApiKey(),
+    qwen_model: hasApiKey() ? QWEN_MODEL : null,
     org: ORG.org_id,
   }));
 
@@ -581,7 +582,11 @@ if (isMain) {
   });
   app
     .listen({ port, host: '0.0.0.0' })
-    .then(() => app.log.info(`TrustFlow backend on :${port} (live_qwen=${hasApiKey()})`))
+    .then(() =>
+      app.log.info(
+        `TrustFlow backend on :${port} (live_qwen=${hasApiKey()}, model=${hasApiKey() ? QWEN_MODEL : 'replay'})`,
+      ),
+    )
     .catch((err) => {
       app.log.error(err);
       process.exit(1);

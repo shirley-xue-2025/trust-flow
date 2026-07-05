@@ -4,35 +4,124 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
+    "claims": [],
     "demands": [
-      { "field": "tool_id", "value": "chatgpt-enterprise" },
-      { "field": "use_case_category", "value": "hr_screening" }
+      {
+        "field": "audit.raw_prompt_logging",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "audit.manager_dashboard_allowed",
+        "value": false,
+        "hard": true
+      }
     ],
-    "natural_language": "HR wants ChatGPT Enterprise to screen and rank job applicants automatically."
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I support the approval of this request for ChatGPT Enterprise in HR screening, ensuring that no raw prompt logging or manager dashboards are enabled."
   },
   {
     "session_id": "S03",
     "round": 1,
     "agent": "procurement",
     "stance": "pass",
-    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
-    "natural_language": "DPA is signed — but defer to Compliance on the use case itself."
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I have no objections in my lane this round. The DPA is signed, and the Betriebsvereinbarung is in place, so I am passing."
   },
   {
     "session_id": "S03",
     "round": 2,
     "agent": "corporate_compliance",
     "stance": "reject",
-    "claims": [{ "type": "regulatory", "ref": "Annex III", "text": "Automated applicant screening is high-risk and needs Art. 14 human oversight; not approvable as a productivity tool." }],
-    "demands": [{ "field": "risk_tier", "value": "high_risk", "hard": true }],
-    "evidence_ids": ["R1"],
-    "natural_language": "HR screening is Annex III high-risk. This is not a limited-risk productivity request — I reject it. Route to the human-oversight workflow."
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "EU AI Act Annex III",
+        "text": "HR screening is a high-risk use case under the EU AI Act and requires a DPIA. The current request does not meet the necessary requirements for high-risk use cases."
+      }
+    ],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I must reject this request as HR screening is a high-risk use case under the EU AI Act, and the current setup does not meet the necessary requirements for such high-risk use cases."
+  },
+  {
+    "session_id": "S03",
+    "round": 3,
+    "agent": "works_council",
+    "stance": "conditional_reject",
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "§87(1) No.6 BetrVG",
+        "text": "A signed annex is required for the company-wide rollout of any system capable of monitoring employees, even if the intent to monitor is not present."
+      }
+    ],
+    "demands": [
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I conditionally reject this request as a signed annex is required for the company-wide rollout, given the high-risk nature of the use case and the regulatory requirements under §87(1) No.6 BetrVG."
+  },
+  {
+    "session_id": "S03",
+    "round": 4,
+    "agent": "it_infra",
+    "stance": "conditional_reject",
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "Art.87(1) No.6 BetrVG",
+        "text": "HR screening is a high-risk use case and requires a signed Betriebsvereinbarung for compliance."
+      }
+    ],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I conditionally reject this request, aligning with the Works Council Liaison's stance. HR screening is a high-risk use case, and we need to ensure data sovereignty and compliance. I propose routing sensitive traffic to LOCAL_QWEN_72B."
   },
   {
     "session_id": "S03",
     "round": 5,
-    "agent": "corporate_compliance",
-    "stance": "reject",
-    "natural_language": "Reject stands. High-risk use denied without an Art. 14 oversight regime."
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "EU AI Act",
+        "text": "HR screening is a high-risk use case, but with the signed Betriebsvereinbarung and appropriate routing, we can mitigate risks."
+      }
+    ],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with the Works Council Liaison and IT & Infra on the need for a signed Betriebsvereinbarung and routing sensitive traffic to LOCAL_QWEN_72B. This will ensure compliance and data sovereignty."
   }
 ]

@@ -13,7 +13,21 @@ import type { BoardroomEnvelope } from '@trustflow/shared';
 
 export const QWEN_BASE_URL =
   process.env.QWEN_BASE_URL ?? 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
-export const QWEN_MODEL = process.env.QWEN_MODEL ?? 'qwen-max';
+
+/** Free-quota dev default — set QWEN_MODEL_DEV in .env to override. */
+export const QWEN_MODEL_DEV = process.env.QWEN_MODEL_DEV ?? 'qwen-flash';
+/** Hackathon / demo video — set QWEN_MODEL_DEMO in .env to override. */
+export const QWEN_MODEL_DEMO = process.env.QWEN_MODEL_DEMO ?? 'qwen-max';
+
+function resolveQwenModel(): string {
+  const profile = process.env.QWEN_PROFILE;
+  if (profile === 'demo') return QWEN_MODEL_DEMO;
+  if (profile === 'dev') return QWEN_MODEL_DEV;
+  return process.env.QWEN_MODEL ?? QWEN_MODEL_DEV;
+}
+
+/** Active model for this process. QWEN_PROFILE=demo forces demo model without editing .env. */
+export const QWEN_MODEL = resolveQwenModel();
 
 export function hasApiKey(): boolean {
   return Boolean(process.env.DASHSCOPE_API_KEY);

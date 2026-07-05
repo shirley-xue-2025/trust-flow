@@ -4,62 +4,113 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
-    "claims": [{ "type": "process", "text": "Support team needs Copilot to summarize ticket threads." }],
+    "claims": [],
     "demands": [
-      { "field": "tool_id", "value": "microsoft-copilot-365" },
-      { "field": "use_case_category", "value": "summarization" }
+      {
+        "field": "audit.raw_prompt_logging",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "audit.manager_dashboard_allowed",
+        "value": false,
+        "hard": true
+      }
     ],
-    "evidence_ids": ["R0002"],
-    "natural_language": "Customer support wants Microsoft 365 Copilot for ticket summarization. Low-risk, big time win."
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I fully support the approval of this request for Microsoft 365 Copilot, as it aligns with our organizational policies and will significantly enhance productivity."
   },
   {
     "session_id": "S01",
     "round": 1,
     "agent": "procurement",
     "stance": "approve",
-    "claims": [{ "type": "vendor", "ref": "DPA", "text": "Microsoft DPA is signed; EU residency available." }],
-    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
-    "evidence_ids": ["R0011"],
-    "natural_language": "Microsoft DPA is on file and EU data residency is available. No procurement blocker."
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "The DPA is signed, and there are no vendor-related concerns. I support the approval."
   },
   {
     "session_id": "S01",
     "round": 2,
     "agent": "corporate_compliance",
     "stance": "conditional_approve",
-    "claims": [{ "type": "regulatory", "ref": "Art.50", "text": "Summarization is limited-risk; transparency suffices." }],
-    "demands": [
-      { "field": "audit.raw_prompt_logging", "value": false, "hard": true },
-      { "field": "audit.manager_dashboard_allowed", "value": false, "hard": true }
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "EU AI Act Art. 50",
+        "text": "Summarization is categorized as limited risk, requiring transparency measures."
+      }
     ],
-    "concessions": [{ "field": "risk_tier", "value": "limited_risk" }],
-    "evidence_ids": ["R0008", "R1"],
-    "natural_language": "Limited-risk use. I approve with fingerprint-only logs and no manager dashboards."
+    "demands": [
+      {
+        "field": "risk_tier",
+        "value": "LIMITED_RISK",
+        "hard": true
+      },
+      {
+        "field": "audit.retention_class",
+        "value": "standard_6mo",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with the Workflow Runner's demands on raw prompt logging and manager dashboard access. However, we need to ensure that the risk tier is set to LIMITED_RISK and the audit retention class is at least standard_6mo to comply with EU AI Act and GDPR."
   },
   {
     "session_id": "S01",
     "round": 3,
     "agent": "works_council",
-    "stance": "approve",
-    "claims": [{ "type": "process", "ref": "§87 BetrVG", "text": "Betriebsvereinbarung annex is signed for Copilot." }],
-    "concessions": [{ "field": "gates.betriebsvereinbarung_status", "value": "signed" }],
-    "evidence_ids": ["E001"],
-    "natural_language": "The Betriebsvereinbarung annex is signed. No co-determination blocker for this rollout."
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I have no objections in my lane, as the Betriebsvereinbarung status is signed and the use case does not trigger additional works council requirements."
   },
   {
     "session_id": "S01",
     "round": 4,
     "agent": "it_infra",
-    "stance": "approve",
-    "claims": [{ "type": "cost", "text": "Cloud route is fine; modest token cap on the support pool." }],
-    "concessions": [{ "field": "routing.default", "value": "CLOUD_QWEN_MAX" }],
-    "natural_language": "Cloud route is fine for non-sensitive summaries. Capping the support department pool."
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "cost",
+        "ref": "Org Policy",
+        "text": "Routing sensitive traffic to LOCAL_QWEN_72B for data sovereignty and cost efficiency."
+      }
+    ],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with the demands from Corporate Compliance on risk tier and retention class. I propose routing sensitive traffic to LOCAL_QWEN_72B to ensure data sovereignty and cost efficiency."
   },
   {
     "session_id": "S01",
     "round": 5,
     "agent": "workflow_runner",
     "stance": "approve",
-    "natural_language": "Consensus reached. Approving for rollout."
+    "claims": [],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [],
+    "natural_language": "I support the demands from Corporate Compliance and IT & Infra. Routing sensitive traffic to LOCAL_QWEN_72B is a practical solution that aligns with our data sovereignty and cost efficiency goals."
   }
 ]

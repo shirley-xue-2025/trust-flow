@@ -4,59 +4,135 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
+    "claims": [],
     "demands": [
-      { "field": "tool_id", "value": "claude-code" },
-      { "field": "use_case_category", "value": "code_completion" }
+      {
+        "field": "audit.raw_prompt_logging",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "audit.manager_dashboard_allowed",
+        "value": false,
+        "hard": true
+      }
     ],
-    "natural_language": "Payments engineering wants Claude Code for boilerplate. Company-wide rollout requested."
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I advocate for the approval of this request to use Claude Code for code completion. It will significantly boost our developers' productivity and aligns with our current policies."
   },
   {
     "session_id": "S02",
     "round": 1,
     "agent": "procurement",
-    "stance": "approve",
-    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
-    "natural_language": "Anthropic DPA is executed for this entity. Procurement clears it."
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I have no objections in my lane this round, as the DPA status is signed and there are no subprocessor issues to address."
   },
   {
     "session_id": "S02",
     "round": 2,
     "agent": "corporate_compliance",
     "stance": "conditional_approve",
-    "demands": [
-      { "field": "audit.raw_prompt_logging", "value": false, "hard": true },
-      { "field": "audit.retention_class", "value": "financial_sector" }
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "EU AI Act Art. 50",
+        "text": "Code completion is categorized as limited risk, but we must ensure transparency and compliance with GDPR and local works council regulations."
+      }
     ],
-    "concessions": [{ "field": "risk_tier", "value": "limited_risk" }],
-    "evidence_ids": ["R0008"],
-    "natural_language": "Code completion is limited-risk. Fingerprint-only logs, financial-sector retention."
+    "demands": [
+      {
+        "field": "risk_tier",
+        "value": "LIMITED_RISK",
+        "hard": true
+      },
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I conditionally approve this request, but we need to ensure the Betriebsvereinbarung is signed before the tool is rolled out, and the risk tier is set to LIMITED_RISK."
   },
   {
     "session_id": "S02",
     "round": 3,
     "agent": "works_council",
-    "stance": "reject",
-    "claims": [{ "type": "process", "ref": "§87(1) No.6 BetrVG", "text": "No signed Betriebsvereinbarung; company-wide rollout blocked." }],
-    "demands": [{ "field": "gates.betriebsvereinbarung_status", "value": "signed", "hard": true }],
-    "evidence_ids": ["E001", "E004"],
-    "natural_language": "Claude Code logs user activity. Without a signed Betriebsvereinbarung we cannot approve a company-wide rollout. This goes to the works-council process."
+    "stance": "conditional_reject",
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "§87(1) No.6 BetrVG",
+        "text": "A signed Betriebsvereinbarung or annex is required before company-wide rollout for any system capable of monitoring employees."
+      }
+    ],
+    "demands": [
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I conditionally reject the request until a signed Betriebsvereinbarung or annex is in place, as required by §87(1) No.6 BetrVG. The current status is pending, which does not meet the regulatory requirement."
   },
   {
     "session_id": "S02",
     "round": 4,
     "agent": "it_infra",
     "stance": "conditional_approve",
-    "concessions": [
-      { "field": "routing.default", "value": "LOCAL_QWEN_72B" },
-      { "field": "budget.max_tokens_per_day", "value": 500000 }
+    "claims": [
+      {
+        "type": "process",
+        "ref": "pending Betriebsvereinbarung",
+        "text": "The pending status of the Betriebsvereinbarung is a concern, and we need to ensure it is signed before proceeding."
+      }
     ],
-    "natural_language": "Infra is ready: local route + 500k token cap once the gate clears."
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I conditionally approve this request, but I agree with Works Council Liaison that the Betriebsvereinbarung must be signed. I also propose routing sensitive traffic to LOCAL_QWEN_72B for data sovereignty and cost efficiency."
   },
   {
     "session_id": "S02",
     "round": 5,
-    "agent": "works_council",
-    "stance": "reject",
-    "natural_language": "Position unchanged: external Betriebsvereinbarung process must complete first."
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "process",
+        "ref": "BetrVG §87(1) No.6",
+        "text": "While the Betriebsvereinbarung is pending, we can still move forward with a pilot to ensure that the tool meets our needs and aligns with our processes."
+      }
+    ],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with IT & Infra's suggestion to route sensitive traffic to LOCAL_QWEN_72B. Let's proceed with a pilot while the Betriebsvereinbarung is finalized to avoid delays and ensure the tool's effectiveness."
   }
 ]

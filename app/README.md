@@ -20,7 +20,7 @@ validated, signed, and enforces it.*
 app/
 ├── shared/        TS types mirrored from the 2 JSON schemas + canonical hash
 ├── backend/       Fastify REST+SSE, boardroom, compiler, gateway, file stores
-│   └── test/      vitest + hand-authored golden transcripts (S01–S05)
+│   └── test/      vitest + golden transcripts (S01–S05, captured from live qwen-max)
 └── web/           React + Vite UI
     ├── employee/  Product portals (employee + governance)
     ├── glassbox/  Judge / engineer boardroom theater
@@ -74,7 +74,7 @@ Header **Viewing as** switches DPO / Procurement / IT personas.
 `/demo` redirects to `/glassbox`.
 
 **Replay mode** (`?replay=S0X` on boardroom session) is the keyless, deterministic path.
-It sources hand-authored golden transcripts instead of calling Qwen, then runs them
+It sources recorded live-qwen-max golden transcripts instead of calling Qwen, then runs them
 through the *same* compiler + gateway.
 
 ## Live Qwen (optional — needs the voucher key)
@@ -85,7 +85,9 @@ Put the key in a git-ignored `.env` at the repo root (template: `.env.example`):
 ```
 DASHSCOPE_API_KEY=sk-...
 # QWEN_BASE_URL defaults to the Singapore/intl endpoint; override only for another region.
-# QWEN_MODEL defaults to qwen-max; set qwen-plus for cheap dev iteration.
+QWEN_MODEL_DEV=qwen-flash
+QWEN_MODEL_DEMO=qwen-max
+QWEN_MODEL=qwen-flash
 PORT=8080
 ```
 
@@ -93,7 +95,10 @@ The app **auto-loads `.env`** (Node's built-in `--env-file` loader, no `dotenv`
 dependency), so no secrets go on the command line. Just run the one-shot smoke test:
 
 ```bash
-npm run smoke   # one live qwen-max round-trip → valid envelope
+npm run smoke        # one live qwen-flash round-trip → valid envelope
+npm run smoke:demo   # same, but qwen-max (demo dry-run without editing .env)
+npm run dev:demo     # full UI on qwen-max for demo video
+npm run capture:golden:demo -- S04 --write-golden   # record live qwen-max → test/golden/S04.json
 ```
 
 With the key present, glassbox **Use custom request** + **Run** starts a real

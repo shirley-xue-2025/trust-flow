@@ -121,6 +121,10 @@ export default function GlassBoxCanvas() {
               value={replay ?? ''}
               onChange={(e) => {
                 const id = e.target.value;
+                if (!id) {
+                  if (request) handleRequestChange(request, undefined);
+                  return;
+                }
                 const s = scenarios.find((sc) => sc.scenario_id === id);
                 if (s) handleRequestChange(s.request, s.scenario_id);
               }}

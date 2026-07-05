@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BoardroomEnvelope, EvalScenario, GatewayAuditEvent, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import type { BoardroomResult, InferenceResponse } from '../api.js';
 import PolicyPanel from '../views/PolicyPanel.js';
@@ -50,7 +50,10 @@ export default function NodeInspector({
       return (
         <div className="inspector-body">
           {!embedded && <h3>Employee request</h3>}
-          <p className="inspector-lead">Configure inputs or pick a locked replay scenario (no API key).</p>
+          <p className="inspector-lead">
+            Configure inputs for a <strong>live</strong> Qwen run (needs API key), or pick a replay
+            scenario below to play a recorded transcript.
+          </p>
           <RequestInspectorForm request={request} scenarios={scenarios} onSubmit={onRequestChange} />
         </div>
       );
@@ -189,6 +192,34 @@ function RequestInspectorForm({
   const [useCase, setUseCase] = useState(request?.use_case_category ?? 'code_completion');
   const [dept, setDept] = useState(request?.department ?? 'payments_engineering');
   const [payment, setPayment] = useState(Boolean(request?.data_classes?.length));
+  const [vendorDpa, setVendorDpa] = useState<'signed' | 'pending'>(
+    request?.vendor_dpa_status === 'pending' ? 'pending' : 'signed',
+  );
+  const [betriebsrat, setBetriebsrat] = useState<'signed' | 'pending'>(
+    request?.betriebsvereinbarung_status === 'pending' ? 'pending' : 'signed',
+  );
+
+  useEffect(() => {
+    if (!request) return;
+    setToolId(request.tool_id);
+    setUseCase(request.use_case_category);
+    setDept(request.department ?? 'payments_engineering');
+    setPayment(Boolean(request.data_classes?.length));
+    setVendorDpa(request.vendor_dpa_status === 'pending' ? 'pending' : 'signed');
+    setBetriebsrat(request.betriebsvereinbarung_status === 'pending' ? 'pending' : 'signed');
+  }, [request]);
+
+  const buildRequest = (): RequestPacket => ({
+    request_id: crypto.randomUUID(),
+    tool_id: toolId,
+    use_case_category: useCase,
+    department: dept,
+    data_classes: payment ? ['payment_api_schemas'] : [],
+    annex_iii_risk: useCase === 'hr_screening',
+    entity_country: 'DE',
+    vendor_dpa_status: vendorDpa,
+    betriebsvereinbarung_status: betriebsrat,
+  });
 
   return (
     <div className="inspector-form">
@@ -221,26 +252,30 @@ function RequestInspectorForm({
         Prompts may touch payment API schemas
       </label>
 
-      <button
-        type="button"
-        className="primary"
-        onClick={() =>
-          onSubmit({
-            request_id: crypto.randomUUID(),
-            tool_id: toolId,
-            use_case_category: useCase,
-            department: dept,
-            data_classes: payment ? ['payment_api_schemas'] : [],
-            annex_iii_risk: useCase === 'hr_screening',
-            entity_country: 'DE',
-          })
-        }
+      <label>Vendor DPA</label>
+      <select value={vendorDpa} onChange={(e) => setVendorDpa(e.target.value as 'signed' | 'pending')}>
+        <option value="signed">Signed</option>
+        <option value="pending">Pending</option>
+      </select>
+
+      <label>Betriebsvereinbarung (§87)</label>
+      <select
+        value={betriebsrat}
+        onChange={(e) => setBetriebsrat(e.target.value as 'signed' | 'pending')}
       >
-        Use custom request
+        <option value="signed">Signed</option>
+        <option value="pending">Pending</option>
+      </select>
+
+      <button type="button" className="primary" onClick={() => onSubmit(buildRequest())}>
+        Use custom request (live)
       </button>
 
       <div className="inspector-scenarios">
         <strong>Replay scenarios</strong>
+        <p className="inspector-hint muted">
+          Recorded qwen-max transcripts — deterministic, no API key.
+        </p>
         {scenarios.map((s) => (
           <button
             key={s.scenario_id}

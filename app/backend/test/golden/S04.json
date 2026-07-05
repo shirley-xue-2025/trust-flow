@@ -4,64 +4,113 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
+    "claims": [],
     "demands": [
-      { "field": "tool_id", "value": "claude-code" },
-      { "field": "use_case_category", "value": "code_completion" }
+      {
+        "field": "audit.raw_prompt_logging",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "audit.manager_dashboard_allowed",
+        "value": false,
+        "hard": true
+      }
     ],
-    "natural_language": "Payments team needs Claude Code on payment API schemas. Pilot already cleared the works council; DPA signed."
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I advocate for the approval of this request as it stands, with the non-negotiable red lines intact. This will unlock significant productivity gains for our developers."
   },
   {
     "session_id": "S04",
     "round": 1,
     "agent": "procurement",
     "stance": "approve",
-    "concessions": [{ "field": "gates.vendor_dpa_status", "value": "signed" }],
-    "natural_language": "Anthropic DPA executed with EU addendum. Procurement clears it."
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "The vendor DPA status is signed, and there are no other issues in my lane. I approve the request."
   },
   {
     "session_id": "S04",
     "round": 2,
     "agent": "corporate_compliance",
     "stance": "conditional_approve",
-    "claims": [{ "type": "regulatory", "ref": "R1", "text": "Code completion is limited-risk, but payment schemas must stay in the EU." }],
-    "demands": [
-      { "field": "audit.raw_prompt_logging", "value": false, "hard": true },
-      { "field": "audit.manager_dashboard_allowed", "value": false, "hard": true },
-      { "field": "audit.retention_class", "value": "financial_sector" },
-      { "field": "routing.sensitive", "value": "LOCAL_QWEN_72B", "hard": true }
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "EU AI Act Art. 50",
+        "text": "Code completion is considered limited risk, but still requires transparency and appropriate safeguards."
+      }
     ],
-    "concessions": [{ "field": "risk_tier", "value": "limited_risk" }],
-    "evidence_ids": ["R0008", "R1"],
-    "natural_language": "I approve only if payment-schema traffic routes to the local sovereign node, fingerprint-only logs, financial-sector retention."
+    "demands": [
+      {
+        "field": "risk_tier",
+        "value": "LIMITED_RISK",
+        "hard": false
+      },
+      {
+        "field": "audit.retention_class",
+        "value": "standard_6mo",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with the Workflow Runner's demands, but we need to ensure the risk tier is set to LIMITED_RISK and that the audit retention class meets the standard 6-month requirement."
   },
   {
     "session_id": "S04",
     "round": 3,
     "agent": "works_council",
-    "stance": "approve",
-    "concessions": [{ "field": "gates.betriebsvereinbarung_status", "value": "signed" }],
-    "evidence_ids": ["E001"],
-    "natural_language": "Pilot annex is signed for the payments team. No co-determination blocker."
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I have no objections in my lane, as the Betriebsvereinbarung status is signed and the non-negotiable red lines are respected."
   },
   {
     "session_id": "S04",
     "round": 4,
     "agent": "it_infra",
-    "stance": "approve",
-    "claims": [{ "type": "cost", "text": "Local Qwen 72B has capacity for the payments pool." }],
-    "concessions": [
-      { "field": "routing.default", "value": "LOCAL_QWEN_72B" },
-      { "field": "routing.sensitive", "value": "LOCAL_QWEN_72B" },
-      { "field": "budget.max_tokens_per_day", "value": 500000 }
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "cost",
+        "ref": "budget.*",
+        "text": "Routing sensitive and payment-schema traffic to LOCAL_QWEN_72B is more cost-effective and ensures data sovereignty."
+      }
     ],
-    "evidence_ids": ["R0003"],
-    "natural_language": "Routing payment schemas to LOCAL_QWEN_72B with a 500k/day cap on the payments pool. Sovereign and cheaper."
+    "demands": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I agree with the Workflow Runner's demands, but I propose routing the sensitive and payment-schema traffic to LOCAL_QWEN_72B for cost and data sovereignty reasons."
   },
   {
     "session_id": "S04",
     "round": 5,
     "agent": "workflow_runner",
-    "stance": "approve",
-    "natural_language": "Consensus: approved with the sovereign local route for payment data."
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [],
+    "natural_language": "I agree with the IT & Infra's suggestion to route sensitive and payment-schema traffic to LOCAL_QWEN_72B. This will help us maintain data sovereignty and manage costs effectively, while still unlocking productivity for our developers."
   }
 ]
