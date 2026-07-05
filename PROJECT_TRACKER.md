@@ -3,7 +3,7 @@
 **Purpose:** Shared view of who is working on what, current phase, and links to deliverables.  
 **Update rule:** When you start, finish, or hand off work — edit **Active workstreams** and append **Changelog** with your name and date.
 
-**Last updated:** 2026-07-05 (late evening) · Shirley + Agent (Cursor)
+**Last updated:** 2026-07-06 (late) · Shirley + Agent
 
 ---
 
@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| **Phase** | **4 Demo UI + product surfaces** — employee/governance portals live; `/glassbox` boardroom theater for judges |
-| **Next milestone** | Technical spec + build from **PRD v0.2** (HITL + negotiation transparency) |
+| **Phase** | **4 Demo UI + submission** — live Qwen + measured baseline on `main`; video/deck/ECS remain |
+| **Next milestone** | **Submission (Jul 9, 5 PM EDT)** — video, deck, ECS redeploy, repo public, Devpost |
 | **Hackathon** | Track 3: Agent Society — demo scope in [`docs/plans/hackathon_mvp_scope.md`](docs/plans/hackathon_mvp_scope.md) |
 
 **Cold start:** [`SESSION_LATEST.md`](SESSION_LATEST.md) · **Deploy / fork:** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) · **Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
@@ -23,12 +23,13 @@
 
 | ID | Topic | Owner | Status | Result / links |
 |----|-------|-------|--------|----------------|
-| W01 | P0 decisions (deadline, stack, split) | **Shirley** (+ teammate for B04–B05) | 🔴 Blocked | Shirley: `memory/BLOCKED_ON_SHIRLEY.md` · shared status below |
+| W01 | P0 decisions (deadline, stack, split) | **Shirley** (+ teammate for B04–B05) | 🟢 Done | Deadline Jul 9 · Node/TS stack · split per `DEPLOY_AND_REPO_COORDINATION.md` |
 | W02 | Persona review (DPO Katrin) | **Shirley** | 🟡 Review | [`docs/research/personas/dpo_fintech_de.md`](docs/research/personas/dpo_fintech_de.md) |
 | W03 | GitHub collaborator invite | **Shirley** | 🟢 Done | Mutual access on private repos (Shirley ↔ Max) |
 | W09 | ECS redeploy from canonical `main` | **Max** | 🟡 Waiting | Live box likely stale fork; redeploy when Shirley demo-frozen — [`DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) |
-| W04 | Phase 2 — Boardroom core | **Unassigned** | ⏸ Waiting on W01 | [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) |
-| W05 | Phase 3 — Gateway simulator | **Unassigned** | ⏸ Waiting on W04 | [`docs/schemas/gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
+| W04 | Phase 2 — Boardroom core | **Shirley + Agent** | 🟢 Done | Live qwen-max + recorded golden replay; `capture:golden:demo` |
+| W11 | Track 3 baseline + judge copy | **Shirley + Agent** | 🟢 Done | S05 monolith vs boardroom — [`docs/hackathon/baseline/`](docs/hackathon/baseline/) · readability pass `3ce0099` |
+| W05 | Phase 3 — Gateway simulator | **Shirley + Agent** | 🟢 Done | PII scan, routing, deny codes, audit events — [`gateway-audit-event.schema.json`](docs/schemas/gateway-audit-event.schema.json) |
 | W06 | Phase 4 — Demo UI | **Agent** | 🟢 Done | Employee + governance portals; glassbox theater; Playwright e2e |
 | W08 | HITL + negotiation transparency | **Shirley** | 🟢 Demo-ready | Gateway activity UX; policy-by-hash; glassbox theater — [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) v2 |
 | W10 | Hackathon presentation artifacts | **Shirley** | 🟢 Done | [`docs/hackathon/`](docs/hackathon/) — deck outline, spoken lines, evidence, Devpost DRAFT, diagram PNGs |
@@ -75,6 +76,7 @@ Master research index: [`docs/research/RESEARCH_LEDGER.md`](docs/research/RESEAR
 
 | Date | Who | What | Links |
 |------|-----|------|-------|
+| 2026-07-06 | Shirley + Agent | Local Qwen env; live goldens S01–S05; S05 single-agent baseline; judge readability (glosses, why-Germany, UI) | `0f14150`, `492d0df`, `3ce0099` · `session_logs/SESSION_HANDOVER_2026-07-06_qwen_live_baseline_readability.md` |
 | 2026-07-05 | Shirley + Agent | Glassbox → boardroom-first theater (pipeline strip, live transcript, in-layout detail panel); product boardroom hero; hygiene (dead canvas CSS, trim processGraph) | `session_logs/SESSION_HANDOVER_2026-07-05_glassbox_theater.md` |
 | 2026-07-05 | Shirley + Agent | Win strategy (Ring 2); doc audit — `_REMOVE_BEFORE_PUBLIC/`; blockers → `memory/` | `memory/HACKATHON_WIN_STRATEGY.md`, `session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md` |
 | 2026-07-05 | Shirley + Agent | Glassbox → single-page node canvas; removed in-app tool chat; gateway activity on employee request; policy lookup by hash; docs sync | `glassbox/GlassBoxCanvas.tsx`, `docs/DEMO_SCRIPT.md` |

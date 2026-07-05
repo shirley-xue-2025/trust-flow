@@ -4,23 +4,25 @@
 
 ---
 
-## Current state — 2026-07-05 (late evening)
+## Current state — 2026-07-06 (late evening)
 
-**Phase:** **Demo-ready** — product portals + glassbox boardroom theater + gateway-activity employee UX (no in-app tool chat). Track B presentation artifacts on disk.
+**Phase:** **Submission-ready code** — live Qwen verified locally; all goldens from real qwen-max; S05 baseline artifact; judge copy glossed. **Deadline: Jul 9, 2026 @ 5 PM EDT.**
 
 **👉 Demo script (v2):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
 
-**👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md)  
+**👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md) · [`baseline/S05_single_agent_vs_boardroom.md`](docs/hackathon/baseline/S05_single_agent_vs_boardroom.md)  
 **👉 Devpost DRAFT (delete before public):** [`docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md`](docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md)  
-**👉 Win strategy (Ring 2, local):** `memory/HACKATHON_WIN_STRATEGY.md` · doc audit [`session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md`](session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md)
+**👉 Win strategy (Ring 2, local):** `memory/HACKATHON_WIN_STRATEGY.md`
 
 **👉 Diagrams:** [`docs/hackathon/diagrams/architecture.png`](docs/hackathon/diagrams/architecture.png) · [`round_schedule.png`](docs/hackathon/diagrams/round_schedule.png)
 
 **👉 Deploy / fork:** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) — Max redeploys ECS when demo-frozen.
 
-**👉 Recent handovers:** [`session_logs/SESSION_HANDOVER_2026-07-05_glassbox_theater.md`](session_logs/SESSION_HANDOVER_2026-07-05_glassbox_theater.md) · [`win_strategy_doc_audit.md`](session_logs/SESSION_HANDOVER_2026-07-05_win_strategy_doc_audit.md) · [`product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md)
+**👉 Last handover:** [`session_logs/SESSION_HANDOVER_2026-07-06_qwen_live_baseline_readability.md`](session_logs/SESSION_HANDOVER_2026-07-06_qwen_live_baseline_readability.md)
 
-**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **Tests:** `npm run test` (32) + `npm run test:e2e` (28)
+**Run:** `cd app && npm run dev:demo` (qwen-max) or `npm run dev` (qwen-flash) · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **Tests:** `npm run test` (34)
+
+**Qwen key:** `trust-flow/.env` (gitignored) — see `memory/setup-and-troubleshooting.md` §4.
 
 ### Surfaces (quick map)
 
@@ -28,7 +30,7 @@
 |-----|------|
 | `/employee` | Product — dashboard, requests, **Agent negotiation**, **Gateway activity** |
 | `/governance` | DPO/IT queues, sign-off, appeals, audit |
-| `/glassbox` | Judge view — **boardroom theater** (pipeline strip + live transcript + detail panel) |
+| `/glassbox` | Judge view — **boardroom theater** (pipeline strip + live/replay transcript + detail panel) |
 | `/demo` | Redirects to `/glassbox` |
 
 ---
@@ -43,4 +45,4 @@
 
 ---
 
-*Previous handover: `session_logs/SESSION_HANDOVER_2026-07-04_hitl_prd.md`*
+*Previous handover: `session_logs/SESSION_HANDOVER_2026-07-05_glassbox_theater.md`*
