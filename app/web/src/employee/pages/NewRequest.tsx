@@ -186,12 +186,31 @@ export default function NewRequestPage({ profile }: { profile: EmployeeProfile }
         </CardHeader>
         <CardContent className="grid gap-2 sm:grid-cols-2">
           {[
-            { id: 'S04', label: 'S04 — Approved, local route' },
-            { id: 'S02', label: 'S02 — BR pending' },
-            { id: 'S05', label: 'S05 — DPA denied' },
-            { id: 'S01', label: 'S01 — Happy path' },
+            {
+              id: 'S04',
+              label: 'S04 — Approved, local route',
+              hint: 'Payment schemas → sovereign local route',
+            },
+            {
+              id: 'S02',
+              label: 'S02 — Works council pending',
+              hint: 'Blocked until Betriebsvereinbarung signed',
+            },
+            {
+              id: 'S05',
+              label: 'S05 — DPA denied',
+              hint: 'Procurement blocks unsigned vendor DPA',
+            },
+            { id: 'S01', label: 'S01 — Happy path', hint: 'Copilot summarization, all gates signed' },
           ].map((s) => (
-            <Button key={s.id} variant="outline" size="sm" disabled={submitting} onClick={() => submit(s.id)}>
+            <Button
+              key={s.id}
+              variant="outline"
+              size="sm"
+              title={s.hint}
+              disabled={submitting}
+              onClick={() => submit(s.id)}
+            >
               {s.label}
             </Button>
           ))}

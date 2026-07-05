@@ -5,7 +5,7 @@
 **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed`  
 **Live URL (when deployed):** _TBD — Max ECS redeploy from canonical `main`_
 
-**Video arc:** Problem → Glassbox canvas S04 SSE → HITL sign-off → S05 deny/appeal → Gateway PII → Audit + S02 BR → close
+**Video arc:** Problem → Glassbox canvas S04 SSE → HITL (human sign-off) → S05 deny/appeal → Gateway PII → Audit + S02 works council → close
 
 ---
 
@@ -48,7 +48,7 @@
 |---|---|
 | **Path** | http://localhost:5173/strategy_explorer.html (or **Problem framing (pitch) ↗** in glassbox legend) |
 | **Show** | Inspector: strategy explorer iframe — approval deadlock chart, shadow-AI friction |
-| **Spoken** | *"Enterprise AI doesn't fail on models — it fails on approvals. IT tickets and email chains take weeks; employees route around policy with shadow ChatGPT. We're not building another Jira queue or ServiceNow form — TrustFlow compresses multi-stakeholder negotiation into a compiled gateway policy."* |
+| **Spoken** | *"Enterprise AI doesn't fail on models — it fails on approvals. In Germany, elected worker representatives — the Works Council, Betriebsrat — have a legal veto over workplace AI; what takes weeks elsewhere can take months there. We built for that hardest case. IT tickets and email chains stall rollouts; employees route around policy with shadow ChatGPT. TrustFlow compresses multi-stakeholder negotiation into a compiled gateway policy — not another Jira queue."* |
 | **Track 3 — decomposition** | Problem sets up **five specialist lanes** (Runner, Procurement, Compliance, Works Council, IT) vs one generic approver. |
 | **Track 3 — negotiation** | — (setup beat) |
 | **Track 3 — baseline** | Strategy explorer **98%** tile = **illustrative projection** — say *"weeks to seconds in stakeholder review, not a measured production SLA."* |
@@ -63,18 +63,18 @@
 |---|---|
 | **Path** | `/glassbox` — toolbar **Scenario** → **S04** (auto-loads on first visit) → **▶ Run** — watch transcript on stage |
 | **Show** | Live rounds 0–5 in the boardroom theater; roster stance chips update. Click **Employee request** or enforcement chips for the detail panel. |
-| **Spoken** | *"Watch five agents decompose one employee request into lanes — procurement checks DPA, compliance sets audit red lines, works council clears §87 Betriebsrat, IT assigns sovereign routing. This is Qwen Cloud boardroom on Layer B; enforcement stays deterministic on Layer A in the customer VPC."* |
+| **Spoken** | *"Watch five agents decompose one employee request into lanes — procurement checks vendor **DPA** (data-processing agreement), compliance sets audit red lines, works council clears **§87 BetrVG** works-council gate, IT assigns sovereign routing. This is Layer B (boardroom — agents negotiate) on Qwen Cloud; enforcement stays deterministic on Layer A (gateway) in the customer VPC."* |
 | **Track 3 — decomposition** | Round schedule: R0 Runner → R1 Procurement → R2 Compliance → R3 Works Council → R4 IT → R5 consensus. |
 | **Track 3 — negotiation** | Compliance **conditional_approve** vs IT **concessions** on `routing.sensitive` — compromise, not instant agreement. |
 | **Track 3 — baseline** | Golden replay completes in **seconds**; email approval chain = **weeks** (journey map — illustrative). |
 
-**Fallback:** If `DASHSCOPE_API_KEY` missing → Scenario **S04** uses canned golden transcript (no live LLM).
+**Fallback:** If `DASHSCOPE_API_KEY` missing → Scenario **S04** uses recorded qwen-max transcript replay (no live LLM).
 
 **Recovery:** Empty boardroom → reseed; persisted `transcript_snapshot` on employee request survives restart.
 
 ---
 
-## Beat 2 — HITL sign-off → employee activation (1:35–2:40)
+## Beat 2 — HITL (human-in-the-loop) sign-off → employee activation (1:35–2:40)
 
 | | |
 |---|---|

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { BoardroomEnvelope, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import { startSession, streamSession, type BoardroomResult } from '../api.js';
+import { DENY_LABELS } from '../lib/agentLabels.js';
 
 const AGENT_NAME: Record<string, string> = {
   workflow_runner: 'Workflow Runner',
@@ -129,7 +130,9 @@ export default function Boardroom({
         {result && (
           <>
             <div className={`outcome ${result.outcome}`}>{result.outcome}</div>
-            {result.deny_code && <p className="muted">deny code: {result.deny_code}</p>}
+            {result.deny_code && (
+              <p className="muted">{DENY_LABELS[result.deny_code] ?? result.deny_code}</p>
+            )}
             {result.routing_decision && <p className="muted">routing: {result.routing_decision}</p>}
             <div className="hash" style={{ margin: '10px 0' }}>
               policy_version_hash

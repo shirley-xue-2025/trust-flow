@@ -88,8 +88,8 @@ export function InputContextBar({
         <span className="glassbox-inputs__chip-title">Org gates read</span>
         <span className="glassbox-inputs__chip-summary">
           {request
-            ? `DPA ${request.vendor_dpa_status ?? '—'} · BR ${request.betriebsvereinbarung_status ?? '—'}`
-            : 'DPA · Betriebsrat · entity'}
+            ? `DPA ${request.vendor_dpa_status ?? '—'} · Works council ${request.betriebsvereinbarung_status ?? '—'}`
+            : 'DPA · Works council · entity'}
         </span>
       </button>
     </div>

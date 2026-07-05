@@ -33,6 +33,9 @@ export function BoardroomTheater({
           <p className="glassbox-theater__lead">
             Five Qwen specialists negotiate in structured rounds — proposals only; compiler signs.
           </p>
+          <p className="glassbox-theater__mode-hint muted">
+            Replay = recorded qwen-max transcript (no API key) · Live = real negotiation (API key)
+          </p>
         </div>
         <div className="glassbox-theater__status">
           {running && <span className="glassbox-theater__live">● Live</span>}

@@ -1,12 +1,29 @@
 # TrustFlow
 
-**Safe AI adoption for European enterprises.** When a business team wants to use a
-new AI tool, TrustFlow runs a structured negotiation between five role-played
-stakeholder agents, then compiles their agreement into a signed, machine-enforced
-policy — so the enterprise can say *yes* to AI without losing control of compliance.
+**Safe AI adoption for European enterprises** — when a team wants a new AI tool,
+TrustFlow runs a structured negotiation between five stakeholder agents, compiles
+their agreement into a signed machine-enforced policy, and keeps humans in control
+of activation.
+
+> **Why Germany first:** In Germany, labor law gives elected worker representatives
+> (the **Works Council / Betriebsrat**) a legal veto over workplace AI tools —
+> approval that takes weeks in the US can take months there. We built for the
+> hardest market; everywhere else is a subset.
 
 > Qwen Cloud Global AI Hackathon — **Track 3: Agent Society**.
 > Built on Qwen Cloud (`qwen-max` via DashScope), deployed on Alibaba Cloud.
+
+---
+
+## Glossary (judge skim)
+
+| Term | Plain English |
+|------|----------------|
+| **Betriebsrat** | Works Council — Germany's mandatory worker-representation body with legal veto power over workplace tools (§87 German labor law) |
+| **Betriebsvereinbarung** | Formal works-council agreement on how a tool may be used; TrustFlow tracks signature status as a gate (the legal negotiation stays outside the software) |
+| **DPA** | Vendor data-processing agreement |
+| **HITL** | Human-in-the-loop sign-off before the gateway activates |
+| **Art. 50** | EU AI Act transparency disclosure (shown to users interacting with AI) |
 
 ---
 
@@ -14,10 +31,10 @@ policy — so the enterprise can say *yes* to AI without losing control of compl
 
 European enterprises are stuck between two bad options: ban AI tools (and watch
 shadow-AI spread anyway) or allow them and accept uncontrolled exposure to GDPR,
-the EU AI Act, and works-council (Betriebsvereinbarung) obligations. The bottleneck
-isn't the model — it's **governance**: every new use case needs sign-off from
-compliance, IT, procurement, and worker representatives, and that negotiation is
-slow, ad-hoc, and unauditable.
+the EU AI Act, and **Betriebsvereinbarung** (works-council agreement) obligations.
+The bottleneck isn't the model — it's **governance**: every new use case needs
+sign-off from compliance, IT, procurement, and worker representatives, and that
+negotiation is slow, ad-hoc, and unauditable.
 
 TrustFlow turns that negotiation into software.
 
@@ -25,17 +42,20 @@ TrustFlow turns that negotiation into software.
 
 This is the differentiator, and the whole design hangs off one boundary:
 
-- **Layer B — the Agent Boardroom** *(generative)* — the **only** place an LLM runs.
-  Five Qwen-powered agents with distinct mandates debate a request across multiple
-  rounds, react to each other's arguments, raise conditions, and converge. They emit
-  **structured proposals**, never executable rules.
+- **Layer C — Human sign-off** *(HITL)* — DPO and IT activate the compiled policy;
+  no gateway enforcement until humans sign.
+
+- **Layer B — Agent Boardroom** *(generative — the only LLM)* — five Qwen-powered
+  agents with distinct mandates debate a request across multiple rounds, react to
+  each other's arguments, raise conditions, and converge. They emit **structured
+  proposals**, never executable rules.
 
 - **Deterministic compiler** *(the gate — no LLM)* — pure code merges the agents'
-  demands and concessions, **floor-checks** them against the organization's
-  non-negotiable red lines, validates against a JSON schema, hashes the result, and
-  signs it. Agents can *propose*; only deterministic code can *decide*.
+  demands and concessions, **floor-checks** them (validates against the org's
+  non-negotiable red lines), validates against a JSON schema, hashes the result,
+  and signs it. Agents can *propose*; only deterministic code can *decide*.
 
-- **Layer A — the Edge Gateway** *(deterministic enforcement)* — pure code again:
+- **Layer A — Edge Gateway** *(deterministic enforcement)* — pure code again:
   PII scanning, model routing, and audit logging on every inference. **No LLM sits
   in the enforcement path.**
 
@@ -50,28 +70,29 @@ This is the differentiator, and the whole design hangs off one boundary:
 | **Workflow Runner** | Advocates for the business use case; proposes alternatives |
 | **Corporate Compliance** | GDPR / EU AI Act red lines; can conditionally reject |
 | **IT / Infrastructure** | Routing, data residency, technical feasibility |
-| **Procurement** | Vendor DPA status, contractual exposure |
-| **Works Council Liaison** | Worker representation, Betriebsvereinbarung status |
+| **Procurement** | Vendor **DPA** (data-processing agreement) status, contractual exposure |
+| **Works Council Liaison** | Worker representation, **Betriebsvereinbarung** (works-council agreement) status |
 
 ---
 
 ## Quickstart (no API key needed)
 
-The application code lives in [`app/`](app/). Replay mode runs the full pipeline —
-boardroom → compiler → gateway — against golden transcripts recorded from live qwen-max, with **no
-network and no key**, so judges can see everything working immediately.
+The application code lives in [`app/`](app/). **Replay mode** runs the full pipeline —
+boardroom → compiler → gateway — using **recorded live-qwen-max transcripts,
+replayed deterministically** (no API key needed), so judges can see everything
+working immediately.
 
 ```bash
 cd app
 npm install
-npm run test     # golden-transcript suite (scenarios S01–S05), no network / no key
+npm run test     # scenario suite (S01–S05), no network / no key
 npm run dev      # backend :8080 + web :5173
 ```
 
 Open <http://localhost:5173/employee> for the **product** (employee + governance portals).
 
-Open <http://localhost:5173/glassbox> for the **technical judge view** — boardroom theater
-with pipeline strip, live negotiation transcript, and click-to-inspect detail panel.
+Open <http://localhost:5173/glassbox> for the **glassbox** — transparent judge view of
+the negotiation engine: boardroom theater, pipeline strip, and click-to-inspect panels.
 Scenario **S04** auto-loads; click **Gateway enforce** to try email MASK / IBAN BLOCK.
 
 **Live Qwen negotiation** (optional, needs the hackathon voucher key): put
@@ -84,10 +105,10 @@ Full instructions: [`app/README.md`](app/README.md).
 | Scenario | Outcome | What it shows |
 |---|---|---|
 | S01 | APPROVED | Copilot summarization, works-council agreement signed |
-| S02 | PENDING_EXTERNAL | Blocked on `BETRIEBSVEREINBARUNG_PENDING` |
+| S02 | PENDING_EXTERNAL | Blocked on unsigned **Betriebsvereinbarung** (works-council agreement) |
 | S03 | DENIED | `HIGH_RISK_USE_DENIED` (EU AI Act Annex III) |
 | S04 | APPROVED | Routed to on-prem `LOCAL_QWEN_72B` |
-| S05 | DENIED | `VENDOR_DPA_PENDING` |
+| S05 | DENIED | Unsigned vendor **DPA** (`VENDOR_DPA_PENDING`) |
 
 ---
 

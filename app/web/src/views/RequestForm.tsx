@@ -80,8 +80,8 @@ export default function RequestForm({
       <div className="col panel">
         <h2>Replay a locked scenario (no API key)</h2>
         <p className="muted">
-          Each scenario replays a golden transcript through the same deterministic compiler — the
-          Step 6 demo fallback.
+          Each scenario replays a recorded live-qwen-max transcript through the same deterministic
+          compiler — no API key needed.
         </p>
         {scenarios.map((s) => (
           <div key={s.scenario_id} style={{ marginBottom: 10 }}>

@@ -1,4 +1,5 @@
 import type { EmployeeRequestRecord, PolicyArtifact } from '@trustflow/shared';
+import { DENY_LABELS } from './agentLabels.js';
 
 export interface ComplianceCheck {
   id: string;
@@ -87,7 +88,7 @@ export function computeComplianceScore(
         display === 'approved'
           ? `Routing: ${record.routing_decision ?? 'configured'}`
           : record.deny_code
-            ? `Blocked: ${record.deny_code}`
+            ? DENY_LABELS[record.deny_code] ?? `Blocked: ${record.deny_code}`
             : undefined,
     },
     {

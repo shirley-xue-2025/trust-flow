@@ -5,6 +5,7 @@ import PolicyPanel from '../views/PolicyPanel.js';
 import Playground from '../views/Playground.js';
 import AuditLog from '../views/AuditLog.js';
 import { resultGrounding } from './processGraph.js';
+import { DENY_LABELS } from '../lib/agentLabels.js';
 
 const AGENT_NAME: Record<string, string> = {
   workflow_runner: 'Workflow Runner',
@@ -97,7 +98,11 @@ export default function NodeInspector({
           {result && (
             <>
               <div className={`outcome ${result.outcome}`}>{result.outcome}</div>
-              {result.deny_code && <p className="muted">deny: {result.deny_code}</p>}
+              {result.deny_code && (
+                <p className="muted">
+                  {DENY_LABELS[result.deny_code] ?? result.deny_code}
+                </p>
+              )}
               {result.routing_decision && <p className="muted">routing: {result.routing_decision}</p>}
               <div className="hash">hash: {result.policy_version_hash}</div>
             </>

@@ -3,11 +3,13 @@
 Node/TypeScript monorepo (npm workspaces). Two judged ideas made literal in the
 module layout:
 
+- **Layer C — Human sign-off (HITL)** (`backend/src/governance`) — DPO and IT activate policy.
 - **Layer B — Agent Boardroom** (`backend/src/boardroom`) is the only place an LLM
   runs. It emits *proposals* (structured envelopes), never `rules.json`.
 - **Deterministic compiler** (`backend/src/compiler`) is pure code: it merges the
-  agents' demands/concessions, **floor-checks** them against the org's red lines,
-  validates against the JSON schema, hashes, and writes the policy.
+  agents' demands/concessions, **floor-checks** them (validates against the org's
+  non-negotiable red lines), validates against the JSON schema, hashes, and writes
+  the policy.
 - **Layer A — Edge Gateway** (`backend/src/gateway`) is pure code too: PII scan,
   routing, audit — **no LLM in the enforcement path**.
 
@@ -23,7 +25,7 @@ app/
 │   └── test/      vitest + golden transcripts (S01–S05, captured from live qwen-max)
 └── web/           React + Vite UI
     ├── employee/  Product portals (employee + governance)
-    ├── glassbox/  Judge / engineer boardroom theater
+    ├── glassbox/  Glassbox — transparent judge view of the negotiation engine
     └── views/     Shared inspector panels (Playground, PolicyPanel, AuditLog, …)
 ```
 

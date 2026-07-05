@@ -12,7 +12,7 @@ const LABELS: Record<EmployeeRequestStatus, string> = {
   denied_pending_employee: 'Action required',
   appeal_pending: 'Appeal pending',
   denied_closed: 'Closed',
-  pending_external: 'Pending external',
+  pending_external: 'Pending — works council gate',
   pending_human: 'Needs DPO review',
   denied: 'Denied',
 };

@@ -1,5 +1,6 @@
 import type { BoardroomEnvelope, GatewayAuditEvent, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import type { BoardroomResult, InferenceResponse } from '../api.js';
+import { DENY_LABELS } from '../lib/agentLabels.js';
 
 export interface GlassboxSummaryContext {
   request?: RequestPacket;
@@ -21,11 +22,11 @@ export function nodeSummary(id: string, ctx: GlassboxSummaryContext): string {
       if (!request) return 'Pick a scenario or configure';
       return `${request.tool_id} · ${request.use_case_category.replace(/_/g, ' ')}`;
     case 'org-gates': {
-      if (!request) return 'DPA · Betriebsrat · entity';
+      if (!request) return 'DPA · Works council · entity';
       const br = request.betriebsvereinbarung_status ?? 'from packet';
       const dpa = request.vendor_dpa_status ?? 'from packet';
       const classes = request.data_classes?.length ? `${request.data_classes.length} data class` : 'no sensitive class';
-      return `DPA ${dpa} · BR ${br} · ${classes}`;
+      return `DPA ${dpa} · Works council ${br} · ${classes}`;
     }
     case 'boardroom':
       if (running) return `Live · ${turns.length} turns streaming`;
@@ -72,9 +73,13 @@ export function resultGrounding(ctx: GlassboxSummaryContext): {
   if (pii?.action === 'masked') {
     detail = `Email masked at gateway — business continues on ${routing}.`;
   } else if (ctx.inference?.outcome === 'denied') {
-    detail = `Blocked: ${ctx.inference.deny_reason_code ?? 'policy deny'}.`;
+    const code = ctx.inference.deny_reason_code;
+    detail = code ? (DENY_LABELS[code] ?? `Blocked: ${code}`) : 'Blocked at gateway.';
   } else if (ctx.result?.outcome === 'DENIED') {
-    detail = `Boardroom denied: ${ctx.result.deny_code ?? 'policy gates'}.`;
+    const code = ctx.result.deny_code;
+    detail = code
+      ? (DENY_LABELS[code] ?? `Boardroom denied: ${code}`)
+      : 'Boardroom denied — policy gates.';
   }
 
   return {
