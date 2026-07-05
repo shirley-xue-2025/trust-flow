@@ -28,7 +28,7 @@ This PRD defines two connected capabilities:
 | Negotiation visible on employee request | Tab **Agent negotiation** (default when transcript exists) |
 | Human sign-off before gateway | Governance DPO + IT sign-off; `policy_activation: active` |
 | Employee audit without in-app chat | Tab **Gateway activity** — no `/employee/tools` chat UI |
-| Glassbox technical depth | `/glassbox` single-page **node canvas** + inspector (replaces tabbed demo) |
+| Glassbox technical depth | `/glassbox` **boardroom theater** + detail panel (replaces tabbed demo) |
 | PII honesty | Email **MASK**, IBAN **BLOCK** in glassbox **Gateway enforce** + seeded audit on activation |
 | Policy version integrity | `policy_version_hash` on lookup/activation (S04 vs S02 collision fixed) |
 
@@ -248,7 +248,7 @@ Human sign-off transitions `pending_signoff` → `approved` + `policy_activation
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| F1 | `/glassbox` single-page **node canvas** — live SSE, compiler, scenarios S01–S05 in inspector | — shipped |
+| F1 | `/glassbox` **boardroom theater** — live SSE transcript, enforcement chips, scenarios S01–S05 in detail panel | — shipped |
 | F2 | Footnote in glassbox Result inspector: “Production requires human sign-off — see Governance queue” | P1 — shipped |
 | F3 | No employee appeal/sign-off flows in glassbox | — |
 
@@ -266,7 +266,7 @@ Human sign-off transitions `pending_signoff` → `approved` + `policy_activation
 | Governance role switcher | **New** — same pattern as Employee/Governance product switcher |
 | Governance appeal queue | **New** |
 | Governance request detail | Sign-off / appeal actions when permitted |
-| Glassbox | Single-page node canvas + inspector (`/glassbox`) |
+| Glassbox | Boardroom theater + detail panel (`/glassbox`) |
 
 ---
 
