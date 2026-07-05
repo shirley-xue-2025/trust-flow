@@ -3,9 +3,9 @@ import type { PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import { runInference, type InferenceResponse } from '../api.js';
 
 const SAMPLES = [
+  { label: 'Email (masked)', text: 'Email the receipt to katrin.brenner@nordpay.example.' },
   { label: 'Clean prompt', text: 'Refactor this internal helper to use async/await.' },
-  { label: 'IBAN (PII)', text: 'Process the refund to IBAN DE89370400440532013000 for the customer.' },
-  { label: 'Email (PII)', text: 'Email the receipt to katrin.brenner@nordpay.example.' },
+  { label: 'IBAN (may block)', text: 'Process the refund to IBAN DE89370400440532013000 for the customer.' },
   { label: 'Payment schema', text: 'Generate a TypeScript type for this payment API schema field set.' },
 ];
 
@@ -16,7 +16,7 @@ export default function Playground({
   policy?: PolicyArtifact;
   request?: RequestPacket;
 }) {
-  const [prompt, setPrompt] = useState(SAMPLES[1].text);
+  const [prompt, setPrompt] = useState(SAMPLES[0].text);
   const [resp, setResp] = useState<InferenceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,8 +43,9 @@ export default function Playground({
     <div className="panel">
       <h2>Governed inference — Layer A gateway</h2>
       <p className="muted">
-        Enforcing <span className="mono">{policy.policy_id}</span>. Deterministic: PII scan →
-        routing → audit. No LLM in this path.
+        Enforcing <span className="mono">{policy.policy_id}</span>. Per-entity PII: emails masked
+        (business continues); IBANs may block on payment routes. Deterministic — no LLM in
+        enforcement.
       </p>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -79,8 +80,13 @@ export default function Playground({
               <pre className="json">{prompt}</pre>
             </div>
             <div className="box">
-              <strong>What the model saw (masked)</strong>
+              <strong>What the model saw (redacted)</strong>
               <pre className="json">{resp.redacted_prompt ?? '— blocked at edge —'}</pre>
+              {resp.outcome === 'allowed' && resp.redacted_prompt && (
+                <p className="muted" style={{ fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
+                  Sent to model (redacted)
+                </p>
+              )}
             </div>
           </div>
 

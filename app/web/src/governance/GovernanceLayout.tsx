@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { ClipboardList, LayoutDashboard, Shield, ScrollText } from 'lucide-react';
+import { ArchitectureStrip } from '@/components/ArchitectureStrip';
 import { ProductRoleSwitcher } from '@/components/ProductRoleSwitcher';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,8 @@ export default function GovernanceLayout() {
           </div>
         </div>
       </header>
+
+      <ArchitectureStrip />
 
       <div className="container flex gap-8 py-8 pb-32 md:pb-8">
         <aside className="hidden w-56 shrink-0 md:block">

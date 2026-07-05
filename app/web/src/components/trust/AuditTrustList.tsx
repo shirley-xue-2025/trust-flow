@@ -58,6 +58,15 @@ export function AuditTrustList({
                     PII: {e.pii_actions.map((p) => `${p.entity_type} ${p.action}`).join(', ')}
                   </p>
                 )}
+                {(e.risk_tier || e.disclosure_shown !== undefined) && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {e.risk_tier && <span>risk_tier: {e.risk_tier}</span>}
+                    {e.risk_tier && e.disclosure_shown !== undefined && ' · '}
+                    {e.disclosure_shown !== undefined && (
+                      <span>disclosure_shown: {String(e.disclosure_shown)}</span>
+                    )}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

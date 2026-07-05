@@ -54,7 +54,7 @@ test.describe('Denied request — page links', () => {
     await expect(page).toHaveURL(/\/governance\/requests\/demo-s05-denied/);
 
     await page.goto(DENIED_URL);
-    await page.getByRole('tab', { name: /Negotiation/i }).click();
+    await page.getByRole('tab', { name: /Agent negotiation/i }).click();
     await expect(page.getByText(/Round 1/i)).toBeVisible();
     await page.getByRole('tab', { name: 'Policy' }).click();
     await page.getByRole('tab', { name: 'My usage' }).click();

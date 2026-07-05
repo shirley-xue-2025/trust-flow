@@ -51,4 +51,19 @@ test.describe('Employee dashboard demo links', () => {
     await expect(page).toHaveURL(/demo-s05-denied/);
     await expect(page.getByRole('button', { name: 'Propose alternative' })).toBeVisible();
   });
+
+  test('S04 opens agent negotiation tab by default', async ({ page }) => {
+    await page.goto('/employee/requests/demo-s04-pending-signoff');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/Claude Code/i);
+    await expect(page.getByRole('tab', { name: /Agent negotiation/i })).toHaveAttribute('data-state', 'active');
+    await expect(page.getByText(/Round 1 ·/)).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('demo tour links are visible', async ({ page }) => {
+    await page.goto('/employee');
+    await expect(page.getByRole('heading', { name: /Hackathon demo tour/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Watch agents negotiate/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Human sign-off/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Governed gateway/i })).toBeVisible();
+  });
 });

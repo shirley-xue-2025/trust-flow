@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { EmployeeProfile, EmployeeRequestRecord } from '@trustflow/shared';
-import { ArrowRight, Bot, Clock, Plus } from 'lucide-react';
+import { ArrowRight, Bot, Clock, Plus, Users, UserCheck, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getApprovedTools, listEmployeeRequests } from '@/employee/api';
@@ -29,6 +29,30 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
     { id: 'demo-s02-external', label: 'Claude Code — BR external gate' },
   ];
 
+  const tourSteps = [
+    {
+      step: 1,
+      title: 'Watch agents negotiate',
+      description: 'Five Qwen agents debate policy — full trace, no black box.',
+      icon: Users,
+      to: '/employee/requests/demo-s04-pending-signoff',
+    },
+    {
+      step: 2,
+      title: 'Human sign-off',
+      description: 'DPO and IT approve before any tool goes live.',
+      icon: UserCheck,
+      to: '/governance/queues?queue=signoff&role=dpo',
+    },
+    {
+      step: 3,
+      title: 'Governed gateway',
+      description: 'After sign-off, prompts pass through Layer A — PII masked, audit logged.',
+      icon: ShieldCheck,
+      to: '/glassbox',
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -45,6 +69,35 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
           </Link>
         </Button>
       </div>
+
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-lg">Hackathon demo tour</CardTitle>
+          <CardDescription>
+            Problem → Agent Society → HITL sign-off → Gateway → Audit
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {tourSteps.map(({ step, title, description, icon: Icon, to }) => (
+              <Link
+                key={step}
+                to={to}
+                className="group flex flex-col rounded-lg border p-4 transition-colors hover:border-primary/40 hover:bg-muted/50"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {step}
+                  </span>
+                  <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                </div>
+                <p className="font-medium text-foreground">{title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>

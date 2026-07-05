@@ -13,6 +13,7 @@ import { AppealReviewPanel } from '@/governance/components/AppealReviewPanel';
 import { getGovernanceRequest, type GovernanceRequestDetail } from '@/governance/api';
 import { governanceLink, useGovernanceRole } from '@/governance/useGovernanceRole';
 import { computeComplianceScore } from '@/lib/complianceScore';
+import { defaultRequestDetailTab } from '@/lib/requestDetailTabs';
 import { DENY_LABELS } from '@/lib/agentLabels';
 
 export default function GovernanceRequestOversight() {
@@ -44,7 +45,7 @@ export default function GovernanceRequestOversight() {
   const { record } = detail;
   const score = computeComplianceScore(record, detail.policy?.policy ?? null);
   const transcript = detail.session?.transcript ?? [];
-  const defaultTab = 'negotiation';
+  const defaultTab = defaultRequestDetailTab(record, transcript.length);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -88,14 +89,14 @@ export default function GovernanceRequestOversight() {
 
       <Tabs defaultValue={defaultTab}>
         <TabsList>
-          <TabsTrigger value="negotiation">Boardroom</TabsTrigger>
+          <TabsTrigger value="negotiation">Agent negotiation trace</TabsTrigger>
           <TabsTrigger value="policy">Policy</TabsTrigger>
           <TabsTrigger value="audit">Gateway audit</TabsTrigger>
         </TabsList>
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Full stakeholder negotiation — what Legal, Procurement, IT, and Works Council said before
-            any policy was compiled.
+            Full agent negotiation trace — Compliance, Procurement, IT, Works Council, and Runner
+            before any policy was compiled.
           </p>
           <BoardroomTranscript turns={transcript} />
         </TabsContent>

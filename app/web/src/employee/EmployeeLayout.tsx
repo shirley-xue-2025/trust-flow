@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import type { EmployeeProfile } from '@trustflow/shared';
 import { LayoutDashboard, MessageSquarePlus, ClipboardList, Shield } from 'lucide-react';
+import { ArchitectureStrip } from '@/components/ArchitectureStrip';
 import { ProductRoleSwitcher } from '@/components/ProductRoleSwitcher';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -36,6 +37,8 @@ export default function EmployeeLayout({ profile }: { profile: EmployeeProfile }
           </div>
         </div>
       </header>
+
+      <ArchitectureStrip />
 
       <div className="container flex gap-8 py-8 pb-32 md:pb-8">
         <aside className="hidden w-56 shrink-0 md:block">

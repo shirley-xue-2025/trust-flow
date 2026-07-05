@@ -18,13 +18,23 @@ interface ChatMessage {
     outcome?: string;
     deny_code?: string;
     route?: string;
+    redacted_prompt?: string;
   };
 }
 
 const STARTERS = [
-  'Refactor this internal helper to use async/await.',
-  'Generate a TypeScript type for a payment API schema field.',
-  'Summarize the error handling pattern in our SDK.',
+  {
+    label: 'Email (masked)',
+    text: 'Send the invoice to katrin.brenner@nordpay.example for review.',
+  },
+  {
+    label: 'Clean prompt',
+    text: 'Refactor this internal helper to use async/await.',
+  },
+  {
+    label: 'Payment schema',
+    text: 'Generate a TypeScript type for a payment API schema field.',
+  },
 ];
 
 export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) {
@@ -76,7 +86,14 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
           : (resp.response_body ?? 'Response received.');
 
       setMessages((m) => [
-        ...m,
+        ...m.map((msg) =>
+          msg.id === userMsg.id
+            ? {
+                ...msg,
+                meta: resp.redacted_prompt ? { redacted_prompt: resp.redacted_prompt } : msg.meta,
+              }
+            : msg,
+        ),
         {
           id: crypto.randomUUID(),
           role: resp.outcome === 'denied' ? 'system' : 'assistant',
@@ -115,7 +132,7 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
           <h1 className="truncate text-xl font-semibold">{record?.tool_display_name ?? 'Tool workspace'}</h1>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Governed gateway · PII scan · audit logged
+            Governed gateway · per-entity PII policy · audit logged
           </p>
         </div>
         {record?.routing_decision && (
@@ -138,8 +155,8 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
             <CardHeader className="border-b py-3">
               <CardTitle className="text-base">Chat</CardTitle>
               <CardDescription>
-                Prompts pass through Layer A — sensitive data masked, routing enforced, no LLM in
-                enforcement.
+                Per-entity policy at the edge — emails masked so work continues; IBANs may block on
+                payment routes. No LLM in enforcement.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4">
@@ -149,8 +166,8 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
                     <p className="mb-3 text-sm text-muted-foreground">Try a starter prompt:</p>
                     <div className="flex flex-wrap justify-center gap-2">
                       {STARTERS.map((s) => (
-                        <Button key={s} variant="outline" size="sm" onClick={() => send(s)}>
-                          {s.slice(0, 40)}…
+                        <Button key={s.label} variant="outline" size="sm" onClick={() => send(s.text)}>
+                          {s.label}
                         </Button>
                       ))}
                     </div>
@@ -168,6 +185,9 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
                     }
                   >
                     <p className="whitespace-pre-wrap">{m.content}</p>
+                    {m.meta?.redacted_prompt && (
+                      <p className="mt-2 text-xs opacity-70 italic">Sent to model (redacted)</p>
+                    )}
                     {m.meta?.route && (
                       <p className="mt-2 text-xs opacity-70">route: {m.meta.route}</p>
                     )}
@@ -178,7 +198,7 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
 
               <div className="flex gap-2">
                 <Textarea
-                  placeholder="Ask the approved tool… (IBANs and emails will be blocked at the edge)"
+                  placeholder="Ask the approved tool… (emails masked; IBANs may block on payment routes)"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   rows={2}
@@ -198,7 +218,7 @@ export default function ToolChatPage({ profile }: { profile: EmployeeProfile }) 
           </Card>
 
           <p className="text-center text-xs text-muted-foreground">
-            Test PII blocking: paste an IBAN like DE89370400440532013000
+            Hard-block test: paste an IBAN like DE89370400440532013000 on payment routes
           </p>
         </>
       )}

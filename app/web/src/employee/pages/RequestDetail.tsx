@@ -20,6 +20,7 @@ import { AuditTrustList } from '@/components/trust/AuditTrustList';
 import { AdvocatePanel } from '@/employee/components/AdvocatePanel';
 import { EmployeeResolutionPanel } from '@/employee/components/EmployeeResolutionPanel';
 import { computeComplianceScore } from '@/lib/complianceScore';
+import { defaultRequestDetailTab } from '@/lib/requestDetailTabs';
 import type { GatewayAuditEvent, PolicyArtifact } from '@trustflow/shared';
 
 export default function RequestDetailPage() {
@@ -30,6 +31,13 @@ export default function RequestDetailPage() {
   const [audit, setAudit] = useState<GatewayAuditEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setActiveTab(null);
+    setHydrated(false);
+  }, [id, reloadKey]);
 
   useEffect(() => {
     if (!id) return;
@@ -66,6 +74,7 @@ export default function RequestDetailPage() {
           if (!cancelled) setAudit(events.filter((e) => e.policy_id === r.policy_id));
         }
 
+        if (!cancelled) setHydrated(true);
         return r;
       } catch (e) {
         if (!cancelled) setError((e as Error).message);
@@ -87,6 +96,11 @@ export default function RequestDetailPage() {
 
   const reload = () => setReloadKey((k) => k + 1);
 
+  useEffect(() => {
+    if (!hydrated || !record || activeTab !== null) return;
+    setActiveTab(defaultRequestDetailTab(record, transcript.length));
+  }, [hydrated, record, transcript.length, activeTab]);
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -106,12 +120,6 @@ export default function RequestDetailPage() {
 
   const inProgress = !isTerminalStatus(record.status);
   const score = computeComplianceScore(record, policy);
-  const defaultTab =
-    record.status === 'negotiating' || record.status === 'submitted'
-      ? 'negotiation'
-      : record.status === 'denied_pending_employee' || record.status === 'agent_recommended_deny'
-        ? 'overview'
-        : 'overview';
 
   const showDenyPath =
     record.status === 'denied_pending_employee' ||
@@ -156,11 +164,11 @@ export default function RequestDetailPage() {
           <CardContent className="flex items-center gap-4 pt-6">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <div className="flex-1 space-y-2">
-              <p className="text-sm font-medium">Stakeholder review in progress</p>
+              <p className="text-sm font-medium">Agent negotiation in progress</p>
               <Progress value={transcript.length > 0 ? Math.min(90, 20 + transcript.length * 12) : 15} className="h-2" />
               <p className="text-xs text-muted-foreground">
-                You can follow the negotiation below — Compliance, Procurement, IT, and Works Council
-                debate your request in real time.
+                Five Qwen agents debate your request in real time — Compliance, Procurement, IT,
+                Works Council, and Runner.
               </p>
             </div>
           </CardContent>
@@ -183,11 +191,11 @@ export default function RequestDetailPage() {
 
       <ComplianceScoreCard score={score} />
 
-      <Tabs defaultValue={defaultTab}>
+      <Tabs value={activeTab ?? 'overview'} onValueChange={setActiveTab}>
         <TabsList className="flex h-auto flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="negotiation">
-            Negotiation {transcript.length > 0 ? `(${transcript.length})` : ''}
+            Agent negotiation {transcript.length > 0 ? `(${transcript.length})` : ''}
           </TabsTrigger>
           <TabsTrigger value="policy">Policy</TabsTrigger>
           <TabsTrigger value="activity">My usage</TabsTrigger>
@@ -255,7 +263,7 @@ export default function RequestDetailPage() {
 
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Transparent stakeholder debate — so you know why a decision was made, not just the outcome.
+            Agent negotiation trace — see why agents agreed or disagreed before any human sign-off.
           </p>
           <BoardroomTranscript turns={transcript} />
         </TabsContent>

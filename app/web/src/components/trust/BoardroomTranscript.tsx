@@ -21,8 +21,8 @@ export function BoardroomTranscript({
   if (turns.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Stakeholder agents have not spoken yet. The boardroom runs Compliance, Procurement, IT,
-        and Works Council in structured rounds.
+        Agent negotiation has not started yet. Five Qwen agents — Compliance, Procurement, IT,
+        Works Council, and Runner — debate in structured rounds.
       </p>
     );
   }

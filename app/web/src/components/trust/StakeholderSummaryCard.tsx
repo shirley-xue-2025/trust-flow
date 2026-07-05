@@ -19,8 +19,10 @@ export function StakeholderSummaryCard({ turns }: { turns: BoardroomEnvelope[] }
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Stakeholder review</CardTitle>
-        <CardDescription>Positions from Legal, Procurement, IT, and Works Council</CardDescription>
+        <CardTitle className="text-base">Agent negotiation trace</CardTitle>
+        <CardDescription>
+          5 Qwen agents — Compliance, Procurement, IT, Works Council, Runner
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="flex flex-wrap gap-2">

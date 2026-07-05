@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph users [Users]
+        EMP[Employee]
+        ADM[Admin / DPO / IT]
+    end
+
+    subgraph trustflow [TrustFlow]
+        UI[Request & Admin UI]
+        BR[Layer B — Agent Boardroom]
+        PS[(Policy Store)]
+        TR[(Tool Registry)]
+        GW[Layer A — Edge Gateway]
+        AL[(Audit Log)]
+    end
+
+    subgraph external [External]
+        LLM1[Qwen Cloud / other APIs]
+        LLM2[Local Qwen node]
+        IDP[Corporate IdP / SSO]
+    end
+
+    EMP --> UI
+    ADM --> UI
+    UI --> BR
+    BR --> PS
+    BR --> TR
+    EMP --> GW
+    GW --> PS
+    GW --> AL
+    GW --> LLM1
+    GW --> LLM2
+    UI --> IDP
+    GW --> IDP

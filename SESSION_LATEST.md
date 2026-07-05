@@ -4,19 +4,23 @@
 
 ---
 
-## Current state — 2026-07-05
+## Current state — 2026-07-05 (evening)
 
-**Phase:** **Demo-ready + polished** — HITL flow, design-review fixes, Playwright e2e, governance role switcher in header.
+**Phase:** **Demo-ready + Track 3 product visibility** — negotiation default tab, Agent Society labels, demo tour, architecture strip, PII honesty, Art. 50 audit fields. Track B presentation artifacts also on disk.
 
-**👉 Deploy / fork (read first if redeploy questions):** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) — canonical = this repo; Max's fork stale; Max redeploys ECS when Shirley says ready.
+**👉 Product visibility handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md)
 
-**👉 Demo script:** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
+**👉 Demo script (v2 winning cut):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
 
-**👉 Spec:** [`docs/plans/spec_hitl_state_model_and_governance_apis.md`](docs/plans/spec_hitl_state_model_and_governance_apis.md)
+**👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`docs/hackathon/SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`docs/hackathon/EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md) · [`docs/hackathon/DEVPOST_DRAFT.md`](docs/hackathon/DEVPOST_DRAFT.md) _(DRAFT)_
 
-**👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_deploy_coordination.md`](session_logs/SESSION_HANDOVER_2026-07-05_deploy_coordination.md) (deploy/fork) · [`session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md`](session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md) (demo polish)
+**👉 Diagrams:** [`docs/hackathon/diagrams/architecture.png`](docs/hackathon/diagrams/architecture.png) · [`round_schedule.png`](docs/hackathon/diagrams/round_schedule.png)
 
-**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **E2E:** `cd app && npm run test:e2e`
+**👉 Deploy / fork:** [`docs/DEPLOY_AND_REPO_COORDINATION.md`](docs/DEPLOY_AND_REPO_COORDINATION.md) — Max redeploys ECS when demo-frozen.
+
+**👉 Handover:** [`session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md`](session_logs/SESSION_HANDOVER_2026-07-05_product_track3_visibility.md) · [`session_logs/SESSION_HANDOVER_2026-07-05_presentation_track.md`](session_logs/SESSION_HANDOVER_2026-07-05_presentation_track.md) · [`SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md`](session_logs/SESSION_HANDOVER_2026-07-05_demo_polish_e2e.md)
+
+**Run:** `cd app && npm run dev` · **Reset:** `curl -X POST http://localhost:8080/v1/demo/reseed` · **E2E:** `cd app && npm run test:e2e` (28 tests)
 
 ---
 

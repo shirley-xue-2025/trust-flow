@@ -1,0 +1,11 @@
+flowchart LR
+    R0["Round 0\nRunner"] --> R1["Round 1\nProcurement"]
+    R1 --> R2["Round 2\nCompliance"]
+    R2 --> R3["Round 3\nWorks Council"]
+    R3 --> R4["Round 4\nIT Infra"]
+    R4 --> R5["Round 5\nFinal sign-off"]
+    R5 --> OUT{Outcome}
+    OUT --> APPROVED
+    OUT --> DENIED
+    OUT --> PENDING_HUMAN
+    OUT --> PENDING_EXTERNAL
