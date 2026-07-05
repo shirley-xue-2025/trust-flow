@@ -4,11 +4,15 @@
 
 ---
 
-## Current state — 2026-07-06 (late evening)
+## Current state — 2026-07-06 (night)
 
-**Phase:** **Submission-ready code** — live Qwen verified locally; all goldens from real qwen-max; S05 baseline artifact; judge copy glossed. **Deadline: Jul 9, 2026 @ 5 PM EDT.**
+**Phase:** **Submission pack complete on `main`** — remaining: rehearse + record video (**use `npm run dev:demo`** for qwen-max), Max ECS redeploy, repo public, Devpost. **Deadline: Jul 9, 2026 @ 5 PM EDT.**
 
-**👉 Demo script (v2):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
+**New tonight:** pitch deck [`docs/hackathon/TrustFlow_deck.pptx`](docs/hackathon/TrustFlow_deck.pptx) · 10 judge stills [`docs/hackathon/screenshots/`](docs/hackathon/screenshots/) (refresh: `cd app && node capture-stills.mjs`) · Devpost thumbnail [`thumbnail_devpost.png`](docs/hackathon/thumbnail_devpost.png) · Devpost draft in story-template format, single-field elevator pitch · demo script v3 (live-qwen beat, beat-4 prerequisite) · **fixes:** gateway now enforces the human-activated policy version (beat 4 unblocked), glassbox transcript duplication race, transcript row spacing, strategy explorer 5-agent copy (hero no longer "On Autopilot").
+
+**Git:** local `main` is ahead of origin, nothing uncommitted — **ready to push**.
+
+**👉 Demo script (v3):** [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · [`docs/JUDGE_DEMO_RUNBOOK.md`](docs/JUDGE_DEMO_RUNBOOK.md)
 
 **👉 Hackathon pack:** [`docs/hackathon/PITCH_DECK_OUTLINE.md`](docs/hackathon/PITCH_DECK_OUTLINE.md) · [`SPOKEN_LINES.md`](docs/hackathon/SPOKEN_LINES.md) · [`EVIDENCE_CHAIN.md`](docs/hackathon/EVIDENCE_CHAIN.md) · [`baseline/S05_single_agent_vs_boardroom.md`](docs/hackathon/baseline/S05_single_agent_vs_boardroom.md)  
 **👉 Devpost DRAFT (delete before public):** [`docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md`](docs/_REMOVE_BEFORE_PUBLIC/DEVPOST_DRAFT.md)  

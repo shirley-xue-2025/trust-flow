@@ -11,14 +11,11 @@
 
 ---
 
-## Elevator pitch
+## Elevator pitch (single field, 200 chars max)
 
-| Field | Limit | Draft |
-|-------|-------|-------|
-| Tagline | 60 chars | Five AI agents negotiate your AI policy. Code enforces it. |
-| Short description | 200 chars | TrustFlow compresses weeks of Legal/IT/Procurement/Works Council (Betriebsrat) negotiation into seconds of agent debate, compiles enforceable gateway rules, and keeps humans in control of activation. |
+> Five AI agents negotiate your AI-tool policy in seconds — including Germany's Works Council veto. A deterministic gateway enforces it; humans sign off before anything activates.
 
-*Tagline alternatives:* `AI agents negotiate your AI policy. A gateway enforces it.` (58) · `Multi-agent policy boardroom + deterministic AI gateway` (56)
+*(177 chars. Alternatives: "Five AI agents — Legal, IT, Procurement, Works Council, Runner — negotiate your AI policy in seconds. A deterministic gateway enforces it; humans sign off before activation." 173 · "Five AI agents negotiate your AI policy. Code enforces it." 58 if a short tagline is ever needed.)*
 
 ---
 
