@@ -19,9 +19,9 @@ function compileScenario(id: string) {
 }
 
 describe('gateway audit events', () => {
-  it('clean prompt on S01 policy → allowed + valid audit', () => {
+  it('clean prompt on S01 policy → allowed + valid audit', async () => {
     const { result, request } = compileScenario('S01');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,
@@ -34,9 +34,9 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
   });
 
-  it('IBAN prompt → PII_BLOCK + valid audit', () => {
+  it('IBAN prompt → PII_BLOCK + valid audit', async () => {
     const { result, request } = compileScenario('S01');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,
@@ -50,9 +50,9 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
   });
 
-  it('S04 payment-schema request → redacted locally, completed on CLOUD_QWEN_MAX + valid audit', () => {
+  it('S04 payment-schema request → redacted locally, completed on CLOUD_QWEN_MAX + valid audit', async () => {
     const { result, request } = compileScenario('S04');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,
@@ -72,9 +72,9 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.redaction_audit_event!)).toEqual([]);
   });
 
-  it('S04 email prompt → masked + allowed (not PII_BLOCK)', () => {
+  it('S04 email prompt → masked + allowed (not PII_BLOCK)', async () => {
     const { result, request } = compileScenario('S04');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,
@@ -99,7 +99,7 @@ describe('gateway audit events', () => {
     }
   });
 
-  it('rule-based sensitive routing (routing.rules, not routing.sensitive) also redacts locally then relays', () => {
+  it('rule-based sensitive routing (routing.rules, not routing.sensitive) also redacts locally then relays', async () => {
     const { result, request } = compileScenario('S04');
     const policy = {
       ...result.policy,
@@ -108,7 +108,7 @@ describe('gateway audit events', () => {
         rules: [{ if: 'data_class_payment_schema', route: 'LOCAL_QWEN_72B' }],
       },
     };
-    const r = runInference(
+    const r = await runInference(
       {
         policy,
         policy_version_hash: result.policy_version_hash,
@@ -122,9 +122,9 @@ describe('gateway audit events', () => {
     expect(r.redaction_audit_event?.routing_decision).toBe('LOCAL_QWEN_72B');
   });
 
-  it('draft policy activation_status → POLICY_NOT_ACTIVATED', () => {
+  it('draft policy activation_status → POLICY_NOT_ACTIVATED', async () => {
     const { result, request } = compileScenario('S01');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,
@@ -138,9 +138,29 @@ describe('gateway audit events', () => {
     expect(r.deny_reason_code).toBe('POLICY_NOT_ACTIVATED');
   });
 
-  it('S02 policy still blocks inference with BETRIEBSVEREINBARUNG_PENDING', () => {
+  it('fully-local terminal route falls back to the stub with no key/env vars configured', async () => {
+    const { result, request } = compileScenario('S01');
+    const policy = {
+      ...result.policy,
+      routing: { default: 'LOCAL_QWEN_72B' as const },
+    };
+    const r = await runInference(
+      {
+        policy,
+        policy_version_hash: result.policy_version_hash,
+        request,
+        prompt: 'Summarize this support thread about a delayed refund.',
+      },
+      { org: ORG, registry: REGISTRY },
+    );
+    expect(r.routing_decision).toBe('LOCAL_QWEN_72B');
+    expect(r.local_redaction).toBe(false);
+    expect(r.response_body).toContain('stubbed response — no GPU in hackathon MVP');
+  });
+
+  it('S02 policy still blocks inference with BETRIEBSVEREINBARUNG_PENDING', async () => {
     const { result, request } = compileScenario('S02');
-    const r = runInference(
+    const r = await runInference(
       {
         policy: result.policy,
         policy_version_hash: result.policy_version_hash,

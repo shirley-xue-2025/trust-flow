@@ -12,6 +12,11 @@
  * in the hackathon MVP), which is what `stubbed` / `stubbedLocalResponse` cover.
  */
 import type { PolicyArtifact, RequestPacket, RoutingDecision } from '@trustflow/shared';
+import {
+  CLOUD_QWEN_MAX_CONFIG,
+  LOCAL_QWEN_72B_CONFIG,
+  type RouteClientConfig,
+} from '../qwen/client.js';
 
 export interface RouteResolution {
   decision: RoutingDecision;
@@ -76,7 +81,17 @@ export function resolveRoute(
   };
 }
 
-/** Canned mock response body for the stubbed local node. */
+/** Client config to use for a resolved routing decision (offline fallback when no key present). */
+export function routeClientConfig(decision: RoutingDecision): RouteClientConfig {
+  return decision === 'LOCAL_QWEN_72B' ? LOCAL_QWEN_72B_CONFIG : CLOUD_QWEN_MAX_CONFIG;
+}
+
+/** Canned mock response body for the stubbed local node (offline fallback, no key). */
 export function stubbedLocalResponse(prompt: string): string {
   return `[LOCAL_QWEN_72B mock] Processed ${prompt.length} chars on the sovereign on-prem node. (stubbed response — no GPU in hackathon MVP)`;
+}
+
+/** Canned mock response body for the cloud route (offline fallback, no key). */
+export function stubbedCloudResponse(decision: RoutingDecision): string {
+  return `[${decision} response] (live call elided in gateway demo)`;
 }
