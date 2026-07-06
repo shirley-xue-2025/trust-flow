@@ -21,6 +21,7 @@ export default function Playground({
   const [prompt, setPrompt] = useState(SAMPLES[0].text);
   const [resp, setResp] = useState<InferenceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   if (!policy) {
     return (
@@ -32,15 +33,19 @@ export default function Playground({
   }
 
   const send = async () => {
+    if (loading) return;
     setError(null);
     setResp(null);
     onInference?.(null);
+    setLoading(true);
     try {
       const next = await runInference({ policy_id: policy.policy_id, prompt, request });
       setResp(next);
       onInference?.(next);
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,8 +67,8 @@ export default function Playground({
       </div>
 
       <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-      <button className="primary" onClick={send} style={{ marginTop: 8 }}>
-        Send through gateway
+      <button className="primary" onClick={send} disabled={loading} style={{ marginTop: 8 }}>
+        {loading ? 'Sending…' : 'Send through gateway'}
       </button>
 
       {error && <div className="banner warn">{error}</div>}
@@ -83,44 +88,48 @@ export default function Playground({
           </div>
 
           {resp.local_redaction && resp.redaction_audit_event && (
-            <div className="box" style={{ marginTop: 10 }}>
-              <strong>Local redaction hop (sovereign node)</strong>
+            <details className="box" style={{ marginTop: 10 }}>
+              <summary style={{ cursor: 'pointer', fontWeight: 700 }}>
+                Local redaction hop (sovereign node)
+              </summary>
               <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
                 Sensitive/payment traffic is redacted on the EU-local safety gateway before the
                 (already-redacted) prompt is relayed to the cloud model for completion — the
                 local node never generates the answer.
               </p>
               <pre className="json">{JSON.stringify(resp.redaction_audit_event, null, 2)}</pre>
-            </div>
+            </details>
           )}
 
           <div className="side">
-            <div className="box">
-              <strong>Raw prompt</strong>
+            <details className="box">
+              <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Raw prompt</summary>
               <pre className="json">{prompt}</pre>
-            </div>
-            <div className="box">
-              <strong>What the model saw (redacted)</strong>
+            </details>
+            <details className="box">
+              <summary style={{ cursor: 'pointer', fontWeight: 700 }}>
+                What the model saw (redacted)
+              </summary>
               <pre className="json">{resp.redacted_prompt ?? '— blocked at edge —'}</pre>
               {resp.outcome === 'allowed' && resp.redacted_prompt && (
                 <p className="muted" style={{ fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
                   Sent to model (redacted)
                 </p>
               )}
-            </div>
+            </details>
           </div>
 
           {resp.response_body && (
-            <div className="box" style={{ marginTop: 10 }}>
-              <strong>Response</strong>
+            <details className="box" style={{ marginTop: 10 }}>
+              <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Response</summary>
               <pre className="json">{resp.response_body}</pre>
-            </div>
+            </details>
           )}
 
-          <div style={{ marginTop: 10 }}>
-            <strong>Audit event</strong>
+          <details style={{ marginTop: 10 }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Audit event</summary>
             <pre className="json">{JSON.stringify(resp.audit_event, null, 2)}</pre>
-          </div>
+          </details>
         </>
       )}
     </div>
