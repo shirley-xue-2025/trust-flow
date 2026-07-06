@@ -19,8 +19,11 @@ export interface RouteResolution {
   model_provider: string;
   model_id: string;
   stubbed: boolean;
-  /** True when sensitive/payment traffic was redacted on the local node before
-   * relaying to `decision` for completion (see module doc). */
+  /** True when this request was routed through the local safety gateway before
+   * being relayed to `decision` for completion (see module doc). This is a
+   * routing/audit label, not a guarantee that PII was found and scrubbed —
+   * masking itself is governed by `policy.pii_masking` and runs on every
+   * route, sensitive or not. */
   localRedaction: boolean;
 }
 

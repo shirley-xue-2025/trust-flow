@@ -32,6 +32,7 @@ import type {
   RequestPacket,
   SessionOutcome,
 } from '@trustflow/shared';
+import { resolveRoute } from '../gateway/routing.js';
 import { mergeTranscript } from './merge.js';
 import { checkFloor, type FloorViolation } from './floor.js';
 
@@ -55,25 +56,6 @@ export interface CompileResult {
   schemaErrors?: string[];
 }
 
-/**
- * Resolve the routing decision the artifact yields for THIS request. Payment-
- * schema / sensitive data is redacted on the sovereign local node when the
- * policy sets routing.sensitive to LOCAL_QWEN_72B, then relayed to the
- * policy's default (completion) route — unless the default route IS the local
- * node, in which case there's nowhere to relay to and it's genuinely terminal.
- */
-function resolveRouting(
-  policy: PolicyArtifact,
-  request: RequestPacket,
-): { decision: string; local_redaction: boolean } {
-  const sensitive =
-    (request.data_classes ?? []).some((c) => c.includes('payment')) ||
-    (request.data_classes ?? []).includes('payment_api_schemas');
-  const sensitiveTarget = sensitive ? policy.routing.sensitive : undefined;
-  const local_redaction = sensitiveTarget === 'LOCAL_QWEN_72B' && policy.routing.default !== 'LOCAL_QWEN_72B';
-  const decision = local_redaction ? policy.routing.default : (sensitiveTarget ?? policy.routing.default);
-  return { decision, local_redaction };
-}
 
 export function compile(
   transcript: BoardroomEnvelope[],
@@ -123,15 +105,18 @@ export function compile(
     : (validatePolicy.errors ?? []).map((e: { instancePath: string; message?: string }) => `${e.instancePath} ${e.message}`);
 
   const hash = policyVersionHash(clean);
-  const routing = resolveRouting(clean, request);
+  // Reuse the gateway's own resolver so the compile-time summary can never
+  // diverge from what the gateway will actually do at inference time (single
+  // source of truth for "sensitive target + routing.rules → route + redaction").
+  const route = resolveRoute(clean, request);
 
   return {
     outcome,
     policy: clean,
     policy_version_hash: hash,
     deny_code,
-    routing_decision: routing.decision,
-    local_redaction: routing.local_redaction,
+    routing_decision: route.decision,
+    local_redaction: route.localRedaction,
     floorViolations,
     schemaValid,
     schemaErrors,

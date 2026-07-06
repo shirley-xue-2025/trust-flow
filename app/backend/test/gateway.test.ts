@@ -93,6 +93,33 @@ describe('gateway audit events', () => {
     expect(piiEvent?.pii_actions?.some((p) => p.entity_type === 'email' && p.action === 'masked')).toBe(
       true,
     );
+    // Dedup: pii_actions must not be duplicated onto the cloud completion event.
+    if (r.local_redaction) {
+      expect(r.audit_event.pii_actions).toBeUndefined();
+    }
+  });
+
+  it('rule-based sensitive routing (routing.rules, not routing.sensitive) also redacts locally then relays', () => {
+    const { result, request } = compileScenario('S04');
+    const policy = {
+      ...result.policy,
+      routing: {
+        default: 'CLOUD_QWEN_MAX',
+        rules: [{ if: 'data_class_payment_schema', route: 'LOCAL_QWEN_72B' }],
+      },
+    };
+    const r = runInference(
+      {
+        policy,
+        policy_version_hash: result.policy_version_hash,
+        request: request as RequestPacket,
+        prompt: 'Generate a TypeScript type for this payment API schema.',
+      },
+      { org: ORG, registry: REGISTRY },
+    );
+    expect(r.local_redaction).toBe(true);
+    expect(r.routing_decision).toBe('CLOUD_QWEN_MAX');
+    expect(r.redaction_audit_event?.routing_decision).toBe('LOCAL_QWEN_72B');
   });
 
   it('draft policy activation_status → POLICY_NOT_ACTIVATED', () => {
