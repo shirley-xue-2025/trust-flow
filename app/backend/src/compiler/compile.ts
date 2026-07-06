@@ -32,6 +32,7 @@ import type {
   RequestPacket,
   SessionOutcome,
 } from '@trustflow/shared';
+import { resolveRoute } from '../gateway/routing.js';
 import { mergeTranscript } from './merge.js';
 import { checkFloor, type FloorViolation } from './floor.js';
 
@@ -44,24 +45,17 @@ export interface CompileResult {
   policy: PolicyArtifact;
   policy_version_hash: string;
   deny_code?: DenyReasonCode;
+  /** The route that will actually complete the request. */
   routing_decision: PolicyArtifact['routing']['default'];
+  /** True when sensitive/payment traffic is redacted on the sovereign local
+   * node before relaying to `routing_decision` for completion (the local node
+   * is a safety gateway, not an alternate answer engine — see gateway/routing.ts). */
+  local_redaction: boolean;
   floorViolations: FloorViolation[];
   schemaValid: boolean;
   schemaErrors?: string[];
 }
 
-/**
- * Resolve the routing decision the artifact yields for THIS request. Payment-
- * schema / sensitive data routes to the sovereign local node when the policy
- * sets routing.sensitive; otherwise the default route.
- */
-function resolveRouting(policy: PolicyArtifact, request: RequestPacket): string {
-  const sensitive =
-    (request.data_classes ?? []).some((c) => c.includes('payment')) ||
-    (request.data_classes ?? []).includes('payment_api_schemas');
-  if (sensitive && policy.routing.sensitive) return policy.routing.sensitive;
-  return policy.routing.default;
-}
 
 export function compile(
   transcript: BoardroomEnvelope[],
@@ -111,14 +105,18 @@ export function compile(
     : (validatePolicy.errors ?? []).map((e: { instancePath: string; message?: string }) => `${e.instancePath} ${e.message}`);
 
   const hash = policyVersionHash(clean);
-  const routing_decision = resolveRouting(clean, request);
+  // Reuse the gateway's own resolver so the compile-time summary can never
+  // diverge from what the gateway will actually do at inference time (single
+  // source of truth for "sensitive target + routing.rules → route + redaction").
+  const route = resolveRoute(clean, request);
 
   return {
     outcome,
     policy: clean,
     policy_version_hash: hash,
     deny_code,
-    routing_decision,
+    routing_decision: route.decision,
+    local_redaction: route.localRedaction,
     floorViolations,
     schemaValid,
     schemaErrors,

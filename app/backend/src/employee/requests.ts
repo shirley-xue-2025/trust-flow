@@ -175,8 +175,8 @@ export function nextStepsForRecord(
   }
   if (status === 'approved') {
     steps.push('Approved — use the tool in your IDE; gateway activity is recorded on this request.');
-    if (record.routing_decision === 'LOCAL_QWEN_72B') {
-      steps.push('Sensitive prompts route to the EU-local model automatically.');
+    if (record.local_redaction) {
+      steps.push('Sensitive prompts are redacted on the EU-local safety gateway before completing on the cloud model.');
     }
     steps.push('Open the Gateway activity tab to review PII actions and routing decisions.');
   }

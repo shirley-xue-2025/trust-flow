@@ -42,6 +42,7 @@ export interface BoardroomResult {
   state: string;
   deny_code: string | null;
   routing_decision: string | null;
+  local_redaction?: boolean;
   policy: PolicyArtifact;
   policy_version_hash: string;
 }
@@ -73,6 +74,8 @@ export interface InferenceResponse {
   outcome: string;
   deny_reason_code?: string;
   routing_decision: string;
+  local_redaction?: boolean;
+  redaction_audit_event?: GatewayAuditEvent;
   redacted_prompt?: string;
   response_body?: string;
   audit_event: GatewayAuditEvent;

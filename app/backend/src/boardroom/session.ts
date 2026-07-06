@@ -36,6 +36,7 @@ export interface BoardroomSession {
   policy_version_hash?: string;
   deny_code?: string;
   routing_decision?: string;
+  local_redaction?: boolean;
   compile?: CompileResult;
 }
 
@@ -105,6 +106,7 @@ export async function runSession(
   session.policy_version_hash = result.policy_version_hash;
   session.deny_code = result.deny_code;
   session.routing_decision = result.routing_decision;
+  session.local_redaction = result.local_redaction;
 
   // Persist the compiled artifact (always — see module doc).
   writePolicy(result.policy, result.policy_version_hash, {

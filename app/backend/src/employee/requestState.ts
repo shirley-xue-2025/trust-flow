@@ -192,6 +192,7 @@ export function boardroomCompletePatch(
     session_id: string;
     deny_code?: string;
     routing_decision?: string;
+    local_redaction?: boolean;
     policy_id?: string;
     policy_version_hash?: string;
     transcript_length?: number;
@@ -205,6 +206,7 @@ export function boardroomCompletePatch(
     session_id: session.session_id,
     deny_code: session.deny_code,
     routing_decision: session.routing_decision,
+    local_redaction: session.local_redaction,
     policy_id: session.policy_id,
     policy_version_hash: session.policy_version_hash,
     transcript_length: session.transcript_length,

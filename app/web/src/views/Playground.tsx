@@ -77,7 +77,22 @@ export default function Playground({
             </span>
             {resp.deny_reason_code && <span className="muted"> · {resp.deny_reason_code}</span>}
             <span className="muted"> · route {resp.routing_decision}</span>
+            {resp.local_redaction && (
+              <span className="muted"> · redacted on EU-local node first</span>
+            )}
           </div>
+
+          {resp.local_redaction && resp.redaction_audit_event && (
+            <div className="box" style={{ marginTop: 10 }}>
+              <strong>Local redaction hop (sovereign node)</strong>
+              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                Sensitive/payment traffic is redacted on the EU-local safety gateway before the
+                (already-redacted) prompt is relayed to the cloud model for completion — the
+                local node never generates the answer.
+              </p>
+              <pre className="json">{JSON.stringify(resp.redaction_audit_event, null, 2)}</pre>
+            </div>
+          )}
 
           <div className="side">
             <div className="box">

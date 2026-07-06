@@ -392,6 +392,9 @@ export interface EmployeeRequestRecord {
   outcome?: SessionOutcome;
   deny_code?: string;
   routing_decision?: string;
+  /** True when sensitive/payment traffic is redacted on the sovereign local
+   * node before relaying to routing_decision for completion. */
+  local_redaction?: boolean;
   policy_id?: string;
   policy_version_hash?: string;
   transcript_length?: number;
