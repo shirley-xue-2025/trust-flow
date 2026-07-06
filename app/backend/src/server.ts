@@ -468,7 +468,7 @@ export function buildServer() {
       return reply.code(400).send({ error: 'decision and rationale required' });
     }
 
-    const result = decideReviewForRequest(id, reviewId, body.decision, body.rationale, reviewerId, ORG);
+    const result = await decideReviewForRequest(id, reviewId, body.decision, body.rationale, reviewerId, ORG);
     if ('error' in result) return reply.code(result.code).send({ error: result.error });
     return result;
   });
@@ -477,7 +477,7 @@ export function buildServer() {
     const id = (req.params as { id: string }).id;
     const reviewerId =
       (req.headers['x-reviewer-id'] as string | undefined) ?? 'katrin.mueller@nordpay.example';
-    const result = activateRequestPolicy(id, reviewerId, ORG);
+    const result = await activateRequestPolicy(id, reviewerId, ORG);
     if ('error' in result) return reply.code(result.code).send({ error: result.error });
     return result;
   });
@@ -551,7 +551,7 @@ export function buildServer() {
         entity_country: ORG.entity_country,
       } as RequestPacket);
 
-    const result = runInference(
+    const result = await runInference(
       {
         policy: stored.policy,
         policy_version_hash: stored.policy_version_hash,

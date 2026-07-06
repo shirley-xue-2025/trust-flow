@@ -11,9 +11,13 @@
  *   5. Route to model per policy.routing
  *   6. Post-flight: fingerprint output, emit audit event
  *
- * No LLM in this path. The policy is loaded by id/hash; every decision is a
- * pure function of the policy + the request, and every outcome emits a
- * schema-valid audit event.
+ * The policy is loaded by id/hash; every pre-flight/routing decision is a pure
+ * function of the policy + the request, and every outcome emits a
+ * schema-valid audit event. This holds fully offline (no API key): the
+ * completion step then returns the deterministic placeholder text below. With
+ * an API key configured, the completion step (5→6) becomes a live call to the
+ * resolved route's model — the "no LLM in this path" invariant applies to
+ * pre-flight/routing only, not to the completion result itself.
  */
 import { randomUUID } from 'node:crypto';
 import { sha256 } from '@trustflow/shared';
@@ -27,8 +31,18 @@ import type {
   ToolRegistry,
 } from '@trustflow/shared';
 import { scanAndApply } from './pii.js';
-import { ROUTE_META, resolveRoute, stubbedLocalResponse } from './routing.js';
+import {
+  ROUTE_META,
+  resolveRoute,
+  routeClientConfig,
+  stubbedCloudResponse,
+  stubbedLocalResponse,
+} from './routing.js';
 import { emitAuditEvent } from './audit.js';
+import { chatComplete, hasApiKeyFor } from '../qwen/client.js';
+
+const GATEWAY_SYSTEM_PROMPT =
+  'You are a corporate AI assistant operating under an enterprise governance policy. Answer the user prompt directly and concisely.';
 
 export interface InferenceRequest {
   policy: PolicyArtifact;
@@ -65,11 +79,11 @@ function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-export function runInference(
+export async function runInference(
   req: InferenceRequest,
   ctx: GatewayContext,
   opts: { activation_status?: 'draft' | 'active' | 'revoked' } = {},
-): InferenceResult {
+): Promise<InferenceResult> {
   const { policy, request, prompt } = req;
   const actor_id = req.actor_id ?? 'emp_demo';
   const tool = ctx.registry.tools.find((t) => t.tool_id === policy.tool_id);
@@ -180,9 +194,12 @@ export function runInference(
     });
   }
 
-  const response_body = route.stubbed
-    ? stubbedLocalResponse(pii.redactedText)
-    : `[${route.decision} response] (live call elided in gateway demo)`;
+  const cfg = routeClientConfig(route.decision);
+  const response_body = hasApiKeyFor(cfg)
+    ? await chatComplete(cfg, GATEWAY_SYSTEM_PROMPT, pii.redactedText)
+    : route.stubbed
+      ? stubbedLocalResponse(pii.redactedText)
+      : stubbedCloudResponse(route.decision);
 
   // 6. Post-flight: fingerprint output, emit audit event
   const audit_event = emitAuditEvent({

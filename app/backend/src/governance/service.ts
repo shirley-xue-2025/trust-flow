@@ -172,20 +172,20 @@ export function governanceOverviewStats(org: OrgConfig) {
   };
 }
 
-function finalizeRequestActivation(
+async function finalizeRequestActivation(
   requestId: string,
   record: EmployeeRequestRecord,
   reviewerIds: string[],
   reviewerIdForAudit: string,
   org: OrgConfig,
-): EmployeeRequestRecord {
+): Promise<EmployeeRequestRecord> {
   if (!record.policy_id) return serializeEmployeeRequest(record);
 
   activatePolicy(record.policy_id, reviewerIds, record.policy_version_hash);
 
   const stored = resolveStoredPolicy(record.policy_id, record.policy_version_hash);
   if (stored?.policy) {
-    runInference(
+    await runInference(
       {
         policy: stored.policy,
         policy_version_hash: stored.policy_version_hash,
@@ -228,19 +228,19 @@ function finalizeRequestActivation(
   return serializeEmployeeRequest(getEmployeeRequest(requestId)!);
 }
 
-export function decideReviewForRequest(
+export async function decideReviewForRequest(
   requestId: string,
   reviewId: string,
   decision: 'approve' | 'reject',
   rationale: string,
   reviewerId: string,
   org: OrgConfig,
-): {
+): Promise<{
   record: EmployeeRequestRecord;
   human_reviews: HumanReviewRecord[];
   activation: ReturnType<typeof activationState>;
   audit_event_id: string;
-} | { error: string; code: number } {
+} | { error: string; code: number }> {
   if (rationale.trim().length < 20) {
     return { error: 'rationale must be at least 20 characters', code: 400 };
   }
@@ -280,7 +280,7 @@ export function decideReviewForRequest(
   if (!updated) return { error: 'update failed', code: 500 };
 
   if (patch.policy_activation === 'active' && record.policy_id) {
-    finalizeRequestActivation(
+    await finalizeRequestActivation(
       requestId,
       getEmployeeRequest(requestId)!,
       human_reviews.filter((r) => r.status === 'approved').map((r) => r.reviewer_id),
@@ -316,11 +316,11 @@ export function decideReviewForRequest(
   };
 }
 
-export function activateRequestPolicy(
+export async function activateRequestPolicy(
   requestId: string,
   reviewerId: string,
   org: OrgConfig,
-): { record: EmployeeRequestRecord } | { error: string; code: number } {
+): Promise<{ record: EmployeeRequestRecord } | { error: string; code: number }> {
   const record = getEmployeeRequest(requestId);
   if (!record) return { error: 'request not found', code: 404 };
 
@@ -344,7 +344,7 @@ export function activateRequestPolicy(
     return { error: 'activation blocked', code: 409 };
   }
 
-  const finalRecord = finalizeRequestActivation(
+  const finalRecord = await finalizeRequestActivation(
     requestId,
     record,
     reviews.filter((r) => r.status === 'approved').map((r) => r.reviewer_id),

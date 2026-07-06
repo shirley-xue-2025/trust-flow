@@ -91,6 +91,14 @@ QWEN_MODEL_DEV=qwen-flash
 QWEN_MODEL_DEMO=qwen-max
 QWEN_MODEL=qwen-flash
 PORT=8080
+
+# LOCAL_QWEN_72B_* — the gateway's "sovereign on-prem" route. Leave these unset
+# and all three fall back to the DashScope cloud config above, so it's
+# cloud-backed out of the box. To make it genuinely on-prem, uncomment and point
+# them at a real local Qwen-72B endpoint (values below are an Ollama example):
+# LOCAL_QWEN_72B_BASE_URL=http://localhost:11434/v1
+# LOCAL_QWEN_72B_MODEL=qwen2.5-72b-instruct
+# LOCAL_QWEN_72B_API_KEY=
 ```
 
 The app **auto-loads `.env`** (Node's built-in `--env-file` loader, no `dotenv`

@@ -52,6 +52,77 @@ function getClient(): OpenAI {
   return client;
 }
 
+// --- Gateway routes (LOCAL_QWEN_72B / CLOUD_QWEN_MAX) ----------------------
+//
+// The gateway needs raw completion text, not the boardroom envelope above.
+// LOCAL_QWEN_72B is presented as a sovereign on-prem node; until a real GPU
+// box is wired up, it's backed by the same DashScope service under dedicated
+// env vars, so pointing it at a genuine local endpoint later is a config
+// change, not a code change.
+
+export const LOCAL_QWEN_72B_BASE_URL = process.env.LOCAL_QWEN_72B_BASE_URL ?? QWEN_BASE_URL;
+export const LOCAL_QWEN_72B_MODEL = process.env.LOCAL_QWEN_72B_MODEL ?? QWEN_MODEL;
+// A real local box likely needs no key; fall back to the DashScope key so the
+// cloud-backed default works out of the box.
+export const LOCAL_QWEN_72B_API_KEY =
+  process.env.LOCAL_QWEN_72B_API_KEY ?? process.env.DASHSCOPE_API_KEY;
+
+export interface RouteClientConfig {
+  baseURL: string;
+  apiKey: string | undefined;
+  model: string;
+}
+
+export const CLOUD_QWEN_MAX_CONFIG: RouteClientConfig = {
+  baseURL: QWEN_BASE_URL,
+  apiKey: process.env.DASHSCOPE_API_KEY,
+  model: QWEN_MODEL,
+};
+
+export const LOCAL_QWEN_72B_CONFIG: RouteClientConfig = {
+  baseURL: LOCAL_QWEN_72B_BASE_URL,
+  apiKey: LOCAL_QWEN_72B_API_KEY,
+  model: LOCAL_QWEN_72B_MODEL,
+};
+
+export function hasApiKeyFor(cfg: RouteClientConfig): boolean {
+  return Boolean(cfg.apiKey);
+}
+
+const routeClients = new Map<string, OpenAI>();
+function getRouteClient(cfg: RouteClientConfig): OpenAI {
+  if (!cfg.apiKey) {
+    throw new Error(`No API key configured for baseURL ${cfg.baseURL} — live path unavailable.`);
+  }
+  let routeClient = routeClients.get(cfg.baseURL);
+  if (!routeClient) {
+    routeClient = new OpenAI({
+      apiKey: cfg.apiKey,
+      baseURL: cfg.baseURL,
+      // See getClient() above — same undici-fetch workaround.
+      fetch: globalThis.fetch as unknown as ClientOptions['fetch'],
+    });
+    routeClients.set(cfg.baseURL, routeClient);
+  }
+  return routeClient;
+}
+
+/** Plain-text single-turn completion for the gateway routes (not a boardroom envelope). */
+export async function chatComplete(
+  cfg: RouteClientConfig,
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<string> {
+  const completion = await getRouteClient(cfg).chat.completions.create({
+    model: cfg.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+  });
+  return completion.choices[0]?.message?.content ?? '';
+}
+
 export interface QwenTurnArgs {
   systemPrompt: string;
   userPrompt: string;
