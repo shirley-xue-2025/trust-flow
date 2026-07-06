@@ -128,5 +128,5 @@ With the key present, glassbox **Use custom request** + **Run** starts a real
 | S01 | APPROVED | Copilot summarization, BR signed |
 | S02 | PENDING_EXTERNAL | `BETRIEBSVEREINBARUNG_PENDING` |
 | S03 | DENIED | `HIGH_RISK_USE_DENIED` (Annex III) |
-| S04 | APPROVED | routing `LOCAL_QWEN_72B` |
+| S04 | APPROVED | redacted on `LOCAL_QWEN_72B`, completed on `CLOUD_QWEN_MAX` |
 | S05 | DENIED | `VENDOR_DPA_PENDING` |

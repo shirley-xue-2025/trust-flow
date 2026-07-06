@@ -41,7 +41,9 @@ export function nodeSummary(id: string, ctx: GlassboxSummaryContext): string {
     case 'gateway':
       if (!policy) return 'Needs compiled policy';
       if (!inference) return 'Send a prompt to test';
-      return `${inference.outcome} · route ${inference.routing_decision}`;
+      return inference.local_redaction
+        ? `${inference.outcome} · redacted locally → ${inference.routing_decision}`
+        : `${inference.outcome} · route ${inference.routing_decision}`;
     case 'audit':
       return auditEvents.length ? `${auditEvents.length} events · retention` : 'Empty until inference';
     case 'result': {
@@ -70,7 +72,9 @@ export function resultGrounding(ctx: GlassboxSummaryContext): {
   const pii = ctx.inference?.audit_event?.pii_actions?.[0];
 
   let detail = 'Agents propose; deterministic compiler signs; gateway enforces without LLM.';
-  if (pii?.action === 'masked') {
+  if (ctx.inference?.local_redaction) {
+    detail = `Redacted on the EU-local safety gateway, then completed on ${routing} — the local node never generates the answer.`;
+  } else if (pii?.action === 'masked') {
     detail = `Email masked at gateway — business continues on ${routing}.`;
   } else if (ctx.inference?.outcome === 'denied') {
     const code = ctx.inference.deny_reason_code;

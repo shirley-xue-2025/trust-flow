@@ -275,6 +275,7 @@ export function buildServer() {
         {
           deny_code: session.deny_code,
           routing_decision: session.routing_decision,
+          local_redaction: session.local_redaction,
           policy_id: session.policy?.policy_id,
           policy_version_hash: session.policy_version_hash,
         },
@@ -354,6 +355,7 @@ export function buildServer() {
         state: session.state,
         deny_code: session.deny_code ?? null,
         routing_decision: session.routing_decision ?? null,
+        local_redaction: session.local_redaction ?? false,
         policy: session.policy,
         policy_version_hash: session.policy_version_hash,
       });
@@ -384,6 +386,7 @@ export function buildServer() {
       outcome: session.outcome ?? null,
       deny_code: session.deny_code ?? null,
       routing_decision: session.routing_decision ?? null,
+      local_redaction: session.local_redaction ?? false,
       policy_id: session.policy?.policy_id ?? null,
       policy_version_hash: session.policy_version_hash ?? null,
       transcript: session.transcript,

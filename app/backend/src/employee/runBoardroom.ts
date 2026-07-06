@@ -47,6 +47,7 @@ export async function runEmployeeBoardroom(
       session_id: session.session_id,
       deny_code: session.deny_code,
       routing_decision: session.routing_decision,
+      local_redaction: session.local_redaction,
       policy_id: session.policy?.policy_id,
       policy_version_hash: session.policy_version_hash,
       transcript_length: transcript.length,
@@ -79,6 +80,7 @@ export function finalizeRequestFromSession(
   sessionFields: {
     deny_code?: string;
     routing_decision?: string;
+    local_redaction?: boolean;
     policy_id?: string;
     policy_version_hash?: string;
   },

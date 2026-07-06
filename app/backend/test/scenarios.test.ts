@@ -26,7 +26,7 @@ describe('S01–S05 scenarios (golden transcript replay)', () => {
         expect(result.deny_code).toBe(scenario.expected_deny_code);
       }
 
-      // Routing where the scenario specifies one (S04 → LOCAL_QWEN_72B).
+      // Routing where the scenario specifies one (S04 → redacted locally, completes on CLOUD_QWEN_MAX).
       if (scenario.expected_routing) {
         expect(result.routing_decision).toBe(scenario.expected_routing);
       }
@@ -39,11 +39,12 @@ describe('S01–S05 scenarios (golden transcript replay)', () => {
     });
   }
 
-  it('S04 sets the sovereign sensitive route', () => {
+  it('S04 redacts on the sovereign local node, then completes on the cloud route', () => {
     const s = SCENARIOS.find((x) => x.scenario_id === 'S04')!;
     const result = compile(loadGolden('S04'), s.request, ORG, { session_id: 'S04' });
     expect(result.policy.routing.sensitive).toBe('LOCAL_QWEN_72B');
-    expect(result.routing_decision).toBe('LOCAL_QWEN_72B');
+    expect(result.local_redaction).toBe(true);
+    expect(result.routing_decision).toBe('CLOUD_QWEN_MAX');
   });
 
   it('S02 carries a BETRIEBSVEREINBARUNG_PENDING deny override', () => {

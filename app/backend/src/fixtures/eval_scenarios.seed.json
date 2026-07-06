@@ -41,7 +41,7 @@
   },
   {
     "scenario_id": "S04",
-    "name": "Payment schema → local route",
+    "name": "Payment schema → redacted locally, completed on cloud",
     "request": {
       "tool_id": "claude-code",
       "use_case_category": "code_completion",
@@ -51,7 +51,7 @@
       "vendor_dpa_status": "signed"
     },
     "expected_session_outcome": "APPROVED",
-    "expected_routing": "LOCAL_QWEN_72B"
+    "expected_routing": "CLOUD_QWEN_MAX"
   },
   {
     "scenario_id": "S05",

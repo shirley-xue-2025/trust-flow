@@ -44,7 +44,12 @@ export interface CompileResult {
   policy: PolicyArtifact;
   policy_version_hash: string;
   deny_code?: DenyReasonCode;
+  /** The route that will actually complete the request. */
   routing_decision: PolicyArtifact['routing']['default'];
+  /** True when sensitive/payment traffic is redacted on the sovereign local
+   * node before relaying to `routing_decision` for completion (the local node
+   * is a safety gateway, not an alternate answer engine — see gateway/routing.ts). */
+  local_redaction: boolean;
   floorViolations: FloorViolation[];
   schemaValid: boolean;
   schemaErrors?: string[];
@@ -52,15 +57,22 @@ export interface CompileResult {
 
 /**
  * Resolve the routing decision the artifact yields for THIS request. Payment-
- * schema / sensitive data routes to the sovereign local node when the policy
- * sets routing.sensitive; otherwise the default route.
+ * schema / sensitive data is redacted on the sovereign local node when the
+ * policy sets routing.sensitive to LOCAL_QWEN_72B, then relayed to the
+ * policy's default (completion) route — unless the default route IS the local
+ * node, in which case there's nowhere to relay to and it's genuinely terminal.
  */
-function resolveRouting(policy: PolicyArtifact, request: RequestPacket): string {
+function resolveRouting(
+  policy: PolicyArtifact,
+  request: RequestPacket,
+): { decision: string; local_redaction: boolean } {
   const sensitive =
     (request.data_classes ?? []).some((c) => c.includes('payment')) ||
     (request.data_classes ?? []).includes('payment_api_schemas');
-  if (sensitive && policy.routing.sensitive) return policy.routing.sensitive;
-  return policy.routing.default;
+  const sensitiveTarget = sensitive ? policy.routing.sensitive : undefined;
+  const local_redaction = sensitiveTarget === 'LOCAL_QWEN_72B' && policy.routing.default !== 'LOCAL_QWEN_72B';
+  const decision = local_redaction ? policy.routing.default : (sensitiveTarget ?? policy.routing.default);
+  return { decision, local_redaction };
 }
 
 export function compile(
@@ -111,14 +123,15 @@ export function compile(
     : (validatePolicy.errors ?? []).map((e: { instancePath: string; message?: string }) => `${e.instancePath} ${e.message}`);
 
   const hash = policyVersionHash(clean);
-  const routing_decision = resolveRouting(clean, request);
+  const routing = resolveRouting(clean, request);
 
   return {
     outcome,
     policy: clean,
     policy_version_hash: hash,
     deny_code,
-    routing_decision,
+    routing_decision: routing.decision,
+    local_redaction: routing.local_redaction,
     floorViolations,
     schemaValid,
     schemaErrors,

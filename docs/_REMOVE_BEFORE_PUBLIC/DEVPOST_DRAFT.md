@@ -38,7 +38,7 @@ The trigger insight: approval that takes weeks in the US can take **months** in 
 
 Demo highlights:
 
-- **S04 approve path:** Agents compromise on sovereign `LOCAL_QWEN_72B` routing → human sign-off → gateway activity audit.
+- **S04 approve path:** Agents compromise on redacting payment-schema traffic through the sovereign `LOCAL_QWEN_72B` safety gateway before it completes on `CLOUD_QWEN_MAX` → human sign-off → gateway activity audit (two chained audit events: redaction, then completion).
 - **S05 deny path:** Procurement vetoes an unsigned OpenAI **DPA** (vendor data-processing agreement) → employee advocate + factual appeal.
 - **Glassbox** (`/glassbox`) — transparent judge view: boardroom theater with live transcript; click **Gateway enforce** to test PII masking/blocking yourself.
 - **Gateway PII:** email masked, IBAN hard-blocked at the edge (regex demo — honest scope).

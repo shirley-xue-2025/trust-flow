@@ -2,7 +2,7 @@
  * Gateway tests (DoD #4): schema-valid audit events for
  *   - a clean prompt → allowed
  *   - an IBAN prompt → PII_BLOCK
- *   - S04 → routed LOCAL_QWEN_72B
+ *   - S04 → redacted on the local safety gateway, completed on CLOUD_QWEN_MAX
  */
 import { describe, expect, it } from 'vitest';
 import { ORG, REGISTRY, getScenario } from '../src/fixtures/index.js';
@@ -50,7 +50,7 @@ describe('gateway audit events', () => {
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
   });
 
-  it('S04 payment-schema request → routed LOCAL_QWEN_72B + valid audit', () => {
+  it('S04 payment-schema request → redacted locally, completed on CLOUD_QWEN_MAX + valid audit', () => {
     const { result, request } = compileScenario('S04');
     const r = runInference(
       {
@@ -61,10 +61,15 @@ describe('gateway audit events', () => {
       },
       { org: ORG, registry: REGISTRY },
     );
-    expect(r.routing_decision).toBe('LOCAL_QWEN_72B');
-    expect(r.outcome).toBe('redirected');
-    expect(r.response_body).toContain('LOCAL_QWEN_72B mock');
+    expect(r.local_redaction).toBe(true);
+    expect(r.routing_decision).toBe('CLOUD_QWEN_MAX');
+    expect(r.outcome).toBe('allowed');
+    expect(r.response_body).toContain('CLOUD_QWEN_MAX response');
+    expect(r.redaction_audit_event?.routing_decision).toBe('LOCAL_QWEN_72B');
+    expect(r.redaction_audit_event?.outcome).toBe('redirected');
+    expect(r.audit_event.parent_event_id).toBe(r.redaction_audit_event?.event_id);
     expect(validateAuditEvent(r.audit_event)).toEqual([]);
+    expect(validateAuditEvent(r.redaction_audit_event!)).toEqual([]);
   });
 
   it('S04 email prompt → masked + allowed (not PII_BLOCK)', () => {
@@ -82,7 +87,10 @@ describe('gateway audit events', () => {
     expect(r.outcome).not.toBe('denied');
     expect(r.deny_reason_code).not.toBe('PII_BLOCK');
     expect(r.redacted_prompt).toContain('EMAIL_MASKED');
-    expect(r.audit_event.pii_actions?.some((p) => p.entity_type === 'email' && p.action === 'masked')).toBe(
+    // Sensitive/payment traffic redacts on the local hop; pii_actions live there,
+    // not on the cloud completion event (see enforce.ts dedup).
+    const piiEvent = r.local_redaction ? r.redaction_audit_event : r.audit_event;
+    expect(piiEvent?.pii_actions?.some((p) => p.entity_type === 'email' && p.action === 'masked')).toBe(
       true,
     );
   });

@@ -107,7 +107,7 @@ Full instructions: [`app/README.md`](app/README.md).
 | S01 | APPROVED | Copilot summarization, works-council agreement signed |
 | S02 | PENDING_EXTERNAL | Blocked on unsigned **Betriebsvereinbarung** (works-council agreement) |
 | S03 | DENIED | `HIGH_RISK_USE_DENIED` (EU AI Act Annex III) |
-| S04 | APPROVED | Routed to on-prem `LOCAL_QWEN_72B` |
+| S04 | APPROVED | Redacted on-prem (`LOCAL_QWEN_72B` safety gateway), completed on `CLOUD_QWEN_MAX` |
 | S05 | DENIED | Unsigned vendor **DPA** (`VENDOR_DPA_PENDING`) |
 
 ---

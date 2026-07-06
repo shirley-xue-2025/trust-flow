@@ -27,7 +27,7 @@ import type {
   ToolRegistry,
 } from '@trustflow/shared';
 import { scanAndApply } from './pii.js';
-import { resolveRoute, stubbedLocalResponse } from './routing.js';
+import { ROUTE_META, resolveRoute, stubbedLocalResponse } from './routing.js';
 import { emitAuditEvent } from './audit.js';
 
 export interface InferenceRequest {
@@ -42,6 +42,12 @@ export interface InferenceResult {
   outcome: GatewayAuditEvent['outcome'];
   deny_reason_code?: DenyReasonCode;
   routing_decision: RoutingDecision | 'BLOCKED';
+  /** True when sensitive/payment traffic was redacted on the sovereign local
+   * node before being relayed to `routing_decision` for completion. */
+  local_redaction: boolean;
+  /** Audit event for the local redaction hop, present only when local_redaction
+   * is true. Chained to `audit_event` via parent_event_id. */
+  redaction_audit_event?: GatewayAuditEvent;
   redacted_prompt?: string;
   response_body?: string;
   audit_event: GatewayAuditEvent;
@@ -93,7 +99,13 @@ export function runInference(
       deny_reason_code: code,
       ...extra,
     });
-    return { outcome: 'denied', deny_reason_code: code, routing_decision: 'BLOCKED', audit_event };
+    return {
+      outcome: 'denied',
+      deny_reason_code: code,
+      routing_decision: 'BLOCKED',
+      local_redaction: false,
+      audit_event,
+    };
   };
 
   // Policy must be human-activated before gateway enforcement (HITL spec).
@@ -145,6 +157,29 @@ export function runInference(
 
   // 5. Route to model per policy.routing
   const route = resolveRoute(policy, request);
+
+  // Local redaction relay: the sovereign node already did its job (the PII scan
+  // above), so this hop is purely an audit record of "traffic passed through
+  // the local safety gateway before continuing to the cloud" — chained to the
+  // completion event via parent_event_id.
+  let redaction_audit_event: GatewayAuditEvent | undefined;
+  if (route.localRedaction) {
+    const localMeta = ROUTE_META.LOCAL_QWEN_72B;
+    redaction_audit_event = emitAuditEvent({
+      event_id: randomUUID(),
+      event_type: 'pii_redaction',
+      ...base,
+      model_provider: localMeta.provider,
+      model_id: localMeta.model,
+      routing_decision: 'LOCAL_QWEN_72B',
+      pii_actions: pii.actions.length ? pii.actions : undefined,
+      input_fingerprint: sha256(prompt),
+      output_fingerprint: sha256(pii.redactedText),
+      outcome: 'redirected',
+      disclosure_shown: policy.gates.disclosure_required ?? false,
+    });
+  }
+
   const response_body = route.stubbed
     ? stubbedLocalResponse(pii.redactedText)
     : `[${route.decision} response] (live call elided in gateway demo)`;
@@ -152,12 +187,13 @@ export function runInference(
   // 6. Post-flight: fingerprint output, emit audit event
   const audit_event = emitAuditEvent({
     event_id: randomUUID(),
+    parent_event_id: redaction_audit_event?.event_id,
     event_type: 'inference_response',
     ...base,
     model_provider: route.model_provider,
     model_id: route.model_id,
     routing_decision: route.decision,
-    pii_actions: pii.actions.length ? pii.actions : undefined,
+    pii_actions: redaction_audit_event ? undefined : pii.actions.length ? pii.actions : undefined,
     input_fingerprint: sha256(pii.redactedText),
     output_fingerprint: sha256(response_body),
     outcome: route.decision === 'LOCAL_QWEN_72B' ? 'redirected' : 'allowed',
@@ -168,6 +204,8 @@ export function runInference(
   return {
     outcome: audit_event.outcome,
     routing_decision: route.decision,
+    local_redaction: route.localRedaction,
+    redaction_audit_event,
     redacted_prompt: pii.redactedText,
     response_body,
     audit_event,
