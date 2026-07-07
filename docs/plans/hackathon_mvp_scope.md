@@ -44,8 +44,6 @@
 | 4:30 | Result + gateway activity after sign-off |
 | 5:00 | Close |
 
-**Transcript:** [`docs/hackathon/DEMO_VIDEO.md`](../hackathon/DEMO_VIDEO.md) (add after recording)
-
 ---
 
 ## Technical stack (as built)

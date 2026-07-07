@@ -84,4 +84,4 @@ flowchart LR
 
 ---
 
-**Related:** [`README.md`](README.md) · [`DEMO_VIDEO.md`](DEMO_VIDEO.md) · [`baseline/S05_single_agent_vs_boardroom.md`](baseline/S05_single_agent_vs_boardroom.md)
+**Related:** [`README.md`](README.md) · [`baseline/S05_single_agent_vs_boardroom.md`](baseline/S05_single_agent_vs_boardroom.md)
