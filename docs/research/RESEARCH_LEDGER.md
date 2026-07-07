@@ -13,7 +13,6 @@ Last updated: 2026-07-06
 | R1 | EU AI Act audit fields → gateway schema | verified | [`01_eu_ai_act_audit_trail.md`](01_eu_ai_act_audit_trail.md) |
 | R2 | Betriebsrat hard stop for DE enterprises | verified | [`02_betriebsrat_co_determination.md`](02_betriebsrat_co_determination.md) |
 | R3 | EU enterprise AI adoption pain points | verified | [`evidence/corpus.jsonl`](evidence/corpus.jsonl) (55 items) |
-| R4 | Fake-door PMF test ("Book demo" LP) | **cancelled** | Not pursued post-hackathon |
 | R5 | Hidden actors in approval chain | verified | [`stakeholders/journey_map.md`](stakeholders/journey_map.md) |
 | R6 | Market positioning (enforcement vs GRC) | verified | One-liner in [`../hackathon/EVIDENCE_CHAIN.md`](../hackathon/EVIDENCE_CHAIN.md) |
 
