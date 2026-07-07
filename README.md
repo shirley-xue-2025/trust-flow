@@ -75,6 +75,17 @@ This is the differentiator, and the whole design hangs off one boundary:
 
 ---
 
+## Track 3 — Agent Society (criteria mapping)
+
+| Track 3 criterion | TrustFlow implementation | Where to verify |
+|---|---|---|
+| **Task decomposition & role assignment** | Five specialist agents (Runner, Procurement, Compliance, Works Council, IT) negotiate over a fixed **six-round schedule** (round 0 advocate → rounds 1–4 lane responses → round 5 consensus). Each turn returns a schema-validated envelope (`stance`, `demands`, `concessions`). | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) · `/glassbox` boardroom theater · golden transcripts `app/backend/test/golden/S04.json` |
+| **Dialogue & disagreement** | Agents react to the shared transcript, not isolated prompts. **S04:** Compliance and IT negotiate sovereign routing (local redact → cloud complete) — a better outcome than the original request. **S05:** Procurement vetoes unsigned vendor **DPA** in round 1. | `/glassbox` (S04 auto-load) · [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) |
+| **Execution conflicts & resolution** | Disagreement becomes deterministic outcomes: **DENIED**, **PENDING_EXTERNAL**, or **APPROVED** after compile. **S02:** works-council agreement pending (`BETRIEBSVEREINBARUNG_PENDING`). Employee **advocate + appeal** re-opens the boardroom; **HITL** parallel DPO + IT sign-off before activation. | `/employee/requests/demo-s05-denied` · `/employee/requests/demo-s02-external` · governance sign-off queues |
+| **Measurable gain vs single-agent baseline** | Same request packet + same `qwen-max` model: one generic governance advisor → *conditional approve* (unsigned DPA never surfaced); five-agent boardroom → **DENIED · VENDOR_DPA_PENDING** in round 1. Live-captured 2026-07-05, committed, reproducible. | [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) · `cd app && npm run baseline:demo -- S05` |
+
+---
+
 ## Quickstart (no API key needed)
 
 The application code lives in [`app/`](app/). **Replay mode** runs the full pipeline —
@@ -143,5 +154,4 @@ passcode gate. Step-by-step guide:
 - **Qwen Cloud API** — all agent reasoning runs on `qwen-max` via the DashScope
   OpenAI-compatible endpoint (live-verified).
 - **Alibaba Cloud** — hosted on ECS via Docker Compose.
-- **Track 3 — Agent Society** — five collaborating agents with distinct roles,
-  emergent multi-round negotiation, and real-world EU-governance applicability.
+- **Track 3 — Agent Society** — see [criteria mapping](#track-3--agent-society-criteria-mapping) above.
