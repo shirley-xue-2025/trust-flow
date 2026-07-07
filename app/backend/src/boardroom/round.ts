@@ -51,6 +51,7 @@ export async function* runRounds(opts: RoundEngineOpts): AsyncGenerator<Boardroo
   if (replayScenarioId) {
     const transcript = loadGolden(replayScenarioId);
     for (const env of transcript) {
+      await replayTurnDelay();
       yield { ...env, session_id };
     }
     return;
@@ -89,3 +90,11 @@ export async function* runRounds(opts: RoundEngineOpts): AsyncGenerator<Boardroo
 }
 
 export const MAX_ROUNDS = 6;
+
+// Replay is instant (reading a JSON fixture), which reads as fake on camera.
+// REPLAY_TURN_DELAY_MS paces it like a real negotiation; unset/0 in tests.
+function replayTurnDelay(): Promise<void> {
+  const ms = Number(process.env.REPLAY_TURN_DELAY_MS ?? 0);
+  if (!ms) return Promise.resolve();
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

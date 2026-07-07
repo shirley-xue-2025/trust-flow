@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: NETWORK ? true : undefined, // bind all interfaces for LAN/tunnel access
-    allowedHosts: NETWORK ? true : undefined, // accept tunnel domains (dev only)
+    allowedHosts: NETWORK ? true : ['trustflow.local'], // accept tunnel domains (dev only)
     proxy: {
       // Proxy API + SSE to the backend; SSE must NOT be buffered.
       '/v1': { target: BACKEND, changeOrigin: true },
