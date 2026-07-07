@@ -268,6 +268,5 @@ click any stage chip for the full inspector (compiler, policy, gateway playgroun
 |-----|---------|
 | [`schemas/policy-artifact.schema.json`](schemas/policy-artifact.schema.json) | Compiled policy shape |
 | [`schemas/gateway-audit-event.schema.json`](schemas/gateway-audit-event.schema.json) | Audit event shape |
-| [`plans/boardroom_protocol.md`](plans/boardroom_protocol.md) | Agent message protocol |
-| [`plans/hackathon_mvp_scope.md`](plans/hackathon_mvp_scope.md) | What's in / out for demo |
+| [`boardroom_protocol.md`](boardroom_protocol.md) | Agent message protocol |
 | [`hackathon/EVIDENCE_CHAIN.md`](hackathon/EVIDENCE_CHAIN.md) | Grounded claims for pitch |

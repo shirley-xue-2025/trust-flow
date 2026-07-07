@@ -25,7 +25,7 @@ Five agent roles in the boardroom (Procurement may merge with Compliance in thin
 | **Procurement & Vendor Risk** | DPA, subprocessor list, VRM | Permanent |
 | **Works Council Liaison** | Betriebsvereinbarung, DE co-determination | Permanent (DE entities) |
 
-Output of negotiation: a **compiled policy** (see Policy Artifact). Full protocol: `docs/plans/boardroom_protocol.md`.
+Output of negotiation: a **compiled policy** (see Policy Artifact). Full protocol: `docs/boardroom_protocol.md`.
 
 ---
 

@@ -130,7 +130,7 @@ passcode gate. Step-by-step guide:
 | [`app/deploy/`](app/deploy/) | Docker, nginx, Alibaba Cloud deploy guide |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product & system architecture |
 | [`docs/hackathon/`](docs/hackathon/) | Submission pack — deck, screenshots, evidence chain |
-| [`docs/plans/boardroom_protocol.md`](docs/plans/boardroom_protocol.md) | Agent negotiation protocol |
+| [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) | Agent negotiation protocol |
 | [`docs/schemas/`](docs/schemas/) | JSON schemas (proposal envelope, policy artifact) |
 | [`docs/fixtures/`](docs/fixtures/) | Org config seed + demo/eval data |
 | [`docs/research/`](docs/research/) | Regulatory & market research, personas |

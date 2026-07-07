@@ -14,7 +14,7 @@ trust-flow/                    ← this git repo (shared / public submission)
 │   ├── DEFINITIONS.md
 │   ├── schemas/
 │   ├── fixtures/
-│   ├── plans/
+│   ├── boardroom_protocol.md
 │   ├── hackathon/             ← submission pack (deck, screenshots, evidence)
 │   └── research/
 ├── prototypes/
