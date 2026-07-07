@@ -51,15 +51,22 @@ export function useBoardroomRun(
       });
   }, [request, replay]);
 
+  const autoRunRef = useRef(autoRun);
+  autoRunRef.current = autoRun;
+
+  // autoRun is read via ref, not listed as a dep: flipping it (e.g. handleRun's
+  // setAutoRun(false) right after a manual run()) must not re-fire this effect's
+  // cleanup, which would bump runSeqRef and orphan the just-started session
+  // before its stream ever opens.
   useEffect(() => {
-    if (!autoRun || !request) return;
+    if (!autoRunRef.current || !request) return;
     run();
     return () => {
       runSeqRef.current++;
       esRef.current?.close();
       esRef.current = null;
     };
-  }, [request, replay, autoRun, run]);
+  }, [request, replay, run]);
 
   const reset = useCallback(() => {
     runSeqRef.current++;
