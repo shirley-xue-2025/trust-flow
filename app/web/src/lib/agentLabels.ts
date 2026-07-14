@@ -23,3 +23,18 @@ export const STANCE_LABELS: Record<string, string> = {
   reject: 'Opposes',
   pass: 'Deferred',
 };
+
+/** Human labels for routing_decision codes shown to judges. */
+export const ROUTING_LABELS: Record<string, string> = {
+  CLOUD_QWEN_MAX: 'Completed in cloud',
+  LOCAL_QWEN_72B: 'Processed on-prem',
+  BLOCKED: 'Blocked',
+};
+
+export function formatRoutingLabel(
+  route: string | null | undefined,
+  outcome?: string | null,
+): string | null {
+  if (!route || outcome === 'DENIED') return null;
+  return ROUTING_LABELS[route] ?? route.replace(/_/g, ' ').toLowerCase();
+}

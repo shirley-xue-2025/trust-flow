@@ -1,15 +1,10 @@
 import type { PolicyArtifact } from '@trustflow/shared';
+import { policyJsonLineHighlighted } from '@/lib/policyHighlight';
 
 /**
- * Shows rules.json + version hash. "Diff highlight" marks the fields the
- * boardroom negotiated above the seed defaults (sensitive routing, retention,
- * deny_overrides) so a DPO can see what changed.
+ * Shows rules.json + version hash. Highlighted lines mark fields the
+ * boardroom negotiated above the seed defaults.
  */
-const HIGHLIGHT_KEYS = ['sensitive', 'retention_class', 'deny_overrides', 'max_tokens_per_day'];
-
-function renderJson(policy: PolicyArtifact): string {
-  return JSON.stringify(policy, null, 2);
-}
 
 export default function PolicyPanel({
   policy,
@@ -29,7 +24,7 @@ export default function PolicyPanel({
     );
   }
 
-  const lines = renderJson(policy).split('\n');
+  const lines = JSON.stringify(policy, null, 2).split('\n');
 
   return (
     <div className="panel">
@@ -44,7 +39,7 @@ export default function PolicyPanel({
       </p>
       <pre className="json">
         {lines.map((ln, i) => {
-          const hit = HIGHLIGHT_KEYS.some((k) => ln.includes(`"${k}"`));
+          const hit = policyJsonLineHighlighted(ln);
           return (
             <div key={i} className={hit ? 'added' : ''}>
               {ln}

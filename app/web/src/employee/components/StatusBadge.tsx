@@ -1,6 +1,7 @@
 import type { EmployeeRequestStatus } from '@trustflow/shared';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { DENY_LABELS } from '@/lib/agentLabels';
 
 const LABELS: Record<EmployeeRequestStatus, string> = {
   submitted: 'Submitted',
@@ -12,7 +13,7 @@ const LABELS: Record<EmployeeRequestStatus, string> = {
   denied_pending_employee: 'Action required',
   appeal_pending: 'Appeal pending',
   denied_closed: 'Closed',
-  pending_external: 'Pending — works council gate',
+  pending_external: 'Pending external gate',
   pending_human: 'Needs DPO review',
   denied: 'Denied',
 };
@@ -37,14 +38,24 @@ const VARIANTS: Record<
 
 export function StatusBadge({
   status,
+  denyCode,
   className,
 }: {
   status: EmployeeRequestStatus;
+  /** Plain-English gate when status is pending_external */
+  denyCode?: string;
   className?: string;
 }) {
+  let label = LABELS[status] ?? status;
+  if (status === 'pending_external' && denyCode && DENY_LABELS[denyCode]) {
+    label = `Pending — ${DENY_LABELS[denyCode]}`;
+  } else if (status === 'denied' && denyCode && DENY_LABELS[denyCode]) {
+    label = `Denied — ${DENY_LABELS[denyCode]}`;
+  }
+
   return (
     <Badge variant={VARIANTS[status] ?? 'secondary'} className={cn(className)}>
-      {LABELS[status] ?? status}
+      {label}
     </Badge>
   );
 }

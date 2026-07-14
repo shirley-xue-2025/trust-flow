@@ -57,7 +57,7 @@ export default function RequestsListPage({ profile }: { profile: EmployeeProfile
                         {new Date(r.submitted_at).toLocaleString()}
                       </td>
                       <td className="py-3 pr-4">
-                        <StatusBadge status={r.status} />
+                        <StatusBadge status={r.status} denyCode={r.deny_code} />
                       </td>
                       <td className="py-3 text-right">
                         <Button variant="ghost" size="sm" asChild>

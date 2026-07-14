@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-07-05",
+  "captured_at": "2026-07-14",
   "model": "qwen-max",
   "scenario_id": "S05",
   "scenario_name": "No DPA — procurement veto",
@@ -14,10 +14,15 @@
     "api_calls": 1,
     "stance": "conditional_approve",
     "recommendation": "CONDITIONAL",
-    "natural_language": "Conditionally approve the use of ChatGPT Enterprise for summarization, with the requirement that raw prompt logging remains disabled and the retention period is set to 6 months.",
+    "natural_language": "Approve the use of ChatGPT Enterprise for summarization with the condition that raw prompt logging remains disabled, no manager dashboard access, and a 6-month retention period is maintained.",
     "demands": [
       {
         "field": "audit.raw_prompt_logging",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "audit.manager_dashboard_allowed",
         "value": false,
         "hard": true
       },
@@ -37,17 +42,17 @@
         {
           "type": "regulatory",
           "ref": "GDPR",
-          "text": "The use case is for summarization, which is considered low-risk. However, to ensure compliance with GDPR, we must maintain the policy of not logging raw prompts."
-        },
-        {
-          "type": "process",
-          "ref": "NordPay AG Policy",
-          "text": "The minimum retention period must be set to standard_6mo as per organizational policy."
+          "text": "The use case is for summarization, which is considered low-risk. However, to ensure compliance with GDPR, we must maintain standard safeguards."
         }
       ],
       "demands": [
         {
           "field": "audit.raw_prompt_logging",
+          "value": false,
+          "hard": true
+        },
+        {
+          "field": "audit.manager_dashboard_allowed",
           "value": false,
           "hard": true
         },
@@ -61,17 +66,17 @@
       "evidence_ids": [
         "R0008"
       ],
-      "natural_language": "Conditionally approve the use of ChatGPT Enterprise for summarization, with the requirement that raw prompt logging remains disabled and the retention period is set to 6 months."
+      "natural_language": "Approve the use of ChatGPT Enterprise for summarization with the condition that raw prompt logging remains disabled, no manager dashboard access, and a 6-month retention period is maintained."
     }
   },
   "multi_agent_boardroom": {
-    "api_calls": 6,
-    "transcript_rounds": 6,
+    "api_calls": 14,
+    "transcript_rounds": 14,
     "outcome": "DENIED",
     "deny_code": "VENDOR_DPA_PENDING",
     "routing_decision": "CLOUD_QWEN_MAX",
     "procurement_round1_stance": "conditional_reject",
-    "summary": "R1 Procurement [conditional_reject]: I am blocking this request until the DPA with the vendor is signed. The DPA is a non-negotiable requirement for vendor risk management. | R5 Runner [conditional_approve]: I agree with IT & Infra's suggestion to route sensitive traffic to LOCAL_QWEN_72B. This will allow us to proceed with a pilot while the DPA is being finalized, unlocking productivity for our employees.",
+    "summary": "R1 Procurement [conditional_reject]: Workflow Runner, I understand the urgency, but we can't move forward without a signed DPA. This is a non-negotiable requirement for us. Let's get the DPA executed as soon as possible to avoid any further delays. | R5 Runner [conditional_approve]: Procurement & Vendor Risk, I understand the importance of a signed DPA, but we can't afford to wait. Let's route sensitive data through Local Qwen-72B, which has no DPA issues. This way, we can start the pilot and still comply with our policies. We have the support from Corporate Compliance, Works Council Liaison, and IT & Infra on this approach.",
     "golden_source": "app/backend/test/golden/S05.json"
   },
   "track3_verdict": {

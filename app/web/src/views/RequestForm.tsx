@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { EvalScenario, RequestPacket } from '@trustflow/shared';
 import { getScenarios } from '../api.js';
+import { scenarioPresentation } from '@/lib/scenarioPresentation';
 
 export default function RequestForm({
   onSubmit,
@@ -78,27 +79,30 @@ export default function RequestForm({
       </div>
 
       <div className="col panel">
-        <h2>Replay a locked scenario (no API key)</h2>
+        <h2>Recorded demo scenarios (no API key)</h2>
         <p className="muted">
-          Each scenario replays a recorded live-qwen-max transcript through the same deterministic
+          Each scenario replays a saved qwen-max negotiation through the same deterministic
           compiler — no API key needed.
         </p>
-        {scenarios.map((s) => (
+        {scenarios.map((s) => {
+          const p = scenarioPresentation(s.scenario_id, s.name);
+          return (
           <div key={s.scenario_id} style={{ marginBottom: 10 }}>
             <button
               className="ghost"
               style={{ width: '100%', textAlign: 'left' }}
               onClick={() => onSubmit(s.request, s.scenario_id)}
             >
-              <strong>{s.scenario_id}</strong> · {s.name}
+              <strong>{p.title}</strong>
               <div className="muted" style={{ fontSize: 12 }}>
-                expected: {s.expected_session_outcome}
-                {s.expected_deny_code ? ` (${s.expected_deny_code})` : ''}
+                Expected: {s.expected_session_outcome}
+                {s.expected_deny_code ? ` · ${s.expected_deny_code.replace(/_/g, ' ').toLowerCase()}` : ''}
                 {s.expected_routing ? ` → ${s.expected_routing}` : ''}
               </div>
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

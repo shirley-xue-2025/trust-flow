@@ -4,7 +4,13 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
-    "claims": [],
+    "claims": [
+      {
+        "type": "process",
+        "ref": "Summarization Use Case",
+        "text": "The Microsoft 365 Copilot tool will significantly enhance our team's productivity by automating the summarization of lengthy documents, enabling faster decision-making and project delivery. This is a critical step in streamlining our operations and ensuring that we meet our upcoming project deadlines."
+      }
+    ],
     "demands": [
       {
         "field": "audit.raw_prompt_logging",
@@ -18,8 +24,11 @@
       }
     ],
     "concessions": [],
-    "evidence_ids": [],
-    "natural_language": "I fully support the approval of this request for Microsoft 365 Copilot, as it aligns with our organizational policies and will significantly enhance productivity."
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "We have an urgent need to approve the use of Microsoft 365 Copilot for summarization. This tool will help us meet our project timelines and improve overall efficiency. We must ensure that raw prompt logging and manager dashboards are not enabled, as these are non-negotiable red lines.",
+    "beat": "opening"
   },
   {
     "session_id": "S01",
@@ -30,7 +39,8 @@
     "demands": [],
     "concessions": [],
     "evidence_ids": [],
-    "natural_language": "The DPA is signed, and there are no vendor-related concerns. I support the approval."
+    "natural_language": "Workflow Runner, I agree with your stance on the non-negotiable red lines. Since the DPA for Microsoft 365 Copilot is signed, and there are no other vendor-related issues, I am in favor of approving this request.",
+    "beat": "lane"
   },
   {
     "session_id": "S01",
@@ -41,18 +51,23 @@
       {
         "type": "regulatory",
         "ref": "EU AI Act Art. 50",
-        "text": "Summarization is categorized as limited risk, requiring transparency measures."
+        "text": "Summarization is considered limited risk, but we must ensure transparency and proper data handling."
       }
     ],
     "demands": [
       {
-        "field": "risk_tier",
-        "value": "LIMITED_RISK",
+        "field": "audit.raw_prompt_logging",
+        "value": false,
         "hard": true
       },
       {
-        "field": "audit.retention_class",
-        "value": "standard_6mo",
+        "field": "audit.manager_dashboard_allowed",
+        "value": false,
+        "hard": true
+      },
+      {
+        "field": "risk_tier",
+        "value": "LIMITED_RISK",
         "hard": true
       }
     ],
@@ -60,7 +75,34 @@
     "evidence_ids": [
       "R0008"
     ],
-    "natural_language": "I agree with the Workflow Runner's demands on raw prompt logging and manager dashboard access. However, we need to ensure that the risk tier is set to LIMITED_RISK and the audit retention class is at least standard_6mo to comply with EU AI Act and GDPR."
+    "natural_language": "Workflow Runner, I agree with your stance on the non-negotiable red lines. Procurement & Vendor Risk, thank you for confirming the DPA. However, to ensure compliance with the EU AI Act, we need to formally document the risk tier as LIMITED_RISK. This will help us maintain provable control and transparency.",
+    "beat": "lane"
+  },
+  {
+    "session_id": "S01",
+    "round": 2,
+    "agent": "workflow_runner",
+    "stance": "approve",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "Corporate Compliance, I appreciate your concern for compliance with the EU AI Act. However, given that the use case is for summarization and no data classes are involved, I believe the risk tier of LIMITED_RISK is already implied. Let's move forward with the approval to avoid delays and ensure our team can leverage this tool for improved productivity.",
+    "beat": "rebuttal",
+    "addressing": "corporate_compliance"
+  },
+  {
+    "session_id": "S01",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "Workflow Runner, I understand the urgency and the need for improved productivity. However, to ensure we maintain provable control and transparency, it is crucial that we formally document the risk tier as LIMITED_RISK. This is a non-negotiable step for compliance with the EU AI Act. Let's move forward with this documentation in place.",
+    "beat": "rebuttal",
+    "addressing": "workflow_runner"
   },
   {
     "session_id": "S01",
@@ -71,7 +113,8 @@
     "demands": [],
     "concessions": [],
     "evidence_ids": [],
-    "natural_language": "I have no objections in my lane, as the Betriebsvereinbarung status is signed and the use case does not trigger additional works council requirements."
+    "natural_language": "Workflow Runner, Corporate Compliance, and Procurement & Vendor Risk, I see that the Betriebsvereinbarung status is signed, and there are no data classes involved. Given that the use case is for summarization, which is a limited risk, and the DPA is in place, I have no objections from my lane. Let's move forward with the approval.",
+    "beat": "lane"
   },
   {
     "session_id": "S01",
@@ -81,10 +124,105 @@
     "claims": [
       {
         "type": "cost",
-        "ref": "Org Policy",
-        "text": "Routing sensitive traffic to LOCAL_QWEN_72B for data sovereignty and cost efficiency."
+        "ref": "budget.*",
+        "text": "Routing sensitive and payment-schema traffic to LOCAL_QWEN_72B is preferred for data sovereignty and cost efficiency."
       }
     ],
+    "demands": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "Workflow Runner, Corporate Compliance, and Procurement & Vendor Risk, I agree with the need to move forward. However, to ensure data sovereignty and cost efficiency, I propose routing all sensitive and payment-schema traffic to LOCAL_QWEN_72B. This aligns with our organizational policies and preferences.",
+    "beat": "lane"
+  },
+  {
+    "session_id": "S01",
+    "round": 4,
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [],
+    "natural_language": "IT & Infra, I understand the need for data sovereignty and cost efficiency. Routing sensitive and payment-schema traffic to LOCAL_QWEN_72B is a reasonable compromise. Let's move forward with this adjustment to ensure we can start using Microsoft 365 Copilot for summarization without further delays.",
+    "beat": "rebuttal",
+    "addressing": "it_infra"
+  },
+  {
+    "session_id": "S01",
+    "round": 4,
+    "agent": "it_infra",
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "Workflow Runner, I appreciate your understanding and support for our proposal to route sensitive and payment-schema traffic to LOCAL_QWEN_72B. This aligns well with our organizational policies and preferences. Since there are no further objections from my lane, let's move forward with this adjustment.",
+    "beat": "rebuttal",
+    "addressing": "workflow_runner"
+  },
+  {
+    "session_id": "S01",
+    "round": 5,
+    "agent": "procurement",
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "Workflow Runner, Corporate Compliance, and IT & Infra, I see that the DPA for Microsoft 365 Copilot is signed, and there are no other vendor-related issues. Given that the Betriebsvereinbarung status is also signed, I have no objections from my lane. Let's move forward with the approval.",
+    "beat": "final"
+  },
+  {
+    "session_id": "S01",
+    "round": 5,
+    "agent": "corporate_compliance",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [
+      {
+        "field": "risk_tier",
+        "value": "LIMITED_RISK",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "Workflow Runner, I appreciate your understanding of the urgency. However, to ensure we maintain provable control and transparency, it is crucial that we formally document the risk tier as LIMITED_RISK. This is a non-negotiable step for compliance with the EU AI Act. Let's move forward with this documentation in place.",
+    "beat": "final"
+  },
+  {
+    "session_id": "S01",
+    "round": 5,
+    "agent": "works_council",
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "Workflow Runner, Corporate Compliance, and IT & Infra, I see that the Betriebsvereinbarung status is signed, and there are no data classes involved. Given that the use case is for summarization, which is a limited risk, and the DPA is in place, I have no objections from my lane. Let's move forward with the approval. I trust that the necessary documentation for the risk tier will be handled as discussed. Thank you, everyone, for your collaboration on this matter. Let's proceed without further delays. Best, Works Council Liaison",
+    "beat": "final"
+  },
+  {
+    "session_id": "S01",
+    "round": 5,
+    "agent": "it_infra",
+    "stance": "pass",
+    "claims": [],
     "demands": [],
     "concessions": [
       {
@@ -95,7 +233,8 @@
     "evidence_ids": [
       "R0008"
     ],
-    "natural_language": "I agree with the demands from Corporate Compliance on risk tier and retention class. I propose routing sensitive traffic to LOCAL_QWEN_72B to ensure data sovereignty and cost efficiency."
+    "natural_language": "Workflow Runner, Corporate Compliance, and Procurement & Vendor Risk, I appreciate the collaboration and the alignment on the need for data sovereignty and cost efficiency. Since we have already agreed to route sensitive and payment-schema traffic to LOCAL_QWEN_72B, and there are no further objections from my lane, let's move forward with this adjustment. Best, IT & Infra",
+    "beat": "final"
   },
   {
     "session_id": "S01",
@@ -110,7 +249,10 @@
         "value": "LOCAL_QWEN_72B"
       }
     ],
-    "evidence_ids": [],
-    "natural_language": "I support the demands from Corporate Compliance and IT & Infra. Routing sensitive traffic to LOCAL_QWEN_72B is a practical solution that aligns with our data sovereignty and cost efficiency goals."
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "Corporate Compliance, I fully understand the need for formal documentation of the risk tier as LIMITED_RISK. IT & Infra, your proposal to route sensitive and payment-schema traffic to LOCAL_QWEN_72B is a reasonable and acceptable adjustment. With these points in place, I believe we are ready to move forward with the approval. Let's get this tool up and running to support our team's productivity.",
+    "beat": "final"
   }
 ]

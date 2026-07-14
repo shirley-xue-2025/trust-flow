@@ -1,10 +1,16 @@
 flowchart LR
-    R0["Round 0\nRunner"] --> R1["Round 1\nProcurement"]
-    R1 --> R2["Round 2\nCompliance"]
-    R2 --> R3["Round 3\nWorks Council"]
-    R3 --> R4["Round 4\nIT Infra"]
-    R4 --> R5["Round 5\nFinal sign-off"]
-    R5 --> OUT{Outcome}
+    R0["Opening\nRunner"] --> L1["Lane\nProcurement"]
+    L1 --> R1{Rebuttal?}
+    R1 -->|veto / conflict| RB1["Runner ↔ Procurement"]
+    R1 -->|pass| L2["Lane\nCompliance"]
+    RB1 --> L2
+    L2 --> L3["Lane\nWorks Council"]
+    L3 --> L4["Lane\nIT Infra"]
+    L4 --> R4{Rebuttal?}
+    R4 -->|optional| RB4["Runner ↔ IT"]
+    R4 --> F["Finals\nall agents"]
+    RB4 --> F
+    F --> OUT{Compiler}
     OUT --> APPROVED
     OUT --> DENIED
     OUT --> PENDING_HUMAN

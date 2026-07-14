@@ -192,6 +192,9 @@ export interface AgentConcession {
   value: unknown;
 }
 
+/** Phase within a boardroom debate (protocol v2). Compiler ignores this. */
+export type DebateBeat = 'opening' | 'lane' | 'rebuttal' | 'final';
+
 export interface BoardroomEnvelope {
   session_id: string;
   round: number;
@@ -202,6 +205,10 @@ export interface BoardroomEnvelope {
   concessions?: AgentConcession[];
   evidence_ids?: string[];
   natural_language: string;
+  /** UI + prompt threading — who this turn primarily addresses. */
+  addressing?: AgentId;
+  /** UI + replay pacing — opening, lane review, rebuttal, or final position. */
+  beat?: DebateBeat;
 }
 
 // ---------------------------------------------------------------------------

@@ -28,16 +28,16 @@ const shot = (name) => page.screenshot({ path: `${OUT}/${name}.png` });
 // 0 — pristine demo state
 await api('POST', '/v1/demo/reseed');
 
-// 1 — glassbox boardroom theater (replay finishes → result badge)
+// 1 — glassbox classic (boardroom outcome after payment-routing demo replay)
 await page.goto(`${WEB}/glassbox`);
-await page.getByText('Round 5', { exact: false }).first().waitFor({ timeout: 30000 });
-await page.waitForTimeout(600);
+await page.locator('.glassbox-theater__outcome, .boardroom-stage-transcript').first().waitFor({ timeout: 45000 });
+await page.waitForTimeout(800);
 await shot('01_glassbox_boardroom_s04');
 
 // 2 — employee S04 agent-negotiation transcript
-await page.goto(`${WEB}/employee/requests/demo-s04-pending-signoff`);
-await page.getByText('Round 0', { exact: false }).first().waitFor({ timeout: 15000 });
-await page.evaluate(() => window.scrollTo(0, 980));
+await page.goto(`${WEB}/employee/requests/demo-s04-pending-signoff?tab=negotiation`);
+await page.getByText('Round 5', { exact: false }).first().waitFor({ timeout: 30000 });
+await page.evaluate(() => window.scrollTo(0, 400));
 await page.waitForTimeout(400);
 await shot('02_employee_negotiation_s04');
 
@@ -69,7 +69,7 @@ await shot('04_governance_signoff_approved');
 
 // 5/6 — gateway playground: email MASK, then IBAN BLOCK
 await page.goto(`${WEB}/glassbox`);
-await page.getByText('Round 5', { exact: false }).first().waitFor({ timeout: 30000 });
+await page.locator('.glassbox-theater__outcome').waitFor({ timeout: 45000 });
 const gatewayCard = page.getByText('Send a prompt to test').first();
 await gatewayCard.click();
 const panel = page.getByText('Send through gateway');

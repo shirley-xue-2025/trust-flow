@@ -42,6 +42,8 @@ export const concessionSchema = z.object({
   value: z.unknown(),
 });
 
+export const DEBATE_BEATS = ['opening', 'lane', 'rebuttal', 'final'] as const;
+
 export const envelopeSchema = z.object({
   session_id: z.string(),
   round: z.number().int().min(0),
@@ -52,6 +54,8 @@ export const envelopeSchema = z.object({
   concessions: z.array(concessionSchema).optional(),
   evidence_ids: z.array(z.string()).optional(),
   natural_language: z.string(),
+  addressing: z.enum(AGENT_IDS).optional(),
+  beat: z.enum(DEBATE_BEATS).optional(),
 });
 
 export type EnvelopeInput = z.infer<typeof envelopeSchema>;

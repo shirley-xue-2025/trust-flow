@@ -104,6 +104,10 @@ export default function RequestDetailPage() {
       setActiveTab('activity');
       return;
     }
+    if (tabFromQuery === 'negotiation') {
+      setActiveTab('negotiation');
+      return;
+    }
     setActiveTab(defaultRequestDetailTab(record, transcript.length));
   }, [hydrated, record, transcript.length, activeTab, tabFromQuery]);
 
@@ -150,7 +154,7 @@ export default function RequestDetailPage() {
             {new Date(record.submitted_at).toLocaleString()}
           </p>
         </div>
-        <StatusBadge status={record.status} className="self-start" />
+        <StatusBadge status={record.status} denyCode={record.deny_code} className="self-start" />
       </div>
 
       {record.parent_request_id && (
@@ -187,6 +191,13 @@ export default function RequestDetailPage() {
           <AlertDescription>
             Stakeholders recommended approval. DPO and IT must sign off before you can use this tool.
           </AlertDescription>
+        </Alert>
+      )}
+
+      {record.status === 'denied_closed' && (
+        <Alert>
+          <AlertTitle>Request closed</AlertTitle>
+          <AlertDescription>You accepted the denial. This request is closed.</AlertDescription>
         </Alert>
       )}
 

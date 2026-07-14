@@ -64,19 +64,17 @@ Header **Viewing as** switches DPO / Procurement / IT personas.
 
 ### Glassbox (`/glassbox`)
 
-**Boardroom-first theater** for judges and engineers (not the employee product):
+**Classic glassbox** — transparent judge view of the full pipeline:
 
-- **Pipeline strip:** Inputs → Agent boardroom → Compiler → Humans → Gateway
-- **Stage:** Five-agent roster + live negotiation transcript (SSE)
-- **Enforcement bar:** Muted chips for compiler, policy, gateway, audit, result — click for detail panel
-- Toolbar: Scenario (S01–S05), **Run** — auto-loads **S04** on first visit
-- Detail panel (in-layout, right): full inspector for request form, org gates, compiler, policy, gateway playground, audit
-- Triad legend: blue (data reads) · green (AI) · purple (deterministic mechanics)
+- Pipeline strip: Inputs → Agent boardroom → Compiler signs → Humans approve → Gateway enforces
+- Boardroom theater with full negotiation transcript (opening → lanes → rebuttals → finals)
+- Click-to-inspect panels: employee request, org gates, compiled policy, gateway playground, audit
+- **Payment data — sovereign routing** demo scenario auto-loads; run boardroom then test PII MASK / IBAN BLOCK in gateway
 
 `/demo` redirects to `/glassbox`.
 
-**Replay mode** (`?replay=S0X` on boardroom session) is the keyless, deterministic path.
-It sources recorded live-qwen-max golden transcripts instead of calling Qwen, then runs them
+**Recorded demo mode** (`?replay=` on boardroom session) is the keyless, deterministic path.
+It replays saved qwen-max negotiations instead of calling the API, then runs them
 through the *same* compiler + gateway.
 
 ## Live Qwen (optional — needs the voucher key)

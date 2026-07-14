@@ -5,7 +5,8 @@ import PolicyPanel from '../views/PolicyPanel.js';
 import Playground from '../views/Playground.js';
 import AuditLog from '../views/AuditLog.js';
 import { resultGrounding } from './processGraph.js';
-import { DENY_LABELS } from '../lib/agentLabels.js';
+import { DENY_LABELS, formatRoutingLabel } from '../lib/agentLabels.js';
+import { scenarioPresentation } from '@/lib/scenarioPresentation';
 
 const AGENT_NAME: Record<string, string> = {
   workflow_runner: 'Workflow Runner',
@@ -103,7 +104,11 @@ export default function NodeInspector({
                   {DENY_LABELS[result.deny_code] ?? result.deny_code}
                 </p>
               )}
-              {result.routing_decision && <p className="muted">routing: {result.routing_decision}</p>}
+              {formatRoutingLabel(result.routing_decision, result.outcome) && (
+                <p className="muted">
+                  Routing: {formatRoutingLabel(result.routing_decision, result.outcome)}
+                </p>
+              )}
               <div className="hash">hash: {result.policy_version_hash}</div>
             </>
           )}
@@ -263,7 +268,7 @@ function RequestInspectorForm({
         <option value="pending">Pending</option>
       </select>
 
-      <label>Betriebsvereinbarung (§87)</label>
+      <label>Works council agreement (Betriebsvereinbarung)</label>
       <select
         value={betriebsrat}
         onChange={(e) => setBetriebsrat(e.target.value as 'signed' | 'pending')}
@@ -277,24 +282,27 @@ function RequestInspectorForm({
       </button>
 
       <div className="inspector-scenarios">
-        <strong>Replay scenarios</strong>
+        <strong>Recorded demo scenarios</strong>
         <p className="inspector-hint muted">
-          Recorded qwen-max transcripts — deterministic, no API key.
+          Saved qwen-max negotiations — replayed deterministically, no API key.
         </p>
-        {scenarios.map((s) => (
+        {scenarios.map((s) => {
+          const p = scenarioPresentation(s.scenario_id, s.name);
+          return (
           <button
             key={s.scenario_id}
             type="button"
             className="scenario-btn"
             onClick={() => onSubmit(s.request, s.scenario_id)}
           >
-            <span>{s.scenario_id}</span> · {s.name}
+            <span>{p.title}</span>
             <small>
               {s.expected_session_outcome}
-              {s.expected_deny_code ? ` (${s.expected_deny_code})` : ''}
+              {s.expected_deny_code ? ` · ${DENY_LABELS[s.expected_deny_code] ?? s.expected_deny_code}` : ''}
             </small>
           </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

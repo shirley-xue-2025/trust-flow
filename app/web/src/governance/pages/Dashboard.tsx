@@ -135,7 +135,7 @@ function RequestTable({
               </td>
               <td className="py-3 pr-4">{r.tool_display_name}</td>
               <td className="py-3 pr-4">
-                <StatusBadge status={r.status} />
+                <StatusBadge status={r.status} denyCode={r.deny_code} />
               </td>
               <td className="py-3 text-muted-foreground">
                 {new Date(r.submitted_at).toLocaleDateString()}

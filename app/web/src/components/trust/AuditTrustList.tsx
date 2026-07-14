@@ -1,7 +1,7 @@
 import type { GatewayAuditEvent } from '@trustflow/shared';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DENY_LABELS } from '@/lib/agentLabels';
+import { DENY_LABELS, formatRoutingLabel } from '@/lib/agentLabels';
 
 const OUTCOME_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline' | 'success'> = {
   allowed: 'success',
@@ -46,7 +46,8 @@ export function AuditTrustList({
                   <Badge variant={OUTCOME_VARIANT[e.outcome] ?? 'outline'}>{e.outcome}</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(e.timestamp).toLocaleString()} · route {e.routing_decision}
+                  {new Date(e.timestamp).toLocaleString()}
+                  {formatRoutingLabel(e.routing_decision) && ` · ${formatRoutingLabel(e.routing_decision)}`}
                 </p>
                 {e.deny_reason_code && (
                   <p className="mt-1 text-xs text-destructive">
@@ -60,10 +61,10 @@ export function AuditTrustList({
                 )}
                 {(e.risk_tier || e.disclosure_shown !== undefined) && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {e.risk_tier && <span>risk_tier: {e.risk_tier}</span>}
+                    {e.risk_tier && <span>Risk tier: {e.risk_tier.replace(/_/g, ' ').toLowerCase()}</span>}
                     {e.risk_tier && e.disclosure_shown !== undefined && ' · '}
                     {e.disclosure_shown !== undefined && (
-                      <span>disclosure_shown: {String(e.disclosure_shown)}</span>
+                      <span>Disclosure banner: {e.disclosure_shown ? 'shown' : 'not shown'}</span>
                     )}
                   </p>
                 )}

@@ -4,7 +4,13 @@
     "round": 0,
     "agent": "workflow_runner",
     "stance": "approve",
-    "claims": [],
+    "claims": [
+      {
+        "type": "process",
+        "ref": "Betriebsrat",
+        "text": "We have a pending Betriebsvereinbarung, and we need to move forward with the Claude Code tool for code completion to ensure our developers can meet the upcoming release deadlines."
+      }
+    ],
     "demands": [
       {
         "field": "audit.raw_prompt_logging",
@@ -17,20 +23,29 @@
         "hard": true
       }
     ],
-    "concessions": [],
-    "evidence_ids": [],
-    "natural_language": "I advocate for the approval of this request to use Claude Code for code completion. It will significantly boost our developers' productivity and aligns with our current policies."
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "We are here to discuss the urgent need for the Claude Code tool to support our developers in meeting the upcoming release deadlines. The data involved is minimal, and we need to ensure that we do not delay the project. I propose we approve this request, with the understanding that raw prompt logging and manager dashboards are not allowed, and sensitive data will be routed to Local Qwen 72B.",
+    "beat": "opening"
   },
   {
     "session_id": "S02",
     "round": 1,
     "agent": "procurement",
-    "stance": "pass",
+    "stance": "approve",
     "claims": [],
     "demands": [],
     "concessions": [],
     "evidence_ids": [],
-    "natural_language": "I have no objections in my lane this round, as the DPA status is signed and there are no subprocessor issues to address."
+    "natural_language": "I agree with the Workflow Runner's proposal. Since the DPA is signed, and the use case is code completion which is limited risk, I see no issues from a procurement and vendor risk perspective. Let's move forward with the approval.",
+    "beat": "lane"
   },
   {
     "session_id": "S02",
@@ -41,13 +56,13 @@
       {
         "type": "regulatory",
         "ref": "EU AI Act Art. 50",
-        "text": "Code completion is categorized as limited risk, but we must ensure transparency and compliance with GDPR and local works council regulations."
+        "text": "Code completion is a limited-risk use case, but we must ensure that the tool complies with GDPR and works council requirements."
       }
     ],
     "demands": [
       {
-        "field": "risk_tier",
-        "value": "LIMITED_RISK",
+        "field": "audit.retention_class",
+        "value": "standard_6mo",
         "hard": true
       },
       {
@@ -60,7 +75,63 @@
     "evidence_ids": [
       "R0008"
     ],
-    "natural_language": "I conditionally approve this request, but we need to ensure the Betriebsvereinbarung is signed before the tool is rolled out, and the risk tier is set to LIMITED_RISK."
+    "natural_language": "I agree with the Workflow Runner and Procurement & Vendor Risk on the limited risk of code completion. However, we need to ensure that the audit retention class meets the minimum standard of 6 months and that the Betriebsvereinbarung is signed before we proceed. These are non-negotiable for compliance.",
+    "beat": "lane"
+  },
+  {
+    "session_id": "S02",
+    "round": 2,
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [],
+    "natural_language": "I appreciate Corporate Compliance's concerns, but we need to balance compliance with the urgency of our project. I propose we move forward with a pilot using Local Qwen 72B for sensitive data, which has no DPA issues. This way, we can start the code completion process while we finalize the Betriebsvereinbarung and ensure the retention class is set to standard_6mo.",
+    "beat": "rebuttal",
+    "addressing": "corporate_compliance"
+  },
+  {
+    "session_id": "S02",
+    "round": 2,
+    "agent": "corporate_compliance",
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "regulatory",
+        "ref": "GDPR Art. 26(6)",
+        "text": "Audit logs must be retained for a minimum of 6 months, and this is non-negotiable."
+      },
+      {
+        "type": "regulatory",
+        "ref": "§87(1) No.6 BetrVG",
+        "text": "A Betriebsvereinbarung must be signed before company-wide rollout, as the tool is objectively capable of monitoring employees."
+      }
+    ],
+    "demands": [
+      {
+        "field": "audit.retention_class",
+        "value": "standard_6mo",
+        "hard": true
+      },
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I understand the urgency, Workflow Runner, but we must adhere to the regulatory requirements. The audit retention class must be set to standard_6mo, and the Betriebsvereinbarung must be signed. These are non-negotiable. Let's move forward with these conditions in place.",
+    "beat": "rebuttal",
+    "addressing": "workflow_runner"
   },
   {
     "session_id": "S02",
@@ -71,7 +142,7 @@
       {
         "type": "regulatory",
         "ref": "§87(1) No.6 BetrVG",
-        "text": "A signed Betriebsvereinbarung or annex is required before company-wide rollout for any system capable of monitoring employees."
+        "text": "A signed Betriebsvereinbarung is required before a company-wide rollout, as the tool is objectively capable of monitoring employees."
       }
     ],
     "demands": [
@@ -85,7 +156,59 @@
     "evidence_ids": [
       "R0008"
     ],
-    "natural_language": "I conditionally reject the request until a signed Betriebsvereinbarung or annex is in place, as required by §87(1) No.6 BetrVG. The current status is pending, which does not meet the regulatory requirement."
+    "natural_language": "I understand the urgency, Workflow Runner, but we must adhere to the regulatory requirements. As per §87(1) No.6 BetrVG, a signed Betriebsvereinbarung is required before a company-wide rollout. I propose we move forward with a small documented pilot while we finalize the Betriebsvereinbarung.",
+    "beat": "lane"
+  },
+  {
+    "session_id": "S02",
+    "round": 3,
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [
+      {
+        "type": "process",
+        "ref": "§87(1) No.6 BetrVG",
+        "text": "A signed Betriebsvereinbarung is required before a company-wide rollout, but a small documented pilot can be initiated."
+      }
+    ],
+    "demands": [],
+    "concessions": [
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "pending"
+      },
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B"
+      }
+    ],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I appreciate the Works Council Liaison's concern about the Betriebsvereinbarung. Let's move forward with a small, documented pilot using Local Qwen 72B for sensitive data, which has no DPA issues. This will allow us to start the code completion process while we finalize the Betriebsvereinbarung and ensure all regulatory requirements are met.",
+    "beat": "rebuttal",
+    "addressing": "works_council"
+  },
+  {
+    "session_id": "S02",
+    "round": 3,
+    "agent": "works_council",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I appreciate the Workflow Runner's proposal for a small, documented pilot. However, as per §87(1) No.6 BetrVG, we must have a signed Betriebsvereinbarung before any company-wide rollout. Let's move forward with the pilot, but I need to see the Betriebsvereinbarung signed before we can proceed further.",
+    "beat": "rebuttal",
+    "addressing": "workflow_runner"
   },
   {
     "session_id": "S02",
@@ -94,11 +217,31 @@
     "stance": "conditional_approve",
     "claims": [
       {
-        "type": "process",
-        "ref": "pending Betriebsvereinbarung",
-        "text": "The pending status of the Betriebsvereinbarung is a concern, and we need to ensure it is signed before proceeding."
+        "type": "cost",
+        "ref": "budget.*",
+        "text": "Routing sensitive and payment-schema traffic to LOCAL_QWEN_72B is cost-effective and ensures data sovereignty."
       }
     ],
+    "demands": [
+      {
+        "field": "routing.sensitive",
+        "value": "LOCAL_QWEN_72B",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I support the move to use Local Qwen 72B for sensitive data, which aligns with our cost and data sovereignty goals. However, I agree with Corporate Compliance and the Works Council Liaison that we need to ensure the Betriebsvereinbarung is signed before a full rollout. Let's proceed with the pilot as proposed by the Workflow Runner.",
+    "beat": "lane"
+  },
+  {
+    "session_id": "S02",
+    "round": 4,
+    "agent": "workflow_runner",
+    "stance": "conditional_approve",
+    "claims": [],
     "demands": [],
     "concessions": [
       {
@@ -106,23 +249,93 @@
         "value": "LOCAL_QWEN_72B"
       }
     ],
-    "evidence_ids": [
-      "R0008"
-    ],
-    "natural_language": "I conditionally approve this request, but I agree with Works Council Liaison that the Betriebsvereinbarung must be signed. I also propose routing sensitive traffic to LOCAL_QWEN_72B for data sovereignty and cost efficiency."
+    "evidence_ids": [],
+    "natural_language": "I appreciate the support from IT & Infra and the Works Council Liaison. Let's move forward with the pilot using Local Qwen 72B for sensitive data, which aligns with our cost and data sovereignty goals. I understand the importance of the Betriebsvereinbarung, and we will ensure it is signed before a full rollout. This approach allows us to start the code completion process while adhering to all regulatory requirements.",
+    "beat": "rebuttal",
+    "addressing": "it_infra"
+  },
+  {
+    "session_id": "S02",
+    "round": 4,
+    "agent": "it_infra",
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I fully support the move to use Local Qwen 72B for sensitive data, which aligns with our cost and data sovereignty goals. I also agree with the need to ensure the Betriebsvereinbarung is signed before a full rollout. Let's proceed with the pilot as proposed by the Workflow Runner.",
+    "beat": "rebuttal",
+    "addressing": "workflow_runner"
   },
   {
     "session_id": "S02",
     "round": 5,
-    "agent": "workflow_runner",
+    "agent": "procurement",
+    "stance": "pass",
+    "claims": [],
+    "demands": [],
+    "concessions": [],
+    "evidence_ids": [],
+    "natural_language": "I fully support the move to use Local Qwen 72B for sensitive data, which aligns with our cost and data sovereignty goals. I also agree with the need to ensure the Betriebsvereinbarung is signed before a full rollout. Let's proceed with the pilot as proposed by the Workflow Runner.",
+    "beat": "final"
+  },
+  {
+    "session_id": "S02",
+    "round": 5,
+    "agent": "corporate_compliance",
     "stance": "conditional_approve",
     "claims": [
       {
-        "type": "process",
-        "ref": "BetrVG §87(1) No.6",
-        "text": "While the Betriebsvereinbarung is pending, we can still move forward with a pilot to ensure that the tool meets our needs and aligns with our processes."
+        "type": "regulatory",
+        "ref": "§87(1) No.6 BetrVG",
+        "text": "A signed Betriebsvereinbarung is required before a company-wide rollout."
       }
     ],
+    "demands": [
+      {
+        "field": "audit.retention_class",
+        "value": "standard_6mo",
+        "hard": true
+      },
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I appreciate the support from IT & Infra and the Works Council Liaison. Let's move forward with the pilot using Local Qwen 72B for sensitive data, but we must ensure that the audit retention class is set to standard_6mo and the Betriebsvereinbarung is signed before a full rollout. These are non-negotiable for compliance.",
+    "beat": "final"
+  },
+  {
+    "session_id": "S02",
+    "round": 5,
+    "agent": "works_council",
+    "stance": "conditional_approve",
+    "claims": [],
+    "demands": [
+      {
+        "field": "gates.betriebsvereinbarung_status",
+        "value": "signed",
+        "hard": true
+      }
+    ],
+    "concessions": [],
+    "evidence_ids": [
+      "R0008"
+    ],
+    "natural_language": "I appreciate the support from IT & Infra and the Workflow Runner. Let's move forward with the pilot using Local Qwen 72B for sensitive data, but as per §87(1) No.6 BetrVG, we must have a signed Betriebsvereinbarung before any company-wide rollout. This is non-negotiable.",
+    "beat": "final"
+  },
+  {
+    "session_id": "S02",
+    "round": 5,
+    "agent": "it_infra",
+    "stance": "pass",
+    "claims": [],
     "demands": [],
     "concessions": [
       {
@@ -133,6 +346,7 @@
     "evidence_ids": [
       "R0008"
     ],
-    "natural_language": "I agree with IT & Infra's suggestion to route sensitive traffic to LOCAL_QWEN_72B. Let's proceed with a pilot while the Betriebsvereinbarung is finalized to avoid delays and ensure the tool's effectiveness."
+    "natural_language": "I fully support the move to use Local Qwen 72B for sensitive data, which aligns with our cost and data sovereignty goals. I also agree with the need to ensure the Betriebsvereinbarung is signed before a full rollout. Let's proceed with the pilot as proposed by the Workflow Runner.",
+    "beat": "final"
   }
 ]

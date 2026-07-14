@@ -30,7 +30,7 @@ export function BoardroomStageTranscript({
           .filter(Boolean)
           .join(' ')}
       >
-        Negotiation transcript appears here — pick S04 or click Run boardroom.
+        Negotiation transcript appears here — pick a demo scenario or click Run boardroom.
       </div>
     );
   }
@@ -54,7 +54,15 @@ export function BoardroomStageTranscript({
           >
             <div className="boardroom-stage-transcript__meta">
               <span className="boardroom-stage-transcript__round">Round {t.round}</span>
+              {t.beat && t.beat !== 'lane' && (
+                <span className="boardroom-stage-transcript__beat">{t.beat}</span>
+              )}
               <span className="boardroom-stage-transcript__agent">{AGENT_LABELS[t.agent] ?? t.agent}</span>
+              {t.addressing && (
+                <span className="boardroom-stage-transcript__addressing">
+                  → {AGENT_LABELS[t.addressing] ?? t.addressing}
+                </span>
+              )}
               <span className="boardroom-stage-transcript__stance">{STANCE_LABELS[t.stance] ?? t.stance}</span>
             </div>
             <p className="boardroom-stage-transcript__text">{t.natural_language}</p>

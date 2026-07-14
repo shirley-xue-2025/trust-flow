@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import { runInference, type InferenceResponse } from '../api.js';
+import { DENY_LABELS, formatRoutingLabel } from '@/lib/agentLabels';
 
 const SAMPLES = [
   { label: 'Email (masked)', text: 'Email the receipt to katrin.brenner@nordpay.example.' },
@@ -51,7 +52,7 @@ export default function Playground({
 
   return (
     <div className="panel">
-      <h2>Governed inference — Layer A gateway</h2>
+      <h2>Governed inference — gateway</h2>
       <p className="muted">
         Enforcing <span className="mono">{policy.policy_id}</span>. Per-entity PII: emails masked
         (business continues); IBANs may block on payment routes. Deterministic — no LLM in
@@ -80,8 +81,18 @@ export default function Playground({
             <span className={`outcome ${resp.outcome === 'denied' ? 'DENIED' : 'APPROVED'}`}>
               {resp.outcome.toUpperCase()}
             </span>
-            {resp.deny_reason_code && <span className="muted"> · {resp.deny_reason_code}</span>}
-            <span className="muted"> · route {resp.routing_decision}</span>
+            {resp.deny_reason_code && (
+              <span className="muted">
+                {' '}
+                · {DENY_LABELS[resp.deny_reason_code] ?? resp.deny_reason_code}
+              </span>
+            )}
+            {formatRoutingLabel(resp.routing_decision, resp.outcome === 'denied' ? 'DENIED' : 'APPROVED') && (
+              <span className="muted">
+                {' '}
+                · {formatRoutingLabel(resp.routing_decision, resp.outcome === 'denied' ? 'DENIED' : 'APPROVED')}
+              </span>
+            )}
             {resp.local_redaction && (
               <span className="muted"> · redacted on EU-local node first</span>
             )}

@@ -26,7 +26,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
   const demoLinks = [
     { id: 'demo-s04-pending-signoff', label: 'Claude Code — pending sign-off' },
     { id: 'demo-s05-denied', label: 'ChatGPT — denied (appeal demo)' },
-    { id: 'demo-s02-external', label: 'Claude Code — BR external gate' },
+    { id: 'demo-s02-external', label: 'Claude Code — works council gate pending' },
   ];
 
   const tourSteps = [
@@ -47,7 +47,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
     {
       step: 3,
       title: 'Gateway audit',
-      description: 'After sign-off, see PII masked + disclosure_shown in gateway activity. Live tests in glassbox.',
+      description: 'After sign-off, see PII masked and disclosure banners in gateway activity. Live tests in glassbox.',
       icon: ShieldCheck,
       to: '/employee/requests/demo-s04-pending-signoff?tab=activity',
     },
@@ -74,7 +74,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
         <CardHeader>
           <CardTitle className="text-lg">Hackathon demo tour</CardTitle>
           <CardDescription>
-            Problem → Agent Society → HITL sign-off → Gateway → Audit
+            Agent boardroom negotiates → Compiler signs → Humans approve → Gateway enforces
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -202,7 +202,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <StatusBadge status={r.status} />
+                    <StatusBadge status={r.status} denyCode={r.deny_code} />
                     <Button variant="ghost" size="icon" asChild>
                       <Link to={`/employee/requests/${r.request_id}`}>
                         <ArrowRight className="h-4 w-4" />

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import type { EmployeeProfile } from '@trustflow/shared';
 import type { ToolRecord } from '@trustflow/shared';
 import { Loader2 } from 'lucide-react';
+import { scenarioPresentation } from '@/lib/scenarioPresentation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -185,35 +186,21 @@ export default function NewRequestPage({ profile }: { profile: EmployeeProfile }
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2 sm:grid-cols-2">
-          {[
-            {
-              id: 'S04',
-              label: 'S04 — Approved, local route',
-              hint: 'Payment schemas → sovereign local route',
-            },
-            {
-              id: 'S02',
-              label: 'S02 — Works council pending',
-              hint: 'Blocked until Betriebsvereinbarung signed',
-            },
-            {
-              id: 'S05',
-              label: 'S05 — DPA denied',
-              hint: 'Procurement blocks unsigned vendor DPA',
-            },
-            { id: 'S01', label: 'S01 — Happy path', hint: 'Copilot summarization, all gates signed' },
-          ].map((s) => (
+          {(['S04', 'S02', 'S05', 'S01'] as const).map((id) => {
+            const p = scenarioPresentation(id);
+            return (
             <Button
-              key={s.id}
+              key={id}
               variant="outline"
               size="sm"
-              title={s.hint}
+              title={p.subtitle}
               disabled={submitting}
-              onClick={() => submit(s.id)}
+              onClick={() => submit(id)}
             >
-              {s.label}
+              {p.title}
             </Button>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 

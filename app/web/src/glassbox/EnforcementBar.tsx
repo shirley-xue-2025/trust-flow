@@ -54,22 +54,24 @@ export function InputContextBar({
   activeGates,
   onSelectRequest,
   onSelectGates,
+  readOnly = false,
 }: {
   request?: RequestPacket;
   activeRequest?: boolean;
   activeGates?: boolean;
-  onSelectRequest: () => void;
-  onSelectGates: () => void;
+  onSelectRequest?: () => void;
+  onSelectGates?: () => void;
+  readOnly?: boolean;
 }) {
+  const Chip = readOnly ? 'div' : 'button';
   return (
     <div className="glassbox-inputs">
       <span className="glassbox-inputs__label">Inputs</span>
-      <button
-        type="button"
+      <Chip
+        {...(!readOnly ? { type: 'button' as const, onClick: onSelectRequest } : {})}
         className={['glassbox-inputs__chip', activeRequest ? 'glassbox-inputs__chip--active' : '']
           .filter(Boolean)
           .join(' ')}
-        onClick={onSelectRequest}
       >
         <span className="glassbox-inputs__chip-title">Employee request</span>
         <span className="glassbox-inputs__chip-summary">
@@ -77,13 +79,12 @@ export function InputContextBar({
             ? `${request.tool_id} · ${request.use_case_category.replace(/_/g, ' ')}`
             : 'Pick a scenario'}
         </span>
-      </button>
-      <button
-        type="button"
+      </Chip>
+      <Chip
+        {...(!readOnly ? { type: 'button' as const, onClick: onSelectGates } : {})}
         className={['glassbox-inputs__chip', activeGates ? 'glassbox-inputs__chip--active' : '']
           .filter(Boolean)
           .join(' ')}
-        onClick={onSelectGates}
       >
         <span className="glassbox-inputs__chip-title">Org gates read</span>
         <span className="glassbox-inputs__chip-summary">
@@ -91,7 +92,7 @@ export function InputContextBar({
             ? `DPA ${request.vendor_dpa_status ?? '—'} · Works council ${request.betriebsvereinbarung_status ?? '—'}`
             : 'DPA · Works council · entity'}
         </span>
-      </button>
+      </Chip>
     </div>
   );
 }

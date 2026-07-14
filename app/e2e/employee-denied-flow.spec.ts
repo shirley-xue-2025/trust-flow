@@ -33,7 +33,7 @@ test.describe('Denied request — resolution panel', () => {
   test('accept decision closes request', async ({ page }) => {
     await page.goto(DENIED_URL);
     await page.getByRole('button', { name: 'Accept decision' }).click();
-    await expect(page.getByText('Closed')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Request closed' })).toBeVisible();
   });
 
   test('customize alternative link opens new request with parent', async ({ page }) => {
@@ -55,7 +55,7 @@ test.describe('Denied request — page links', () => {
 
     await page.goto(DENIED_URL);
     await page.getByRole('tab', { name: /Agent negotiation/i }).click();
-    await expect(page.getByText(/Round 1/i)).toBeVisible();
+    await expect(page.getByText(/rebuttal|final|Round 1/i).first()).toBeVisible();
     await page.getByRole('tab', { name: 'Policy' }).click();
     await page.getByRole('tab', { name: 'Gateway activity' }).click();
   });

@@ -10,8 +10,8 @@
  * always compiled (even for DENIED/PENDING) so the UI can show what the gateway
  * would enforce once gates clear; deny_overrides keep it blocking meanwhile.
  *
- * If the transcript never reaches a terminal decision within MAX_ROUNDS, the
- * session is forced to PENDING_HUMAN.
+ * If the debate exhausts the turn budget before all agents give final positions,
+ * the session is forced to PENDING_HUMAN.
  */
 import { randomUUID } from 'node:crypto';
 import type {
@@ -24,7 +24,8 @@ import type {
 } from '@trustflow/shared';
 import { compile, type CompileResult } from '../compiler/compile.js';
 import { writePolicy } from '../store/index.js';
-import { MAX_ROUNDS, runRounds } from './round.js';
+import { debateExhausted } from './debate.js';
+import { runRounds } from './round.js';
 
 export interface BoardroomSession {
   session_id: string;
@@ -59,8 +60,8 @@ export function createSession(request: RequestPacket): BoardroomSession {
 }
 
 /** True once the session reached one of the terminal states. */
-function highestRound(transcript: BoardroomEnvelope[]): number {
-  return transcript.reduce((m, e) => Math.max(m, e.round), 0);
+function entityCountry(session: BoardroomSession, org: OrgConfig): string {
+  return session.request.entity_country ?? org.entity_country;
 }
 
 /**
@@ -90,11 +91,10 @@ export async function runSession(
   });
   session.compile = result;
 
-  // Force PENDING_HUMAN if the debate ran past the cap without a clean terminal
-  // decision (i.e. compiler returned APPROVED but rounds exceeded the limit
-  // without consensus). Here the compiler's outcome is authoritative unless the
-  // transcript blew past MAX_ROUNDS.
-  if (highestRound(session.transcript) >= MAX_ROUNDS) {
+  // Force PENDING_HUMAN when the live debate hit the turn cap before finals completed.
+  // Legacy golden replays (no beat tags) never trigger this path.
+  const exhausted = debateExhausted(session.transcript, entityCountry(session, org));
+  if (exhausted) {
     session.outcome = 'PENDING_HUMAN';
     session.state = 'PENDING_HUMAN';
   } else {

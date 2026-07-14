@@ -13,7 +13,7 @@ export const BOARDROOM_AGENT_SHORT: Record<string, string> = {
   corporate_compliance: 'Compliance',
   procurement: 'Procurement',
   it_infra: 'IT & Infra',
-  works_council: 'Works Council (DE labor law)',
+  works_council: 'Works Council',
   workflow_runner: 'Runner',
 };
 

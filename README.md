@@ -79,10 +79,10 @@ This is the differentiator, and the whole design hangs off one boundary:
 
 | Track 3 criterion | TrustFlow implementation | Where to verify |
 |---|---|---|
-| **Task decomposition & role assignment** | Five specialist agents (Runner, Procurement, Compliance, Works Council, IT) negotiate over a fixed **six-round schedule** (round 0 advocate → rounds 1–4 lane responses → round 5 consensus). Each turn returns a schema-validated envelope (`stance`, `demands`, `concessions`). | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) · `/glassbox` boardroom theater · golden transcripts `app/backend/test/golden/S04.json` |
-| **Dialogue & disagreement** | Agents react to the shared transcript, not isolated prompts. **S04:** Compliance and IT negotiate sovereign routing (local redact → cloud complete) — a better outcome than the original request. **S05:** Procurement vetoes unsigned vendor **DPA** in round 1. | `/glassbox` (S04 auto-load) · [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) |
-| **Execution conflicts & resolution** | Disagreement becomes deterministic outcomes: **DENIED**, **PENDING_EXTERNAL**, or **APPROVED** after compile. **S02:** works-council agreement pending (`BETRIEBSVEREINBARUNG_PENDING`). Employee **advocate + appeal** re-opens the boardroom; **HITL** parallel DPO + IT sign-off before activation. | `/employee/requests/demo-s05-denied` · `/employee/requests/demo-s02-external` · governance sign-off queues |
-| **Measurable gain vs single-agent baseline** | Same request packet + same `qwen-max` model: one generic governance advisor → *conditional approve* (unsigned DPA never surfaced); five-agent boardroom → **DENIED · VENDOR_DPA_PENDING** in round 1. Live-captured 2026-07-05, committed, reproducible. | [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) · `cd app && npm run baseline:demo -- S05` |
+| **Task decomposition & role assignment** | Five specialist agents (Runner, Procurement, Compliance, Works Council, IT) negotiate in structured debate (opening → lanes → rebuttals → all-agent finals; up to 15 turns). Each turn returns a schema-validated envelope (`stance`, `demands`, `concessions`). | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) · `/glassbox` boardroom theater · recorded demos in `app/backend/test/golden/` |
+| **Dialogue & disagreement** | Agents react to the shared transcript, not isolated prompts. **Payment data routing:** Compliance and IT negotiate sovereign routing (local redact → cloud complete). **Unsigned DPA:** Procurement vetoes in round 1. | `/glassbox` (payment routing demo auto-loads) · [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) |
+| **Execution conflicts & resolution** | Disagreement becomes deterministic outcomes: **DENIED**, **PENDING_EXTERNAL**, or **APPROVED** after compile. **Works council gate:** agreement pending. Employee **advocate + appeal** re-opens the boardroom; **HITL** parallel DPO + IT sign-off before activation. | `/employee/requests/demo-s05-denied` · `/employee/requests/demo-s02-external` · governance sign-off queues |
+| **Measurable gain vs single-agent baseline** | Same request packet + same `qwen-max` model: one generic governance advisor → *conditional approve* (unsigned DPA never surfaced); five-agent boardroom → **DENIED · vendor DPA pending** in round 1. Live-captured 2026-07-05, committed, reproducible. | [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) · `cd app && npm run baseline:demo -- S05` |
 
 ---
 
@@ -104,7 +104,8 @@ Open <http://localhost:5173/employee> for the **product** (employee + governance
 
 Open <http://localhost:5173/glassbox> for the **glassbox** — transparent judge view of
 the negotiation engine: boardroom theater, pipeline strip, and click-to-inspect panels.
-Scenario **S04** auto-loads; click **Gateway enforce** to try email MASK / IBAN BLOCK.
+The **payment data — sovereign routing** demo auto-loads; click **Run boardroom** then
+**Gateway enforce** to try email MASK / IBAN BLOCK.
 
 **Live Qwen negotiation** (optional, needs the hackathon voucher key): put
 `DASHSCOPE_API_KEY=sk-...` in a git-ignored `app/.env`, then `npm run smoke` for a
@@ -113,13 +114,15 @@ Full instructions: [`app/README.md`](app/README.md).
 
 ### Demo scenarios (asserted by the test suite)
 
-| Scenario | Outcome | What it shows |
+Internal IDs (S01–S05) are for tests only — the UI shows plain-English names.
+
+| ID | Outcome | What it shows (judge-facing) |
 |---|---|---|
-| S01 | APPROVED | Copilot summarization, works-council agreement signed |
-| S02 | PENDING_EXTERNAL | Blocked on unsigned **Betriebsvereinbarung** (works-council agreement) |
-| S03 | DENIED | `HIGH_RISK_USE_DENIED` (EU AI Act Annex III) |
-| S04 | APPROVED | Redacted on-prem (`LOCAL_QWEN_72B` safety gateway), completed on `CLOUD_QWEN_MAX` |
-| S05 | DENIED | Unsigned vendor **DPA** (`VENDOR_DPA_PENDING`) |
+| S01 | APPROVED | Copilot summarization — happy path, all gates signed |
+| S02 | PENDING_EXTERNAL | Works council agreement not signed — blocked until formal agreement |
+| S03 | DENIED | HR screening — high-risk use denied (EU AI Act Annex III) |
+| S04 | APPROVED | Payment data — redacted on-prem, completed in cloud (sovereign routing) |
+| S05 | DENIED | Unsigned vendor DPA — procurement veto |
 
 ---
 

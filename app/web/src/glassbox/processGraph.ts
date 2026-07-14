@@ -1,6 +1,7 @@
 import type { BoardroomEnvelope, GatewayAuditEvent, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import type { BoardroomResult, InferenceResponse } from '../api.js';
-import { DENY_LABELS } from '../lib/agentLabels.js';
+import { DENY_LABELS, formatRoutingLabel } from '../lib/agentLabels.js';
+import { scenarioPresentation } from '@/lib/scenarioPresentation';
 
 export interface GlassboxSummaryContext {
   request?: RequestPacket;
@@ -30,7 +31,13 @@ export function nodeSummary(id: string, ctx: GlassboxSummaryContext): string {
     }
     case 'boardroom':
       if (running) return `Live · ${turns.length} turns streaming`;
-      if (turns.length === 0) return replay ? `Replay ${replay} — click Run` : 'Five agents · click Run';
+      if (turns.length === 0) {
+        if (replay) {
+          const p = scenarioPresentation(replay);
+          return `${p.shortTitle} — click Run`;
+        }
+        return 'Five agents · click Run';
+      }
       return `${turns.length} rounds · ${result?.outcome ?? '…'}`;
     case 'compiler':
       if (!result) return 'Awaiting boardroom';
@@ -42,16 +49,17 @@ export function nodeSummary(id: string, ctx: GlassboxSummaryContext): string {
       if (!policy) return 'Needs compiled policy';
       if (!inference) return 'Send a prompt to test';
       return inference.local_redaction
-        ? `${inference.outcome} · redacted locally → ${inference.routing_decision}`
-        : `${inference.outcome} · route ${inference.routing_decision}`;
+        ? `${inference.outcome} · redacted locally → ${formatRoutingLabel(inference.routing_decision) ?? inference.routing_decision}`
+        : `${inference.outcome} · ${formatRoutingLabel(inference.routing_decision) ?? inference.routing_decision}`;
     case 'audit':
       return auditEvents.length ? `${auditEvents.length} events · retention` : 'Empty until inference';
     case 'result': {
       const outcome = inference?.outcome ?? result?.outcome;
       if (!outcome) return 'Run pipeline';
       const route = inference?.routing_decision ?? result?.routing_decision;
+      const routeLabel = formatRoutingLabel(route, outcome);
       const hash = policyHash?.slice(0, 10);
-      return `${outcome}${route ? ` · ${route}` : ''}${hash ? ` · ${hash}…` : ''}`;
+      return `${outcome}${routeLabel ? ` · ${routeLabel}` : ''}${hash ? ` · ${hash}…` : ''}`;
     }
     default:
       return '';
@@ -66,7 +74,8 @@ export function resultGrounding(ctx: GlassboxSummaryContext): {
   detail: string;
 } {
   const outcome = (ctx.inference?.outcome ?? ctx.result?.outcome ?? 'pending') as string;
-  const routing = ctx.inference?.routing_decision ?? ctx.result?.routing_decision ?? '—';
+  const routeRaw = ctx.inference?.routing_decision ?? ctx.result?.routing_decision;
+  const routing = formatRoutingLabel(routeRaw, ctx.result?.outcome) ?? routeRaw ?? '—';
   const hasHash = Boolean(ctx.policyHash);
   const hasAudit = ctx.auditEvents.length > 0;
   const pii = ctx.inference?.audit_event?.pii_actions?.[0];

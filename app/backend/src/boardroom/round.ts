@@ -1,39 +1,31 @@
 /**
- * Round engine (LAYER B). Drives rounds 0–5 per boardroom_protocol.md:
+ * Round engine (LAYER B). Drives boardroom protocol v2:
  *
- *   0 Runner · 1 Procurement · 2 Compliance · 3 Works Council (skip if !DE)
- *   4 IT Infra · 5 All (final sign-off / deadlock)
+ *   opening → lane specialists → optional rebuttal beats → all-agent finals
  *
- * Agents may "pass". Max 6 rounds; if still unresolved, the session forces
- * PENDING_HUMAN (handled in session.ts). Yields one envelope per agent turn so
- * the server can stream them over SSE.
+ * Rebuttal beats fire on hard vetoes, blocking stances, or field conflicts.
+ * Max MAX_TURNS (15) envelopes; budget exhaustion → PENDING_HUMAN in session.ts.
  *
  * Two sources, same envelope shape:
  *   - REPLAY: yield validated envelopes from a golden transcript.
- *   - LIVE:   call qwen-max per agent turn (only when DASHSCOPE_API_KEY is set).
+ *   - LIVE:   call qwen-max per slot (only when DASHSCOPE_API_KEY is set).
  */
-import type { AgentId, BoardroomEnvelope, OrgConfig, RequestPacket } from '@trustflow/shared';
+import type { AgentId, BoardroomEnvelope, DebateBeat, OrgConfig, RequestPacket } from '@trustflow/shared';
 import {
   AgentPromptContext,
   buildSystemPrompt,
   buildUserPrompt,
 } from './agents/index.js';
+import {
+  baseDebatePlan,
+  MAX_TURNS,
+  needsRebuttal,
+  rebuttalSlots,
+  type DebateSlot,
+} from './debate.js';
 import { loadGolden } from './golden.js';
 import { hasApiKey, qwenAgentTurn } from '../qwen/client.js';
 import { approvedTools } from '../fixtures/index.js';
-
-/** Round → agents that speak (Works Council skipped for non-DE entities). */
-function roundSchedule(entityCountry: string): { round: number; agents: AgentId[] }[] {
-  const isDe = entityCountry === 'DE';
-  return [
-    { round: 0, agents: ['workflow_runner'] },
-    { round: 1, agents: ['procurement'] },
-    { round: 2, agents: ['corporate_compliance'] },
-    ...(isDe ? [{ round: 3, agents: ['works_council' as AgentId] }] : []),
-    { round: 4, agents: ['it_infra'] },
-    { round: 5, agents: ['workflow_runner'] },
-  ];
-}
 
 export interface RoundEngineOpts {
   session_id: string;
@@ -43,9 +35,38 @@ export interface RoundEngineOpts {
   replayScenarioId?: string;
 }
 
+interface LiveTurnOpts {
+  session_id: string;
+  round: number;
+  agent: AgentId;
+  beat: DebateBeat;
+  addressing?: AgentId;
+  transcript: BoardroomEnvelope[];
+  ctx: AgentPromptContext;
+}
+
+async function liveTurn(opts: LiveTurnOpts): Promise<BoardroomEnvelope> {
+  const env = await qwenAgentTurn({
+    systemPrompt: buildSystemPrompt(opts.agent, opts.ctx),
+    userPrompt: buildUserPrompt(opts.agent, opts.round, opts.transcript, {
+      beat: opts.beat,
+      addressing: opts.addressing,
+    }),
+    session_id: opts.session_id,
+    round: opts.round,
+    agent: opts.agent,
+  });
+  return {
+    ...env,
+    beat: opts.beat,
+    addressing: opts.addressing,
+  };
+}
+
 /** Async generator of envelopes — one per agent turn. */
 export async function* runRounds(opts: RoundEngineOpts): AsyncGenerator<BoardroomEnvelope> {
   const { session_id, request, org, replayScenarioId } = opts;
+  const entityCountry = request.entity_country ?? org.entity_country;
 
   // --- Replay path (default for tests/demo fallback) ------------------------
   if (replayScenarioId) {
@@ -71,25 +92,51 @@ export async function* runRounds(opts: RoundEngineOpts): AsyncGenerator<Boardroo
     approvedTools: approvedTools(),
   };
 
-  // Accumulate the transcript so each agent negotiates against prior turns
-  // instead of emitting an isolated monologue (see buildUserPrompt threading).
   const transcript: BoardroomEnvelope[] = [];
-  for (const { round, agents } of roundSchedule(request.entity_country ?? org.entity_country)) {
-    for (const agent of agents) {
-      const env = await qwenAgentTurn({
-        systemPrompt: buildSystemPrompt(agent, ctx),
-        userPrompt: buildUserPrompt(agent, round, transcript),
-        session_id,
-        round,
-        agent,
-      });
-      transcript.push(env);
+  let turnCount = 0;
+
+  async function* speak(slot: DebateSlot): AsyncGenerator<BoardroomEnvelope> {
+    if (turnCount >= MAX_TURNS) return;
+    const env = await liveTurn({
+      session_id,
+      round: slot.round,
+      agent: slot.agent,
+      beat: slot.beat,
+      addressing: slot.addressing,
+      transcript,
+      ctx,
+    });
+    transcript.push(env);
+    turnCount += 1;
+    yield env;
+  }
+
+  const plan = baseDebatePlan(entityCountry);
+  let planIndex = 0;
+
+  while (planIndex < plan.length && turnCount < MAX_TURNS) {
+    const slot = plan[planIndex]!;
+    planIndex += 1;
+
+    let laneTurn: BoardroomEnvelope | undefined;
+    for await (const env of speak(slot)) {
+      laneTurn = env;
       yield env;
+    }
+
+    // After a lane specialist, optionally insert a rebuttal beat before continuing.
+    if (slot.beat === 'lane' && laneTurn && needsRebuttal(laneTurn, transcript) && turnCount < MAX_TURNS) {
+      for (const rebuttal of rebuttalSlots(laneTurn, entityCountry)) {
+        if (turnCount >= MAX_TURNS) break;
+        for await (const env of speak(rebuttal)) {
+          yield env;
+        }
+      }
     }
   }
 }
 
-export const MAX_ROUNDS = 6;
+export { MAX_TURNS } from './debate.js';
 
 // Replay is instant (reading a JSON fixture), which reads as fake on camera.
 // REPLAY_TURN_DELAY_MS paces it like a real negotiation; unset/0 in tests.

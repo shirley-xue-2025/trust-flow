@@ -42,7 +42,7 @@ export function StakeholderSummaryCard({
             </div>
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-green-700 dark:text-green-400">
-                Track 3 · Agent Society
+                Multi-agent negotiation
               </p>
               <CardTitle className="text-xl font-semibold text-foreground">Agent boardroom</CardTitle>
               <CardDescription className="mt-1 text-sm">
@@ -54,7 +54,7 @@ export function StakeholderSummaryCard({
           {showGlassboxLink && (
             <Button variant="outline" size="sm" className="shrink-0 border-green-300 bg-white/80" asChild>
               <Link to="/glassbox">
-                Live replay in glassbox
+                Recorded demo in glassbox
                 <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
               </Link>
             </Button>

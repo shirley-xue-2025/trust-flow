@@ -58,7 +58,7 @@ async function main() {
     const concessions = (env.concessions ?? [])
       .map((c) => `${c.field}=${String(c.value)}`)
       .join(', ');
-    console.log(`R${env.round} · ${env.agent} · [${env.stance}]`);
+    console.log(`R${env.round} · ${env.beat ?? 'lane'} · ${env.agent} · [${env.stance}]${env.addressing ? ` → ${env.addressing}` : ''}`);
     console.log(`  ${env.natural_language}`);
     if (demands) console.log(`  demands: ${demands}`);
     if (concessions) console.log(`  concessions: ${concessions}`);

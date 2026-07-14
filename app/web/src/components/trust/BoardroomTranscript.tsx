@@ -44,6 +44,7 @@ export function BoardroomTranscript({
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-semibold">
                 Round {t.round} · {AGENT_LABELS[t.agent] ?? t.agent}
+                {t.beat && t.beat !== 'lane' ? ` · ${t.beat}` : ''}
               </span>
               <Badge variant={stanceVariant(t.stance)}>{STANCE_LABELS[t.stance] ?? t.stance}</Badge>
             </div>

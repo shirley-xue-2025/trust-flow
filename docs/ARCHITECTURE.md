@@ -181,10 +181,10 @@ sequenceDiagram
 |---------|-----------|
 | **APPROVED** | All agents sign-off OR Compliance overrides with documented exception |
 | **DENIED** | Hard red line (prohibited practice, no DPA path) |
-| **PENDING_HUMAN** | Deadlock → escalate to human DPO/IT (demo: show queue) |
+| **PENDING_HUMAN** | Turn budget exhausted before all agents give final positions |
 | **PENDING_EXTERNAL** | `BETRIEBSVEREINBARUNG_PENDING` — workflow outside product |
 
-Max rounds: **6** (hackathon); then force `PENDING_HUMAN`.
+Debate flow (v2): opening → lane specialists → optional rebuttal beats → all-agent finals. Max **15** turns per session; see `docs/boardroom_protocol.md`.
 
 ### 4.5 LLM stack (hackathon)
 

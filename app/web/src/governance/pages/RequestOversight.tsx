@@ -64,7 +64,7 @@ export default function GovernanceRequestOversight() {
             {record.actor_name} · {record.use_case_category.replace(/_/g, ' ')}
           </p>
         </div>
-        <StatusBadge status={record.status} className="self-start" />
+        <StatusBadge status={record.status} denyCode={record.deny_code} className="self-start" />
       </div>
 
       {record.deny_code && (

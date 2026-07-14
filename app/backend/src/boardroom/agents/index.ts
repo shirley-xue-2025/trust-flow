@@ -14,6 +14,7 @@
 import type {
   AgentId,
   BoardroomEnvelope,
+  DebateBeat,
   OrgConfig,
   RequestPacket,
   ToolRecord,
@@ -29,7 +30,7 @@ JSON object (no prose, no markdown) matching this envelope:
   "demands":     [ { "field": "audit.raw_prompt_logging", "value": false, "hard": true } ],
   "concessions": [ { "field": "routing.sensitive", "value": "LOCAL_QWEN_72B" } ],
   "evidence_ids": ["R0008"],
-  "natural_language": "One or two sentences for the UI transcript."
+  "natural_language": "3–5 sentences for the UI transcript — speak like a real meeting, not a bullet list."
 }
 
 Rules:
@@ -224,30 +225,51 @@ function digestTurn(env: BoardroomEnvelope): string {
 /**
  * The user prompt carries the running transcript so each agent NEGOTIATES
  * against what was actually said, rather than emitting an isolated monologue.
- * Empty `priorTurns` => this agent opens the boardroom.
  */
 export function buildUserPrompt(
   agent: AgentId,
   round: number,
   priorTurns: BoardroomEnvelope[] = [],
+  opts: { beat?: DebateBeat; addressing?: AgentId } = {},
 ): string {
   const title = AGENT_TITLES[agent];
+  const beat = opts.beat ?? (priorTurns.length === 0 ? 'opening' : 'lane');
+  const addressingTitle = opts.addressing ? AGENT_TITLES[opts.addressing] : undefined;
+
+  const beatInstruction = (() => {
+    switch (beat) {
+      case 'opening':
+        return `Round ${round}. You OPEN the boardroom. State the business case with urgency and specifics — what ships, what data is involved, what timeline is at risk.`;
+      case 'lane':
+        return `Round ${round}. As ${title}, give your LANE review — your mandate's verdict on this request.`;
+      case 'rebuttal':
+        return addressingTitle
+          ? `Round ${round}. REBUTTAL — respond directly to ${addressingTitle}. This is a real back-and-forth: challenge their blocker, propose a narrower pilot, an alternative tool, or a concrete compromise. Do not rubber-stamp.`
+          : `Round ${round}. REBUTTAL — respond to the prior speaker. Push back or propose a compromise.`;
+      case 'final':
+        return `Round ${round}. FINAL POSITION — state your sign-off stance given the full debate. Summarize what you accept, what still blocks you, and any concessions you are offering.`;
+      default:
+        return `Round ${round}. As ${title}, respond to the debate.`;
+    }
+  })();
+
   if (priorTurns.length === 0) {
-    return `Round ${round}. You open the boardroom. As ${title}, state your opening position on this request. Emit your single JSON envelope.`;
+    return `${beatInstruction} Emit your single JSON envelope.`;
   }
+
   return [
-    `Round ${round}. The debate so far (oldest first):`,
+    beatInstruction,
+    '',
+    'The debate so far (oldest first):',
     priorTurns.map(digestTurn).join('\n'),
     '',
-    `As ${title}, RESPOND to the debate — engage specific agents by name. A real`,
-    `boardroom does NOT rubber-stamp: where your mandate genuinely differs, push`,
-    `back, challenge a demand as excessive, or propose an alternative. Avoid blanket`,
-    `"I fully agree" padding.`,
+    `As ${title}, RESPOND to the debate — engage specific agents by name in natural_language.`,
+    `A real boardroom does NOT rubber-stamp: where your mandate differs, push back,`,
+    `challenge a demand as excessive, or propose an alternative.`,
     `- Emit "demands" ONLY for fields in YOUR domain. Do NOT repeat demands already`,
-    `  listed above — the compiler already has them; react to them in natural_language.`,
-    `- Use stance "reject" or "conditional_reject" when you are actually blocking —`,
-    `  not a soft "conditional_approve".`,
-    `- If you have no objection in your lane this round, stance "pass" with empty demands.`,
+    `  listed above — the compiler already has them; react in natural_language.`,
+    `- Use stance "reject" or "conditional_reject" when you are actually blocking.`,
+    `- If you have no objection in your lane, stance "pass" with empty demands.`,
     `Then emit your single JSON envelope.`,
   ].join('\n');
 }

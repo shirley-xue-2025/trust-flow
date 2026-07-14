@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import type { EvalScenario, GatewayAuditEvent, PolicyArtifact, RequestPacket } from '@trustflow/shared';
 import { getAudit, getScenarios, type InferenceResponse } from '../api.js';
 import { useBoardroomRun } from '../hooks/useBoardroomRun.js';
 import { BoardroomTheater } from './BoardroomTheater.js';
 import { EnforcementBar, InputContextBar, type EnforcementId } from './EnforcementBar.js';
+import { GlassboxToolbar } from './GlassboxToolbar.js';
 import NodeInspector from './NodeInspector.js';
 import { PipelineStrip } from './PipelineStrip.js';
 
@@ -106,52 +106,15 @@ export default function GlassBoxCanvas() {
 
   return (
     <div className={`glassbox-shell${inspectorId ? ' glassbox-shell--panel-open' : ''}`}>
-      <header className="glassbox-toolbar">
-        <Link to="/employee" className="glassbox-toolbar__back">
-          ← Product
-        </Link>
-        <div className="glassbox-toolbar__title">
-          <h1>TrustFlow glassbox</h1>
-          <p>Agent boardroom is the product — inputs feed it; enforcement follows</p>
-        </div>
-        <div className="glassbox-toolbar__controls">
-          <label className="glassbox-toolbar__scenario">
-            Scenario
-            <select
-              value={replay ?? ''}
-              onChange={(e) => {
-                const id = e.target.value;
-                if (!id) {
-                  if (request) handleRequestChange(request, undefined);
-                  return;
-                }
-                const s = scenarios.find((sc) => sc.scenario_id === id);
-                if (s) handleRequestChange(s.request, s.scenario_id);
-              }}
-            >
-              <option value="">Custom / none</option>
-              {scenarios.map((s) => (
-                <option key={s.scenario_id} value={s.scenario_id}>
-                  {s.scenario_id} · {s.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            className="glassbox-toolbar__run"
-            onClick={handleRun}
-            disabled={!request || running}
-          >
-            ▶ Run boardroom
-          </button>
-          {error ? (
-            <p className="glassbox-toolbar__error" role="alert">
-              {error}
-            </p>
-          ) : null}
-        </div>
-      </header>
+      <GlassboxToolbar
+        scenarios={scenarios}
+        replay={replay}
+        request={request}
+        running={running}
+        error={error}
+        onScenarioChange={handleRequestChange}
+        onRun={handleRun}
+      />
 
       <PipelineStrip highlight="boardroom" />
 
