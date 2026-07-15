@@ -18,7 +18,7 @@ Open **http://localhost:5173/glassbox**
 4. Badge reads **Recorded demo · Payment data routing** (saved qwen-max transcript, no API key).
 5. When complete: outcome **APPROVED** — compliance and IT negotiated local redaction before cloud completion.
 
-**Say:** *"Five stakeholder agents negotiate; only deterministic code compiles and enforces the result."*
+**Say:** *"Stakeholder agents negotiate; only deterministic code compiles and enforces the result."*
 
 ## Beat 2 — Compiler + policy (30 sec)
 
