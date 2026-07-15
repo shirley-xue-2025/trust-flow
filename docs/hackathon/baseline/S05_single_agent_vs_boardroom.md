@@ -43,4 +43,4 @@ Without a key: read committed `S05_comparison.json` (evidence for judges / deck)
 
 > *"We ran the same unsigned-DPA request through one super-compliance prompt and through our specialist boardroom. The monolith conditionally approved ChatGPT Enterprise and never blocked on the unsigned OpenAI DPA. Procurement vetoed — the boardroom debated workarounds but still ended DENIED. That's measurable improvement on the quality axis, not a slide assertion."*
 
-**Related:** [`../EVIDENCE_CHAIN.md`](../EVIDENCE_CHAIN.md) · [`TrustFlow_deck.pptx`](../TrustFlow_deck.pptx)
+**Related:** [`../EVIDENCE_CHAIN.md`](../EVIDENCE_CHAIN.md) · [`s05_single_vs_multi_agent_comparison.png`](./s05_single_vs_multi_agent_comparison.png)

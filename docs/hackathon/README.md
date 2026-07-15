@@ -4,8 +4,7 @@ Judge-facing artifacts for **Qwen Cloud Global AI Hackathon — Track 3: Agent S
 
 | Asset | Purpose |
 |-------|---------|
-| [`TrustFlow_deck.pptx`](TrustFlow_deck.pptx) | Pitch deck |
-| [`screenshots/`](screenshots/) | 10 judge stills (refresh: `cd app && node capture-stills.mjs`) |
+| [`screenshots/`](screenshots/) | Judge stills (refresh: `cd app && node capture-stills.mjs`) |
 | [`thumbnail_devpost.png`](thumbnail_devpost.png) | Devpost cover image |
 | [`diagrams/`](diagrams/) | Architecture + round-schedule PNGs |
 | [`DEMO_PLAYBOOK.md`](DEMO_PLAYBOOK.md) | 5-minute naive-judge tour (plain language, no scenario IDs) |
