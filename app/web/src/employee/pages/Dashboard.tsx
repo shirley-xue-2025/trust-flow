@@ -33,7 +33,7 @@ export default function EmployeeDashboard({ profile }: { profile: EmployeeProfil
     {
       step: 1,
       title: 'Watch agents negotiate',
-      description: 'Five Qwen agents in the boardroom — full trace on your request, or live replay in glassbox.',
+      description: 'Stakeholder agents in the boardroom — full trace on your request, or live replay in glassbox.',
       icon: Users,
       to: '/employee/requests/demo-s04-pending-signoff',
     },

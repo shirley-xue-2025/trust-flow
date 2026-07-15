@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const STEPS = [
   { id: 'inputs', label: 'Inputs', detail: 'Employee packet + org reads' },
-  { id: 'boardroom', label: 'Agent boardroom', detail: 'Five specialists negotiate' },
+  { id: 'boardroom', label: 'Agent boardroom', detail: 'Specialists negotiate' },
   { id: 'compiler', label: 'Compiler signs', detail: 'Deterministic policy hash' },
   { id: 'humans', label: 'Humans approve', detail: 'DPO + IT sign-off' },
   { id: 'gateway', label: 'Gateway enforces', detail: 'No LLM at edge' },

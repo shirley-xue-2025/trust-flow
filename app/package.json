@@ -23,7 +23,7 @@
     "dev:backend": "npm run dev --workspace backend",
     "dev:web": "npm run dev --workspace web",
     "dev": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace web\"",
-    "dev:demo": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"QWEN_PROFILE=demo npm run dev --workspace backend\" \"npm run dev --workspace web\"",
+    "dev:demo": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"QWEN_PROFILE=demo REPLAY_TURN_DELAY_MS=1000 npm run dev --workspace backend\" \"npm run dev --workspace web\"",
     "dev:network": "npm run build:shared && concurrently -n backend,web -c blue,magenta \"npm run dev --workspace backend\" \"VITE_NETWORK=1 npm run dev --workspace web\"",
     "build": "npm run build:shared && npm run build --workspace backend && npm run build --workspace web",
     "test:e2e": "playwright test",

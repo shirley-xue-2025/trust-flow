@@ -35,7 +35,7 @@ export function BoardroomTheater({
             Agent boardroom
           </h2>
           <p className="glassbox-theater__lead">
-            Five Qwen specialists negotiate in structured rounds — proposals only; compiler signs.
+            Qwen specialists negotiate in structured rounds — proposals only; compiler signs.
           </p>
           <p className="glassbox-theater__mode-hint muted">
             Recorded demo = saved qwen-max negotiation replayed instantly (no API key) · Live =

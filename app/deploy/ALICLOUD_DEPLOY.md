@@ -160,7 +160,7 @@ curl -s -u judge:PASS http://localhost/v1/health                                
 ```
 
 Then open **`http://<your-ECS-public-ip>/`** in a browser, enter the passcode, and:
-- **`/glassbox`** → toolbar **Scenario S04** → **Run** → watch **Agent boardroom** node stream (SSE through nginx)
+- **`/glassbox`** → toolbar **Payment data — sovereign routing** → **Run** → watch **Agent boardroom** node stream (SSE through nginx)
 - Click **Gateway enforce** → email MASK / IBAN BLOCK samples
 - **`/employee`** → sign-off demo on `demo-s04-pending-signoff`
 - If you set the key: run a **live** negotiation from glassbox **Use custom request**

@@ -5,7 +5,7 @@ Plain-language tour for someone with **no repo context**. Scenario IDs (S01–S0
 ## Start
 
 ```bash
-cd app && npm run dev
+cd app && npm run dev:demo   # qwen-max + paced recorded demo (~1s/turn)
 ```
 
 Open **http://localhost:5173/glassbox**
@@ -14,7 +14,7 @@ Open **http://localhost:5173/glassbox**
 
 1. **Payment data — sovereign routing** loads automatically in the scenario dropdown.
 2. Click **▶ Run boardroom**.
-3. Point at the **five agents** debating — they react to each other, not isolated prompts.
+3. Point at the **specialist agents** debating — they react to each other, not isolated prompts.
 4. Badge reads **Recorded demo · Payment data routing** (saved qwen-max transcript, no API key).
 5. When complete: outcome **APPROVED** — compliance and IT negotiated local redaction before cloud completion.
 

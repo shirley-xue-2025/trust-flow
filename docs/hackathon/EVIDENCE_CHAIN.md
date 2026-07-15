@@ -41,7 +41,7 @@
 |----------|-------------|--------|
 | S04 | `app/backend/test/golden/S04.json` | Multi-lane compromise → sovereign route |
 | S05 | `app/backend/test/golden/S05.json` | Procurement veto — unsigned DPA |
-| S05 baseline | `docs/hackathon/baseline/S05_comparison.json` | Single-agent vs boardroom — Track 3 measurable improvement |
+| S05 baseline | `docs/hackathon/baseline/S05_comparison.json` · [`s05_single_vs_multi_agent_comparison.png`](baseline/s05_single_vs_multi_agent_comparison.png) | Single-agent vs boardroom — Track 3 measurable improvement |
 | S02 | roleplay + compiler | `BETRIEBSVEREINBARUNG_PENDING` external gate |
 
 **Journey map:** [`docs/research/stakeholders/journey_map.md`](../research/stakeholders/journey_map.md) — actors × corpus IDs (R0008 enforcement gap, R0011 VRM).

@@ -21,7 +21,7 @@ export function BoardroomTranscript({
   if (turns.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Agent negotiation has not started yet. Five Qwen agents — Compliance, Procurement, IT,
+        Agent negotiation has not started yet. Stakeholder agents — Compliance, Procurement, IT,
         Works Council (German labor-law representation), and Runner — debate in structured rounds.
       </p>
     );

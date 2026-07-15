@@ -108,7 +108,7 @@ export default function GovernanceRequestOversight() {
         </TabsList>
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Full agent boardroom trace — five specialists debate before any policy was compiled
+            Full agent boardroom trace — specialists debate before any policy was compiled
             or human sign-off.
           </p>
           <BoardroomTranscript turns={transcript} />

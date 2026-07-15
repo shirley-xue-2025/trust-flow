@@ -46,7 +46,7 @@ export function StakeholderSummaryCard({
               </p>
               <CardTitle className="text-xl font-semibold text-foreground">Agent boardroom</CardTitle>
               <CardDescription className="mt-1 text-sm">
-                {turns.length} negotiation rounds · five Qwen specialists debated before any human
+                {turns.length} negotiation turns · Qwen specialists debated before any human
                 sign-off or gateway enforcement
               </CardDescription>
             </div>

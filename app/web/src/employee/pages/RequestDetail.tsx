@@ -177,7 +177,7 @@ export default function RequestDetailPage() {
               <p className="text-sm font-medium">Agent negotiation in progress</p>
               <Progress value={transcript.length > 0 ? Math.min(90, 20 + transcript.length * 12) : 15} className="h-2" />
               <p className="text-xs text-muted-foreground">
-                Five Qwen agents debate your request — Compliance, Procurement, IT,
+                Stakeholder agents debate your request — Compliance, Procurement, IT,
                 Works Council (German labor-law representation), and Runner.
               </p>
             </div>
@@ -293,7 +293,7 @@ export default function RequestDetailPage() {
 
         <TabsContent value="negotiation" className="mt-4">
           <p className="mb-4 text-sm text-muted-foreground">
-            Full agent boardroom trace — five specialists debate your request before any human
+            Full agent boardroom trace — specialists debate your request before any human
             sign-off or gateway enforcement.
           </p>
           <BoardroomTranscript turns={transcript} />

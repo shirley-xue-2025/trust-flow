@@ -1,9 +1,10 @@
 # TrustFlow
 
 **Safe AI adoption for European enterprises** — when a team wants a new AI tool,
-TrustFlow runs a structured negotiation between five stakeholder agents, compiles
-their agreement into a signed machine-enforced policy, and keeps humans in control
-of activation.
+TrustFlow runs a structured negotiation between **stakeholder agents** (lanes match
+the org’s approval process), compiles their agreement into a signed machine-enforced
+policy, and keeps humans in control of activation. The hackathon demo uses a
+five-lane German-fintech cast — not a fixed product headcount.
 
 > **Why Germany first:** In Germany, labor law gives elected worker representatives
 > (the **Works Council / Betriebsrat**) a legal veto over workplace AI tools —
@@ -12,6 +13,8 @@ of activation.
 
 > Qwen Cloud Global AI Hackathon — **Track 3: Agent Society**.
 > Built on Qwen Cloud (`qwen-max` via DashScope), deployed on Alibaba Cloud.
+
+**Build story (Medium):** [Enterprise AI doesn’t fail on models. It fails on approvals.](https://medium.com/@xc.shirley/enterprise-ai-doesnt-fail-on-models-it-fails-on-approvals-59c1b0979fcc)
 
 ---
 
@@ -38,33 +41,35 @@ negotiation is slow, ad-hoc, and unauditable.
 
 TrustFlow turns that negotiation into software.
 
-## The idea — a dual-layer architecture
+## The idea — negotiate, then enforce
 
 This is the differentiator, and the whole design hangs off one boundary:
 
-- **Layer C — Human sign-off** *(HITL)* — DPO and IT activate the compiled policy;
-  no gateway enforcement until humans sign.
+- **Human sign-off** — DPO and IT activate the compiled policy; no gateway
+  enforcement until humans sign.
 
-- **Layer B — Agent Boardroom** *(generative — the only LLM)* — five Qwen-powered
-  agents with distinct mandates debate a request across multiple rounds, react to
-  each other's arguments, raise conditions, and converge. They emit **structured
-  proposals**, never executable rules.
+- **Agent boardroom** *(generative — the only LLM)* — Qwen-powered specialists
+  with distinct mandates debate a request across multiple rounds, react to each
+  other's arguments, raise conditions, and converge. They emit **structured
+  proposals**, never executable rules. *(Demo cast below; agent count is config.)*
 
-- **Deterministic compiler** *(the gate — no LLM)* — pure code merges the agents'
-  demands and concessions, **floor-checks** them (validates against the org's
-  non-negotiable red lines), validates against a JSON schema, hashes the result,
-  and signs it. Agents can *propose*; only deterministic code can *decide*.
+- **Deterministic compiler** *(no LLM)* — pure code merges the agents' demands and
+  concessions, **floor-checks** them (validates against the org's non-negotiable
+  red lines), validates against a JSON schema, hashes the result, and signs it.
+  Agents can *propose*; only deterministic code can *decide*.
 
-- **Layer A — Edge Gateway** *(deterministic enforcement)* — pure code again:
-  PII scanning, model routing, and audit logging on every inference. **No LLM sits
-  in the enforcement path.**
+- **Edge gateway** *(deterministic enforcement)* — pure code again: PII scanning,
+  model routing, and audit logging on every inference. **No LLM sits in the
+  enforcement path.**
 
 > An LLM proposed the policy; deterministic code validated, signed, and enforces it.
 > That contrast — creative negotiation up top, hard guarantees at the bottom — is the
 > point of the project.
 
-### The five agents
+### Demo cast — five lanes (German fintech)
 
+Agent count and roles are **configurable** to the org. This demo models NordPay-style
+gates with five specialists:
 | Agent | Mandate |
 |---|---|
 | **Workflow Runner** | Advocates for the business use case; proposes alternatives |
@@ -79,10 +84,10 @@ This is the differentiator, and the whole design hangs off one boundary:
 
 | Track 3 criterion | TrustFlow implementation | Where to verify |
 |---|---|---|
-| **Task decomposition & role assignment** | Five specialist agents (Runner, Procurement, Compliance, Works Council, IT) negotiate in structured debate (opening → lanes → rebuttals → all-agent finals; up to 15 turns). Each turn returns a schema-validated envelope (`stance`, `demands`, `concessions`). | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) · `/glassbox` boardroom theater · recorded demos in `app/backend/test/golden/` |
+| **Task decomposition & role assignment** | Specialist agents with distinct mandates (demo cast: Runner, Procurement, Compliance, Works Council, IT) negotiate in structured debate (opening → lanes → rebuttals → all-agent finals; up to 15 turns). Each turn returns a schema-validated envelope (`stance`, `demands`, `concessions`). | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) · `/glassbox` boardroom theater · recorded demos in `app/backend/test/golden/` |
 | **Dialogue & disagreement** | Agents react to the shared transcript, not isolated prompts. **Payment data routing:** Compliance and IT negotiate sovereign routing (local redact → cloud complete). **Unsigned DPA:** Procurement vetoes in round 1. | `/glassbox` (payment routing demo auto-loads) · [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) |
-| **Execution conflicts & resolution** | Disagreement becomes deterministic outcomes: **DENIED**, **PENDING_EXTERNAL**, or **APPROVED** after compile. **Works council gate:** agreement pending. Employee **advocate + appeal** re-opens the boardroom; **HITL** parallel DPO + IT sign-off before activation. | `/employee/requests/demo-s05-denied` · `/employee/requests/demo-s02-external` · governance sign-off queues |
-| **Measurable gain vs single-agent baseline** | Same request packet + same `qwen-max` model: one generic governance advisor → *conditional approve* (unsigned DPA never surfaced); five-agent boardroom → **DENIED · vendor DPA pending** in round 1. Live-captured 2026-07-05, committed, reproducible. | [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) · `cd app && npm run baseline:demo -- S05` |
+| **Execution conflicts & resolution** | Disagreement becomes deterministic outcomes: **DENIED**, **PENDING_EXTERNAL**, or **APPROVED** after compile. **Works council gate:** agreement pending. Employee **advocate + appeal** re-opens the boardroom; parallel DPO + IT **human sign-off** before activation. | `/employee/requests/demo-s05-denied` · `/employee/requests/demo-s02-external` · governance sign-off queues |
+| **Measurable gain vs single-agent baseline** | Same request packet + same `qwen-max` model: one generic governance advisor → *conditional approve* (unsigned DPA never surfaced); specialist boardroom → **DENIED · vendor DPA pending** in round 1. Live-captured 2026-07-05, committed, reproducible. | [`docs/hackathon/baseline/S05_comparison.json`](docs/hackathon/baseline/S05_comparison.json) · `cd app && npm run baseline:demo -- S05` |
 
 ---
 
@@ -158,3 +163,4 @@ passcode gate. Step-by-step guide:
   OpenAI-compatible endpoint (live-verified).
 - **Alibaba Cloud** — hosted on ECS via Docker Compose.
 - **Track 3 — Agent Society** — see [criteria mapping](#track-3--agent-society-criteria-mapping) above.
+- **Build write-up** — [Medium](https://medium.com/@xc.shirley/enterprise-ai-doesnt-fail-on-models-it-fails-on-approvals-59c1b0979fcc) (problem framing + measured baseline).

@@ -1,33 +1,53 @@
-flowchart TB
-    subgraph users [Users]
-        EMP[Employee]
-        ADM[Admin / DPO / IT]
-    end
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#ecfdf5",
+    "primaryTextColor": "#0f172a",
+    "primaryBorderColor": "#059669",
+    "lineColor": "#64748b",
+    "secondaryColor": "#f8fafc",
+    "tertiaryColor": "#fff",
+    "fontFamily": "arial",
+    "fontSize": "16px"
+  }
+}}%%
+flowchart LR
+  subgraph people ["People"]
+    EMP["Employee"]
+    GOV["DPO / IT"]
+  end
 
-    subgraph trustflow [TrustFlow]
-        UI[Request & Admin UI]
-        BR[Layer B — Agent Boardroom]
-        PS[(Policy Store)]
-        TR[(Tool Registry)]
-        GW[Layer A — Edge Gateway]
-        AL[(Audit Log)]
-    end
+  UI["Portals\n(employee + governance)"]
 
-    subgraph external [External]
-        LLM1[Qwen Cloud / other APIs]
-        LLM2[Local Qwen node]
-        IDP[Corporate IdP / SSO]
-    end
+  subgraph pipeline ["TrustFlow policy path"]
+    direction LR
+    BR["1 · Agent boardroom\nstakeholder specialists\nqwen-max · lanes match org"]
+    COMP["2 · Compiler\nschema · hash · sign\nno LLM"]
+    HITL["3 · Human sign-off\nDPO + IT activate"]
+    PS[("Active policy")]
+  end
 
-    EMP --> UI
-    ADM --> UI
-    UI --> BR
-    BR --> PS
-    BR --> TR
-    EMP --> GW
-    GW --> PS
-    GW --> AL
-    GW --> LLM1
-    GW --> LLM2
-    UI --> IDP
-    GW --> IDP
+  subgraph runtime ["TrustFlow runtime"]
+    GW["4 · Edge gateway\nPII · routing · deny · audit\nLLM never at the edge"]
+    AL[("Audit log")]
+  end
+
+  subgraph cloud ["External"]
+    QWEN["Qwen Cloud\nqwen-max"]
+    LOCAL["Optional on-prem Qwen\nredact hop"]
+  end
+
+  EMP --> UI
+  GOV --> UI
+  UI --> BR
+  BR -->|"agent turns"| QWEN
+  BR --> COMP
+  COMP --> HITL
+  HITL -->|"activate"| PS
+  COMP --> PS
+  EMP --> GW
+  PS --> GW
+  GW --> AL
+  GW -->|"governed inference"| QWEN
+  GW -.-> LOCAL
+  LOCAL -.-> QWEN

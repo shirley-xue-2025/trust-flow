@@ -36,7 +36,7 @@ export function nodeSummary(id: string, ctx: GlassboxSummaryContext): string {
           const p = scenarioPresentation(replay);
           return `${p.shortTitle} — click Run`;
         }
-        return 'Five agents · click Run';
+        return 'Specialists · click Run';
       }
       return `${turns.length} rounds · ${result?.outcome ?? '…'}`;
     case 'compiler':

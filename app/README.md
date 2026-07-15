@@ -105,13 +105,13 @@ dependency), so no secrets go on the command line. Just run the one-shot smoke t
 ```bash
 npm run smoke        # one live qwen-flash round-trip → valid envelope
 npm run smoke:demo   # same, but qwen-max (demo dry-run without editing .env)
-npm run dev:demo     # full UI on qwen-max for demo video
+npm run dev:demo     # qwen-max + ~1s/turn replay pacing (demo video)
 npm run capture:golden:demo -- S04 --write-golden   # record live qwen-max → test/golden/S04.json
 npm run baseline:demo -- S05 --write                 # single-agent vs boardroom → docs/hackathon/baseline/
 ```
 
 With the key present, glassbox **Use custom request** + **Run** starts a real
-5-agent negotiation. Without it, use replay scenarios.
+multi-agent negotiation. Without it, use replay scenarios.
 
 ## Endpoints
 
