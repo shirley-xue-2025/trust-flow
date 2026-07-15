@@ -41,6 +41,8 @@ negotiation is slow, ad-hoc, and unauditable.
 
 TrustFlow turns that negotiation into software.
 
+Two-slide public framing (demo opener): [`docs/hackathon/problem_frame.html`](docs/hackathon/problem_frame.html).
+
 ## The idea — negotiate, then enforce
 
 This is the differentiator, and the whole design hangs off one boundary:
@@ -148,7 +150,7 @@ passcode gate. Step-by-step guide:
 | [`app/README.md`](app/README.md) | How to run, endpoints, live-Qwen setup |
 | [`app/deploy/`](app/deploy/) | Docker, nginx, Alibaba Cloud deploy guide |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Product & system architecture |
-| [`docs/hackathon/`](docs/hackathon/) | Submission pack — deck, screenshots, evidence chain |
+| [`docs/hackathon/`](docs/hackathon/) | Submission pack — problem slides, screenshots, evidence chain |
 | [`docs/boardroom_protocol.md`](docs/boardroom_protocol.md) | Agent negotiation protocol |
 | [`docs/schemas/`](docs/schemas/) | JSON schemas (proposal envelope, policy artifact) |
 | [`docs/fixtures/`](docs/fixtures/) | Org config seed + demo/eval data |

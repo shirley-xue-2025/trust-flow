@@ -8,6 +8,8 @@ Plain-language tour for someone with **no repo context**. Scenario IDs (S01–S0
 cd app && npm run dev:demo   # qwen-max + paced recorded demo (~1s/turn)
 ```
 
+**Optional opener (problem statement):** [http://localhost:5173/problem_frame.html](http://localhost:5173/problem_frame.html) — two slides (`→` / Space). Same file lives at [`problem_frame.html`](problem_frame.html). Then open glassbox.
+
 Open **http://localhost:5173/glassbox**
 
 ## Beat 1 — Transparent negotiation (2 min)

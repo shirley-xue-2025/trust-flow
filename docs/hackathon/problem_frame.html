@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TrustFlow problem framing: enterprise AI fails on approvals, not models — 21/55 practitioner posts, Germany Works Council veto, then negotiate → compile → activate → enforce." />
+  <title>TrustFlow — Problem statement</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a28;
+      --panel2: #1a2436;
+      --border: #2a3548;
+      --text: #eef2f7;
+      --muted: #8b9bb5;
+      --accent: #34d399;
+      --accent-deep: #059669;
+      --amber: #f0b429;
+      --red: #f87171;
+      --ink-blue: #93c5fd;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 70% 50% at 75% 15%, rgba(5, 150, 105, 0.12), transparent),
+        radial-gradient(ellipse 45% 40% at 10% 85%, rgba(147, 197, 253, 0.06), transparent),
+        var(--bg);
+    }
+
+    .slide {
+      display: none;
+      width: min(1920px, 100vw);
+      aspect-ratio: 16 / 9;
+      max-height: 100vh;
+      padding: clamp(28px, 3.5vw, 56px) clamp(36px, 4.5vw, 72px);
+      flex-direction: column;
+      gap: clamp(14px, 1.8vh, 24px);
+    }
+
+    .slide.active { display: flex; }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      font-size: clamp(11px, 1.05vw, 13px);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dots button {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .dots button[aria-current="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(26px, 3vw, 48px);
+      font-weight: 700;
+      line-height: 1.12;
+      max-width: 22ch;
+      letter-spacing: -0.02em;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--amber);
+    }
+
+    .lead {
+      font-size: clamp(14px, 1.3vw, 20px);
+      color: var(--muted);
+      max-width: 54ch;
+      line-height: 1.45;
+    }
+
+    .grid-2 {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(16px, 2vw, 32px);
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: clamp(14px, 1.6vw, 24px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card h2 {
+      font-size: clamp(12px, 1.1vw, 15px);
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pain-bars { display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: center; }
+
+    .pain-row {
+      display: grid;
+      grid-template-columns: minmax(100px, 130px) 1fr 40px;
+      align-items: center;
+      gap: 10px;
+      font-size: clamp(12px, 1.05vw, 14px);
+    }
+
+    .pain-row .label { color: var(--muted); text-align: right; }
+
+    .bar-track {
+      height: clamp(20px, 2.2vh, 28px);
+      background: var(--panel2);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0b1220;
+      white-space: nowrap;
+    }
+
+    .bar-fill.approval { width: 100%; background: linear-gradient(90deg, var(--amber), #e8a020); }
+    .bar-fill.technical { width: 57%; background: var(--ink-blue); color: #0b1220; }
+    .bar-fill.shadow { width: 38%; background: var(--red); color: #0b1220; }
+
+    .pain-row .n { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .hero-stat { text-align: center; padding: clamp(8px, 1.2vw, 16px) 0; }
+
+    .hero-stat .number {
+      font-size: clamp(44px, 5.5vw, 80px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--amber);
+    }
+
+    .hero-stat .denom {
+      font-size: clamp(13px, 1.25vw, 18px);
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .hero-stat .source {
+      font-size: clamp(10px, 0.9vw, 12px);
+      color: #5a6a82;
+      margin-top: 6px;
+    }
+
+    .chain {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .chain-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: clamp(12px, 1.1vw, 15px);
+    }
+
+    .chain-step .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .chain-step.slow .dot { background: var(--amber); }
+    .chain-step.blocked .dot { background: var(--red); }
+
+    .chain-connector {
+      width: 2px;
+      height: 10px;
+      background: var(--border);
+      margin-left: 4px;
+    }
+
+    .chain-label {
+      font-size: clamp(11px, 1vw, 13px);
+      color: var(--muted);
+      padding-left: 22px;
+    }
+
+    .shadow-path {
+      margin-top: 8px;
+      padding: 12px 14px;
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.28);
+      border-radius: 8px;
+      font-size: clamp(12px, 1.05vw, 14px);
+      line-height: 1.4;
+    }
+
+    .shadow-path strong { color: var(--red); }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      flex: 1;
+    }
+
+    .compare-col {
+      background: var(--panel2);
+      border-radius: 12px;
+      padding: clamp(14px, 1.8vw, 24px);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .compare-col h3 {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 700;
+    }
+
+    .compare-col.us h3 { color: var(--ink-blue); }
+    .compare-col.de h3 { color: var(--amber); }
+
+    .time-block {
+      font-size: clamp(30px, 3.8vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .time-block span {
+      display: block;
+      font-size: clamp(11px, 1vw, 13px);
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0;
+    }
+
+    .illus {
+      font-size: clamp(10px, 0.9vw, 12px);
+      color: #5a6a82;
+      font-weight: 500;
+    }
+
+    .stakeholder-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .pill {
+      font-size: clamp(10px, 0.95vw, 13px);
+      padding: 6px 11px;
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .pill.highlight {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: rgba(240, 180, 41, 0.08);
+    }
+
+    .not-box {
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: rgba(5, 150, 105, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      font-size: clamp(13px, 1.15vw, 16px);
+      line-height: 1.45;
+    }
+
+    .not-box strong { color: var(--accent); }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .pipeline span {
+      padding: 12px 10px;
+      text-align: center;
+      font-size: clamp(11px, 1.05vw, 14px);
+      font-weight: 600;
+      border-right: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .pipeline span:last-child {
+      border-right: none;
+      color: var(--accent);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: clamp(10px, 0.95vw, 13px);
+      color: #5a6a82;
+      padding-top: 2px;
+      gap: 12px;
+    }
+
+    .nav-hint kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: clamp(14px, 1.25vw, 17px);
+      color: var(--text);
+    }
+
+    .logo span { color: var(--accent); }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.95em;
+      color: var(--ink-blue);
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <!-- SLIDE 1: Problem + evidence -->
+    <section class="slide active" id="slide-1" aria-label="Problem and evidence">
+      <div class="top-row">
+        <p class="eyebrow">Problem statement</p>
+        <div class="dots" role="tablist" aria-label="Slides">
+          <button type="button" aria-label="Slide 1" aria-current="true" data-go="0"></button>
+          <button type="button" aria-label="Slide 2" data-go="1"></button>
+        </div>
+      </div>
+      <h1>Enterprise AI fails on <em>approvals</em> — not models</h1>
+      <p class="lead">
+        Teams want employees on AI tools. The bottleneck is multi-stakeholder sign-off —
+        not model quality. When the official path stalls, shadow AI fills the gap.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>What practitioners complain about</h2>
+          <div class="hero-stat">
+            <div class="number">21<span style="font-size:0.45em;color:var(--muted)">/55</span></div>
+            <div class="denom">posts on approval friction — largest pain cluster</div>
+            <div class="source">Measured corpus · practitioner forums · 2026 · see docs/research</div>
+          </div>
+          <div class="pain-bars">
+            <div class="pain-row">
+              <span class="label">Approval process</span>
+              <div class="bar-track"><div class="bar-fill approval">largest cluster</div></div>
+              <span class="n">21</span>
+            </div>
+            <div class="pain-row">
+              <span class="label">Technical blockers</span>
+              <div class="bar-track"><div class="bar-fill technical"></div></div>
+              <span class="n">12</span>
+            </div>
+            <div class="pain-row">
+              <span class="label">Shadow AI</span>
+              <div class="bar-track"><div class="bar-fill shadow"></div></div>
+              <span class="n">8</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>What employees experience</h2>
+          <div class="chain">
+            <div class="chain-step slow"><span class="dot"></span> Employee requests Claude / ChatGPT</div>
+            <div class="chain-connector"></div>
+            <div class="chain-step slow"><span class="dot"></span> Legal · Procurement · IT review</div>
+            <div class="chain-connector"></div>
+            <div class="chain-step slow"><span class="dot"></span> Works Council (Germany — legal veto)</div>
+            <div class="chain-connector"></div>
+            <div class="chain-step blocked"><span class="dot"></span> Weeks of email · still no tool access</div>
+          </div>
+          <p class="chain-label">Official path stalls → shadow AI fills the gap</p>
+          <div class="shadow-path">
+            <strong>Shadow path:</strong> paste company data into private ChatGPT —
+            instant, ungoverned, unaudited.
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span class="logo">Trust<span>Flow</span></span>
+        <span class="nav-hint">1 / 2 · <kbd>→</kbd> or <kbd>Space</kbd> · Why Germany</span>
+      </footer>
+    </section>
+
+    <!-- SLIDE 2: Germany + positioning -->
+    <section class="slide" id="slide-2" aria-label="Why Germany first">
+      <div class="top-row">
+        <p class="eyebrow">Why Germany first</p>
+        <div class="dots" role="tablist" aria-label="Slides">
+          <button type="button" aria-label="Slide 1" data-go="0"></button>
+          <button type="button" aria-label="Slide 2" aria-current="true" data-go="1"></button>
+        </div>
+      </div>
+      <h1>We built for the <em>hardest</em> approval market</h1>
+      <p class="lead">
+        The Works Council (Betriebsrat) — elected worker representatives — holds a legal veto
+        over workplace AI under §87 German labor law. We built for that case; everywhere else is a subset.
+      </p>
+
+      <div class="compare">
+        <div class="compare-col us">
+          <h3>Typical enterprise</h3>
+          <div class="time-block">Weeks<span>Legal · IT · Procurement email chain</span></div>
+          <p class="illus">Illustrative — not a customer SLA study</p>
+          <div class="stakeholder-pills">
+            <span class="pill">Legal</span>
+            <span class="pill">IT</span>
+            <span class="pill">Procurement</span>
+          </div>
+        </div>
+        <div class="compare-col de">
+          <h3>Germany (+ co-determination)</h3>
+          <div class="time-block">Months<span>+ Works council agreement required</span></div>
+          <p class="illus">Illustrative — co-determination adds a hard gate</p>
+          <div class="stakeholder-pills">
+            <span class="pill">Legal</span>
+            <span class="pill">IT</span>
+            <span class="pill">Procurement</span>
+            <span class="pill highlight">Works Council</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="not-box">
+        <strong>Not another ticket queue.</strong>
+        Stakeholder agents negotiate which AI tools employees may use —
+        humans activate; a deterministic gateway enforces every inference.
+      </div>
+
+      <div class="pipeline" aria-label="TrustFlow pipeline">
+        <span>Agents propose</span>
+        <span>Compiler signs</span>
+        <span>Humans approve</span>
+        <span>Gateway enforces</span>
+      </div>
+
+      <footer class="footer">
+        <span class="logo">Trust<span>Flow</span></span>
+        <span class="nav-hint">2 / 2 · <kbd>←</kbd> back · then open <code>/glassbox</code></span>
+      </footer>
+    </section>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    let idx = 0;
+
+    function show(i) {
+      idx = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+      document.querySelectorAll('.dots button').forEach((b) => {
+        const go = Number(b.getAttribute('data-go'));
+        b.setAttribute('aria-current', go === idx ? 'true' : 'false');
+      });
+    }
+
+    document.querySelectorAll('.dots button').forEach((b) => {
+      b.addEventListener('click', () => show(Number(b.getAttribute('data-go'))));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        show(idx + 1);
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(idx - 1);
+      if (e.key === '1') show(0);
+      if (e.key === '2') show(1);
+      if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+      }
+    });
+
+    let touchX = 0;
+    document.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (dx < -40) show(idx + 1);
+      if (dx > 40) show(idx - 1);
+    });
+  </script>
+</body>
+</html>
